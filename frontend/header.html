@@ -1,0 +1,44 @@
+<header class="w-full bg-white shadow-sm fixed top-0 left-0 right-0 z-50">
+    <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+        
+        <a href="index.html" class="flex items-center">
+            <img 
+                src="https://cogimfotos.blob.core.windows.net/cogim-gallery/logo.png" 
+                alt="Cogim Cozinhas Logo" 
+                class="h-14 w-auto"
+            >
+        </a>
+        
+        <div class="flex items-center space-x-6">
+            
+            <nav id="main-nav" class="hidden lg:flex space-x-6 font-medium text-gray-700">
+                <a href="index.html#inicio" class="hover:text-primary transition duration-200" data-translate="nav-home">Início</a>
+                <a href="categoria.html" class="hover:text-primary transition duration-200" data-translate="nav-gallery">Galeria</a>
+                <a href="index.html#sobre" class="hover:text-primary transition duration-200" data-translate="nav-about">Sobre</a>
+                <div class="flex space-x-2">
+                  <a class="language-btn text-gray-700 hover:text-primary transition duration-200 cursor-pointer" 
+       data-lang="pt" 
+       onclick="changeLanguage('pt')">PT</a>
+    
+    <a class="language-btn text-gray-700 hover:text-primary transition duration-200 cursor-pointer" 
+       data-lang="en" 
+       onclick="changeLanguage('en')">EN</a>
+                </div>
+                <a href="tel:+258827288888" class="hover:text-primary transition duration-200" data-translate="footer-contact-link">Contacto</a>
+                <a href="#localizacao" class="hover:text-primary transition duration-200" data-translate="nav-location">Localização</a>
+            </nav>
+            
+            <div class="hidden lg:flex items-center space-x-4">
+                <a href="https://wa.me/258827288888" target="_blank" rel="noopener" class="whatsapp-contact-btn bg-green-500 text-white px-3 py-2 rounded-full flex items-center text-sm space-x-1">
+                    <i class="fa-brands fa-whatsapp whatsapp-icon-header"></i> 
+                    <span data-translate="whatsapp-contact">Entre em contacto</span>
+                </a>
+            </div>
+            
+            <button id="mobile-menu-btn" class="lg:hidden w-10 h-10 flex items-center justify-center text-gray-700">
+                <i class="ri-menu-line ri-2x"></i>
+            </button>
+        </div>
+        
+    </div>
+</header>

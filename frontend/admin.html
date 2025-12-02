@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - Cogim</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="categoria.css">
+
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Google OAuth -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- Facebook SDK -->
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/pt_PT/sdk.js#xfbml=1&version=v18.0&appId=YOUR_APP_ID&autoLogAppEvents=1"></script>
+    
+    <style>
+        .admin-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 163, 255, 0.1);
+            border: 2px solid rgba(0, 163, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .admin-card:hover {
+            box-shadow: 0 8px 30px rgba(0, 163, 255, 0.2);
+            border-color: var(--color-primary);
+            transform: translateY(-2px);
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, var(--color-primary), #0081CC);
+            color: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 163, 255, 0.3);
+        }
+        
+        .btn-admin {
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-admin:hover {
+            background: #0081CC;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 163, 255, 0.4);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--color-primary);
+            border: 2px solid var(--color-primary);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--color-primary);
+            color: white;
+        }
+        
+        .admin-sidebar {
+            background: linear-gradient(180deg, var(--color-primary), #0081CC);
+            min-height: calc(100vh - 160px);
+            margin-top: 80px;
+            border-radius: 12px 0 0 12px;
+            color: white;
+        }
+        
+        .admin-sidebar nav {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 0 !important;
+        }
+        
+        .sidebar-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin: 4px 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .sidebar-item:hover,
+        .sidebar-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+        
+        .content-section {
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        .lang-btn {
+            padding: 8px 16px;
+            border: 2px solid var(--color-primary);
+            background: transparent;
+            color: var(--color-primary);
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 4px;
+        }
+        
+        .lang-btn.active,
+        .lang-btn:hover {
+            background: var(--color-primary);
+            color: white;
+        }
+        
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 12px 24px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            background: white;
+            color: #374151;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .social-btn:hover {
+            border-color: var(--color-primary);
+            box-shadow: 0 4px 12px rgba(0, 163, 255, 0.2);
+        }
+        
+        .social-btn.google {
+            border-color: #db4437;
+            color: #db4437;
+        }
+        
+        .social-btn.google:hover {
+            background: #db4437;
+            color: white;
+        }
+        
+        .social-btn.facebook {
+            border-color: #1877f2;
+            color: #1877f2;
+        }
+        
+        .social-btn.facebook:hover {
+            background: #1877f2;
+            color: white;
+        }
+        
+        .divider {
+            position: relative;
+            text-align: center;
+            margin: 24px 0;
+        }
+        
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e5e7eb;
+        }
+        
+        .divider span {
+            background: white;
+            padding: 0 16px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .modal-overlay {
+            backdrop-filter: blur(4px);
+        }
+        
+        .auth-tabs {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 24px;
+        }
+        
+        .auth-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .auth-tab.active {
+            border-bottom-color: var(--color-primary);
+            color: var(--color-primary);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <img src="../public/images/logo.png" alt="Cogim Logo" class="h-12">
+                    <h1 class="text-2xl font-bold text-gray-800">Painel Administrativo</h1>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span id="admin-user" class="text-gray-600 font-medium"></span>
+                    <button id="logout-btn" class="btn-secondary">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Sair
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex min-h-screen pt-4">
+        <!-- Sidebar -->
+        <div class="admin-sidebar w-64">
+            <div class="p-6">
+                <h2 class="text-xl font-bold mb-6" data-translate="main-menu">Menu Principal</h2>
+                <nav>
+                    <div class="sidebar-item active" data-section="dashboard">
+                        <i class="fas fa-chart-bar mr-3"></i>
+                        <span data-translate="dashboard">Dashboard</span>
+                    </div>
+                    <div class="sidebar-item" data-section="gallery">
+                        <i class="fas fa-images mr-3"></i>
+                        <span data-translate="gallery">Galeria</span>
+                    </div>
+                    <div class="sidebar-item" data-section="content">
+                        <i class="fas fa-edit mr-3"></i>
+                        <span data-translate="content-management">Gestão de Conteúdo</span>
+                    </div>
+                    <div class="sidebar-item" data-section="messages">
+                        <i class="fas fa-envelope mr-3"></i>
+                        <span data-translate="messages">Mensagens</span>
+                    </div>
+                    <div class="sidebar-item" data-section="settings">
+                        <i class="fas fa-cog mr-3"></i>
+                        <span data-translate="settings">Configurações</span>
+                    </div>
+                    <div class="sidebar-item" data-section="users">
+                        <i class="fas fa-users mr-3"></i>
+                        <span data-translate="users">Utilizadores</span>
+                    </div>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 p-8">
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="content-section active">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Dashboard</h2>
+                    <p class="text-gray-600">Visão geral do sistema Cogim</p>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="stat-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-blue-100 text-sm">Total de Visualizações</p>
+                                <p class="text-3xl font-bold">2,847</p>
+                            </div>
+                            <i class="fas fa-eye text-4xl text-blue-200"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-blue-100 text-sm">Contactos Recebidos</p>
+                                <p class="text-3xl font-bold">127</p>
+                            </div>
+                            <i class="fas fa-phone text-4xl text-blue-200"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-blue-100 text-sm">Projetos Ativos</p>
+                                <p class="text-3xl font-bold">43</p>
+                            </div>
+                            <i class="fas fa-project-diagram text-4xl text-blue-200"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-blue-100 text-sm">Imagens na Galeria</p>
+                                <p class="text-3xl font-bold" id="gallery-count">0</p>
+                            </div>
+                            <i class="fas fa-images text-4xl text-blue-200"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="admin-card p-6 mb-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Ações Rápidas</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <button class="btn-admin">
+                            <i class="fas fa-plus"></i>
+                            Adicionar Imagem
+                        </button>
+                        <button class="btn-admin">
+                            <i class="fas fa-edit"></i>
+                            Editar Conteúdo
+                        </button>
+                        <button class="btn-admin">
+                            <i class="fas fa-chart-line"></i>
+                            Ver Relatórios
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="admin-card p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4" data-translate="recent-activity">Atividade Recente</h3>
+                    <div id="recent-activity-list" class="space-y-4">
+                        <!-- Activity items will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Management Section -->
+            <div id="content" class="content-section">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Gestão de Conteúdo</h2>
+                    <p class="text-gray-600">Edite o conteúdo das páginas do website</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="admin-card p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Página Principal</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Título Principal</label>
+                                <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="Móveis por Medida de Qualidade Superior">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Subtítulo</label>
+                                <textarea class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="3">Transformamos os seus sonhos em realidade com móveis personalizados de alta qualidade. Cozinhas, closets, racks e muito mais.</textarea>
+                            </div>
+                            <button class="btn-admin">
+                                <i class="fas fa-save"></i>
+                                Guardar Alterações
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="admin-card p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Informações de Contacto</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">WhatsApp</label>
+                                <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="+258 82 728 8888">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <input type="email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="info@cogim.co.mz">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Endereço</label>
+                                <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="Maputo, Moçambique">
+                            </div>
+                            <button class="btn-admin">
+                                <i class="fas fa-save"></i>
+                                Atualizar Contactos
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gallery Management Section -->
+            <div id="gallery" class="content-section">
+                <div class="mb-8 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800 mb-2">Gestão da Galeria</h2>
+                        <p class="text-gray-600">Gerir imagens e categorias da galeria</p>
+                    </div>
+                    <button class="btn-admin" id="add-image-btn">
+                        <i class="fas fa-plus"></i>
+                        Adicionar Imagem
+                    </button>
+                </div>
+
+                <div class="admin-card p-6">
+                    <div class="flex flex-wrap gap-4 mb-6">
+                        <button class="btn-admin category-filter active" data-category="all">Todas</button>
+                        <button class="btn-secondary category-filter" data-category="cozinhas">Cozinhas</button>
+                        <button class="btn-secondary category-filter" data-category="guardafatos">Guarda-fatos</button>
+                        <button class="btn-secondary category-filter" data-category="racks">Racks</button>
+                        <button class="btn-secondary category-filter" data-category="outros">Outros</button>
+                    </div>
+
+                    <div id="gallery-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                        <!-- Gallery images will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages Section -->
+            <div id="messages" class="content-section">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Mensagens</h2>
+                    <p class="text-gray-600">Contactos e mensagens recebidas</p>
+                </div>
+
+                <div class="admin-card p-6">
+                    <div class="space-y-4">
+                        <div class="border-b border-gray-200 pb-4">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">João Silva</h4>
+                                    <p class="text-gray-600 text-sm">+258 84 123 4567</p>
+                                    <p class="text-gray-700 mt-2">Gostaria de orçamento para uma cozinha moderna.</p>
+                                </div>
+                                <span class="text-gray-500 text-sm">Há 1 hora</span>
+                            </div>
+                            <div class="mt-3 flex gap-2">
+                                <button class="btn-admin text-sm">
+                                    <i class="fas fa-reply"></i>
+                                    Responder
+                                </button>
+                                <button class="btn-secondary text-sm">
+                                    <i class="fas fa-archive"></i>
+                                    Arquivar
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="border-b border-gray-200 pb-4">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">Maria Santos</h4>
+                                    <p class="text-gray-600 text-sm">+258 87 987 6543</p>
+                                    <p class="text-gray-700 mt-2">Preciso de um closet personalizado para o meu quarto.</p>
+                                </div>
+                                <span class="text-gray-500 text-sm">Há 3 horas</span>
+                            </div>
+                            <div class="mt-3 flex gap-2">
+                                <button class="btn-admin text-sm">
+                                    <i class="fas fa-reply"></i>
+                                    Responder
+                                </button>
+                                <button class="btn-secondary text-sm">
+                                    <i class="fas fa-archive"></i>
+                                    Arquivar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div id="settings" class="content-section">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Configurações</h2>
+                    <p class="text-gray-600">Configurações gerais do sistema</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="admin-card p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Configurações Visuais</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Cor Primária</label>
+                                <div class="flex items-center gap-3">
+                                    <input type="color" value="#00A3FF" class="w-12 h-10 border border-gray-300 rounded">
+                                    <input type="text" value="#00A3FF" class="flex-1 p-3 border border-gray-300 rounded-lg">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Logo</label>
+                                <input type="file" accept="image/*" class="w-full p-3 border border-gray-300 rounded-lg">
+                            </div>
+                            <button class="btn-admin">
+                                <i class="fas fa-palette"></i>
+                                Aplicar Alterações
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="admin-card p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Configurações de Sistema</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-700">Modo Manutenção</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-700">Notificações por Email</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" checked class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                            <button class="btn-admin">
+                                <i class="fas fa-save"></i>
+                                Guardar Configurações
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Section -->
+            <div id="users" class="content-section">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Utilizadores</h2>
+                    <p class="text-gray-600">Gestão de utilizadores do painel administrativo</p>
+                </div>
+
+                <div class="admin-card p-6">
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                                    D
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">Dono do Website</h4>
+                                    <p class="text-gray-600 text-sm">Administrador Principal</p>
+                                    <span class="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full mt-1">Ativo</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="btn-admin text-sm">
+                                    <i class="fas fa-edit"></i>
+                                    Editar
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                                    D
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">Desenvolvedora</h4>
+                                    <p class="text-gray-600 text-sm">Desenvolvedor & Suporte Técnico</p>
+                                    <span class="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full mt-1">Ativo</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="btn-admin text-sm">
+                                    <i class="fas fa-edit"></i>
+                                    Editar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-50 modal-overlay flex items-end justify-center z-50 pb-8">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <!-- Language Selector -->
+            <div class="flex justify-center mb-6">
+                <button class="lang-btn active" data-lang="pt" data-translate="lang-pt">PT</button>
+                <button class="lang-btn" data-lang="en" data-translate="lang-en">EN</button>
+            </div>
+            
+            <div class="text-center mb-6">
+                <img src="../public/images/logo.png" alt="Cogim Logo" class="h-16 mx-auto mb-4">
+                <h2 class="text-2xl font-bold text-gray-800" data-translate="admin-access">Acesso Administrativo</h2>
+                <p class="text-gray-600" data-translate="admin-subtitle">Entre com as suas credenciais</p>
+            </div>
+
+            <!-- Auth Tabs -->
+            <div class="auth-tabs">
+                <div class="auth-tab active" data-tab="login" data-translate="tab-login">Entrar</div>
+                <div class="auth-tab" data-tab="register" data-translate="tab-register">Criar Conta</div>
+            </div>
+
+            <!-- Social Login -->
+            <div class="space-y-3 mb-6">
+                <button class="social-btn google" id="google-signin">
+                    <i class="fab fa-google text-xl"></i>
+                    <span data-translate="continue-google">Continuar com Google</span>
+                </button>
+                <button class="social-btn facebook" id="facebook-signin">
+                    <i class="fab fa-facebook-f text-xl"></i>
+                    <span data-translate="continue-facebook">Continuar com Facebook</span>
+                </button>
+            </div>
+
+            <div class="divider">
+                <span data-translate="or">ou</span>
+            </div>
+
+            <!-- Login Form -->
+            <div id="login-form-container">
+                <form id="login-form">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="email-label">Email</label>
+                            <input type="email" id="login-email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="password-label">Palavra-passe</label>
+                            <input type="password" id="login-password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <span class="ml-2 text-sm text-gray-600" data-translate="remember-me">Lembrar-me</span>
+                            </label>
+                            <a href="#" class="text-sm text-blue-600 hover:text-blue-800" data-translate="forgot-password">Esqueceu a palavra-passe?</a>
+                        </div>
+                        <button type="submit" class="btn-admin w-full">
+                            <i class="fas fa-sign-in-alt"></i>
+                            <span data-translate="sign-in">Entrar</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Register Form -->
+            <div id="register-form-container" style="display: none;">
+                <form id="register-form">
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="first-name">Nome</label>
+                                <input type="text" id="register-firstname" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="last-name">Apelido</label>
+                                <input type="text" id="register-lastname" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="email-label">Email</label>
+                            <input type="email" id="register-email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="password-label">Palavra-passe</label>
+                            <input type="password" id="register-password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="confirm-password">Confirmar Palavra-passe</label>
+                            <input type="password" id="register-confirm-password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="role-label">Função</label>
+                            <select id="register-role" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="admin" data-translate="role-admin">Administrador</option>
+                                <option value="editor" data-translate="role-editor">Editor</option>
+                                <option value="viewer" data-translate="role-viewer">Visualizador</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="accept-terms" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" required>
+                            <label for="accept-terms" class="ml-2 text-sm text-gray-600">
+                                <span data-translate="accept-terms">Aceito os</span> 
+                                <a href="#" class="text-blue-600 hover:text-blue-800" data-translate="terms-conditions">Termos e Condições</a>
+                            </label>
+                        </div>
+                        <button type="submit" class="btn-admin w-full">
+                            <i class="fas fa-user-plus"></i>
+                            <span data-translate="create-account">Criar Conta</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Admin Quick Access -->
+            <div class="mt-6 pt-6 border-t border-gray-200">
+                <p class="text-sm text-gray-600 text-center mb-3" data-translate="admin-quick-access">Acesso rápido para administradores</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <button class="btn-secondary text-sm py-2" data-admin="owner">
+                        <i class="fas fa-crown mr-2"></i>
+                        <span data-translate="owner-access">Proprietário</span>
+                    </button>
+                    <button class="btn-secondary text-sm py-2" data-admin="developer">
+                        <i class="fas fa-code mr-2"></i>
+                        <span data-translate="dev-access">Desenvolvedora</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin-translations.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
