@@ -15,32 +15,30 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
-      # Passo 1: Checkout do código (necessário)
       - uses: actions/checkout@v3
         with:
           submodules: true
           lfs: false
           
-      # Passo 2: Build e Deploy para o Azure Static Web App (necessário)
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
-          # Use o seu token real aqui (segredo)
+          # Use o seu token real aqui
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ZEALOUS_BEACH_0A5AABE03 }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }} # Usado para integrações com o Github
+          repo_token: ${{ secrets.GITHUB_TOKEN }} # Usado para integrações com o Github (i.e. comentários PR)
           action: "upload"
           
-          ###### Configurações Corrigidas ######
-          # 1. Localização da App: Pasta 'Frontend'
+          ###### Configurações de Repositório/Build CORRIGIDAS ######
+          # 1. App source code path: Aponta para a pasta onde o index.html está
           app_location: "frontend"
           
-          # 2. Localização da API: Vazio
+          # 2. Api source code path: Deixado vazio, pois não há Azure Functions
           api_location: ""
           
-          # 3. Localização do Output: Raiz da pasta 'Frontend'
+          # 3. Built app content directory: O conteúdo servível está na raiz da pasta 'frontend'
           output_location: "/"
-          ###### Fim das Configurações Corrigidas ######
+          ###### Fim das Configurações de Repositório/Build ######
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
@@ -53,4 +51,3 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ZEALOUS_BEACH_0A5AABE03 }}
           action: "close"
-
