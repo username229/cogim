@@ -21,15 +21,16 @@ jobs:
           submodules: true
           lfs: false
           
-      # 2. 🛠️ Instalar Dependências (Executa na raiz onde está o package.json)
+      # 2. 🛠️ Instalar Dependências (Obrigatório, executado na Raiz)
       - name: Install Node Dependencies
         run: npm install
 
-      # 3. 🛠️ CORRIGIDO: Executar o Build do Frontend
-      # Usa 'working-directory' para forçar o npm a procurar o package.json dentro de 'frontend/'.
+      # 3. 🛠️ CORREÇÃO FINAL: Executar o Build
+      # Executa o script "build": "npm run build-css" diretamente da Raiz, 
+      # que é onde o package.json está.
       - name: Run Frontend Build
-        working-directory: frontend
-        run: npm run build
+        run: npm run build 
+        # ATENÇÃO: Nenhum prefixo ou working-directory é necessário aqui.
 
       # 4. Deploy para o Azure Static Web Apps (Apenas Upload)
       - name: Deploy to Azure Static Web Apps
@@ -42,8 +43,18 @@ jobs:
           action: "upload"
           
           # CONFIGURAÇÕES DE CAMINHO
+          # A aplicação final (index.html) está na pasta 'frontend'
           app_location: "frontend" 
-          output_location: "build" 
+          # O Tailwind NÃO CRIA uma pasta 'build', ele apenas cria o styles-clean.css. 
+          # O output location deve ser a pasta que contém o index.html, que é 'frontend'.
+          # No entanto, se o Azure Static Web App espera um output_location separado (como 'build') 
+          # e o seu código React/Vue está em 'frontend', você DEVE AJUSTAR SEU BUILD.
+          #
+          # Se este é um projeto HTML/CSS/JS simples (sem framework):
+          output_location: "" # <--- DEIXE VAZIO SE NÃO HOUVER PASTA DE SAÍDA (Tudo está em frontend)
+          
+          # Se o 'output_location' não for reconhecido, use 'frontend' como saída, 
+          # mas vamos tentar "" primeiro.
           api_location: ""
           
   close_pull_request_job:
