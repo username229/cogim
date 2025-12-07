@@ -8,7 +8,11 @@ const translations = {
         // Navegação
         'nav-home': 'Início',
         'nav-gallery': 'Galeria',
+<<<<<<< HEAD
         'nav-about': 'Sobre ',
+=======
+        'nav-about': 'Sobre a Cogim Cozinhas',
+>>>>>>> 6333dcf848ae64fd7587074f35a06b22539f9781
         'nav-location': 'Localização',
         
         // Página inicial - Hero
@@ -93,7 +97,11 @@ const translations = {
         'specialized-team-desc': 'Nossa equipe de profissionais é altamente qualificada e experiente em projetos de móveis planejados.',
         'personalized-service': 'Atendimento Personalizado',
         'personalized-service-desc': 'Oferecemos atendimento personalizado desde o projeto até a instalação dos móveis.',
+<<<<<<< HEAD
         'about-cogim-title': 'Sobre a Cogim',
+=======
+        'about-cogim-title': 'Sobre a Cogim Cozinhas',
+>>>>>>> 6333dcf848ae64fd7587074f35a06b22539f9781
         'about-cogim-p1': 'A Cogim Cozinhas é uma empresa especializada na fabricação de móveis planejados sob medida em Maputo, Moçambique. Com anos de experiência no mercado, nos destacamos pela qualidade dos nossos produtos e excelência no atendimento.',
         'about-cogim-p2': 'Nossa missão é transformar ambientes através de móveis funcionais e esteticamente agradáveis, sempre respeitando as necessidades e preferências dos nossos clientes.',
         '3d-projects': 'Projetos 3D',
@@ -126,7 +134,11 @@ const translations = {
         // Navigation
         'nav-home': 'Home',
         'nav-gallery': 'Gallery',
+<<<<<<< HEAD
         'nav-about': 'About',
+=======
+        'nav-about': 'About Cogim Kitchens',
+>>>>>>> 6333dcf848ae64fd7587074f35a06b22539f9781
         'nav-location': 'Location',
         
         // Homepage - Hero
@@ -211,8 +223,13 @@ const translations = {
         'specialized-team-desc': 'Our team of professionals is highly qualified and experienced in custom furniture projects.',
         'personalized-service': 'Personalized Service',
         'personalized-service-desc': 'We offer personalized service from design to furniture installation.',
+<<<<<<< HEAD
         'about-cogim-title': 'About Cogim',
         'about-cogim-p1': 'Cogim is a company specialized in manufacturing custom furniture in Maputo, Mozambique. With years of experience in the market, we stand out for the quality of our products and excellence in service.',
+=======
+        'about-cogim-title': 'About Cogim Kitchens',
+        'about-cogim-p1': 'Cogim Kitchens is a company specialized in manufacturing custom furniture in Maputo, Mozambique. With years of experience in the market, we stand out for the quality of our products and excellence in service.',
+>>>>>>> 6333dcf848ae64fd7587074f35a06b22539f9781
         'about-cogim-p2': 'Our mission is to transform environments through functional and aesthetically pleasing furniture, always respecting the needs and preferences of our clients.',
         '3d-projects': '3D Projects',
         'quality-guarantee': 'Quality Guarantee',

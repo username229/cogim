@@ -2,10 +2,14 @@
 html, body {
     min-height: 200vh;
     margin: 0;
+<<<<<<< HEAD
     padding-top: var(--navbar-height);
     padding-left: 0; /* Garante que o padding lateral é controlado apenas no main-container */
     padding-right: 0;
 
+=======
+    padding: 0;
+>>>>>>> 6333dcf848ae64fd7587074f35a06b22539f9781
     font-family: 'Poppins', sans-serif;
     /* Permite o scroll vertical */
     overflow-y: auto;
@@ -13,7 +17,11 @@ html, body {
 
 /* Variáveis de largura e altura */
 :root {
+<<<<<<< HEAD
     --navbar-height: 2rem; 
+=======
+    --navbar-height: 5rem; 
+>>>>>>> 6333dcf848ae64fd7587074f35a06b22539f9781
     --sidebar-width: 300px; 
     --sidebar-width-closed: 4rem; /* 64px */
     --footer-spacing: 64px;
@@ -24,7 +32,11 @@ html, body {
 
 #main-container {
     
+<<<<<<< HEAD
    
+=======
+    margin-top: var(--navbar-height); 
+>>>>>>> 6333dcf848ae64fd7587074f35a06b22539f9781
     height: auto; 
     
     max-width: 1600px; 
@@ -46,7 +58,10 @@ html, body {
     height: auto; 
     overflow-y: visible; 
     
+<<<<<<< HEAD
     
+=======
+>>>>>>> 6333dcf848ae64fd7587074f35a06b22539f9781
     /* Transição para suavizar a abertura/fechamento */
     transition: width 0.3s ease-in-out, transform 0.3s ease-in-out;
     transform: translateX(0);
@@ -63,7 +78,11 @@ html, body {
         padding-top: var(--desktop-gap);
         padding-bottom: var(--desktop-gap);
         
+<<<<<<< HEAD
       
+=======
+        margin-top: 0; 
+>>>>>>> 6333dcf848ae64fd7587074f35a06b22539f9781
     }
     
     /* * Torna a barra lateral Sticky no desktop.

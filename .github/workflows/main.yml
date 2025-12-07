@@ -1,0 +1,65 @@
+name: Azure Static Web Apps CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - main
+
+jobs:
+  build_and_deploy_job:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    runs-on: ubuntu-latest
+    name: Build and Deploy Job
+    steps:
+      # 1. Checkout do Código
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+          lfs: false
+          
+      # 2. 💡 NOVO PASSO: Instalar Dependências (Executado na Raiz, onde está o package.json)
+      # Isso resolve o erro de deteção do Oryx.
+      - name: Install Node Dependencies
+        run: npm install
+
+      # 3. 💡 NOVO PASSO: Executar o Build do Frontend
+      # Executa o script 'build' definido no seu package.json, direcionando-o para a subpasta 'frontend'.
+      - name: Run Frontend Build
+        run: npm run build --prefix frontend
+
+      # 4. Deploy para o Azure Static Web Apps (Ação Final)
+      # Esta ação agora APENAS faz o upload dos ficheiros que foram gerados nos passos anteriores.
+      - name: Deploy to Azure Static Web Apps
+        id: builddeploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          # TOKEN SECRETO
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ZEALOUS_BEACH_0A5AABE03 }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          
+          # CONFIGURAÇÕES DE CAMINHO
+          # O código está em 'frontend'
+          app_location: "frontend" 
+          
+          # A saída do build está em 'frontend/build' (ou a sua pasta de saída real)
+          output_location: "build" 
+          
+          # Não temos API (Azure Functions)
+          api_location: ""
+          
+  close_pull_request_job:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    name: Close Pull Request Job
+    steps:
+      - name: Close Pull Request
+        id: closepullrequest
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ZEALOUS_BEACH_0A5AABE03 }}
+          action: "close"

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 name: Azure Static Web Apps CI/CD
 
 on:
@@ -56,3 +57,74 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ZEALOUS_BEACH_0A5AABE03 }}
           action: "close"
+=======
+name: Azure Static Web Apps CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - main
+
+jobs:
+  build_and_deploy_job:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    runs-on: ubuntu-latest
+    name: Build and Deploy Job
+    steps:
+      # 1. Checkout do Código
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+          lfs: false
+          
+      # 2. Instalar Dependências (Executado na Raiz, onde está o package.json)
+      # 💡 Garantimos que o 'npm install' é executado primeiro.
+      - name: Install Node Dependencies
+        run: npm install
+
+      # 3. Executar o Build do Frontend
+      - name: Run Frontend Build
+        # Assumindo que o seu script 'build' no package.json lida com o frontend, 
+        # ou que você usa este comando para executar o build na subpasta.
+        run: npm run build --prefix frontend
+
+      # 4. Deploy para o Azure Static Web Apps
+      - name: Build And Deploy
+        id: builddeploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          # Use o seu token real aqui
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ZEALOUS_BEACH_0A5AABE03 }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          
+          # CONFIGURAÇÕES DE CAMINHO
+          # A App está na subpasta 'frontend'
+          app_location: "frontend" 
+          
+          # A saída do build é a pasta 'build' dentro da pasta 'frontend'
+          output_location: "build" 
+          
+          # Não temos API (Azure Functions) neste deploy
+          api_location: ""
+          
+          # O comando de build é executado ANTES (Passo 3), 
+          # então este parâmetro é desnecessário.
+          # app_build_command: "npm run build --prefix frontend"
+          
+  close_pull_request_job:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    name: Close Pull Request Job
+    steps:
+      - name: Close Pull Request
+        id: closepullrequest
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ZEALOUS_BEACH_0A5AABE03 }}
+          action: "close"
+>>>>>>> 6333dcf848ae64fd7587074f35a06b22539f9781
