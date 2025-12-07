@@ -1,0 +1,15 @@
+# Use a imagem oficial do Nginx
+FROM nginx:alpine
+
+# Remove a configuração padrão do Nginx
+RUN rm /etc/nginx/conf.d/default.conf
+
+# Copia os ficheiros de configuração do Nginx proxy
+# O ficheiro nginx.conf principal será copiado pelo docker-compose para o contêiner 'proxy'
+# Este contêiner 'frontend' apenas precisa de servir os arquivos:
+
+# Copia os arquivos estáticos do frontend para o diretório de serviço do Nginx
+COPY frontend /usr/share/nginx/html
+
+# Expõe a porta 80, que será usada internamente pelo proxy
+EXPOSE 80

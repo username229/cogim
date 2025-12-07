@@ -1,0 +1,203 @@
+
+html, body {
+    min-height: 200vh;
+    margin: 0;
+    padding-top: var(--navbar-height);
+    padding-left: 0; /* Garante que o padding lateral é controlado apenas no main-container */
+    padding-right: 0;
+
+    font-family: 'Poppins', sans-serif;
+    /* Permite o scroll vertical */
+    overflow-y: auto;
+}
+
+/* Variáveis de largura e altura */
+:root {
+    --navbar-height: 2rem; 
+    --sidebar-width: 300px; 
+    --sidebar-width-closed: 4rem; /* 64px */
+    --footer-spacing: 64px;
+    --layout-gap: 24px; 
+    --desktop-gap: 32px; 
+
+}
+
+#main-container {
+    
+   
+    height: auto; 
+    
+    max-width: 1600px; 
+    margin-left: auto;
+    margin-right: auto;
+    
+    /* Padding lateral padrão no mobile e desktop */
+    padding-left: var(--layout-gap);
+    padding-right: var(--layout-gap);
+}
+
+/* --- SIDEBAR (FILTROS) --- */
+
+#sidebar-menu {
+    position: sticky;
+    top: var(--navbar-height);
+    width: var(--sidebar-width);
+    flex-shrink: 0; 
+    height: auto; 
+    overflow-y: visible; 
+    
+    
+    /* Transição para suavizar a abertura/fechamento */
+    transition: width 0.3s ease-in-out, transform 0.3s ease-in-out;
+    transform: translateX(0);
+}
+
+/* --- LAYOUT DESKTOP (>= 1024px) --- */
+@media (min-width: 1024px) {
+    
+    /* Ativa o Flexbox e o espaçamento entre as colunas */
+    #main-container {
+        display: flex; 
+        gap: var(--desktop-gap); 
+        /* Adiciona padding superior e inferior (fora da área da navbar) */
+        padding-top: var(--desktop-gap);
+        padding-bottom: var(--desktop-gap);
+        
+      
+    }
+    
+    /* * Torna a barra lateral Sticky no desktop.
+     * Ela "gruda" na posição abaixo da navbar ao rolar.
+     */
+    #sidebar-menu {
+        top: var(--navbar-height); 
+        position: sticky; 
+    }
+    
+    /* ESTADO DE RECOLHIMENTO (DESKTOP) */
+    #sidebar-menu.sidebar-closed-desktop {
+        width: var(--sidebar-width-closed);
+        padding-left: 0.5rem; 
+        padding-right: 0.5rem;
+    }
+    
+    /* Ocultar textos no estado recolhido */
+    #sidebar-menu.sidebar-closed-desktop .sidebar-text,
+    #sidebar-menu.sidebar-closed-desktop .sidebar-title,
+    #sidebar-menu.sidebar-closed-desktop .ri-arrow-down-s-line { 
+        display: none !important;
+    }
+
+    /* Roda a seta do botão de recolher */
+    #sidebar-menu.sidebar-closed-desktop #toggle-desktop-btn i {
+        transform: rotate(180deg);
+    }
+    
+    /* Esconde submenus completamente */
+    #sidebar-menu.sidebar-closed-desktop .py-1 div.ml-4 {
+        display: none !important; 
+    }
+    
+    /* Centraliza ícones e esconde checkboxes no estado recolhido */
+    #sidebar-menu.sidebar-closed-desktop .filter-item-label {
+        justify-content: center !important;
+        padding-left: 0;
+        padding-right: 0;
+        /* Garante que o ícone é o único elemento visível do filtro */
+    }
+    #sidebar-menu.sidebar-closed-desktop .filter-item-label input {
+        display: none; /* Esconde o checkbox/radio */
+    }
+    
+    /* No desktop, o main-container já fornece o padding esquerdo/direito */
+    #gallery-content {
+        padding: 0;
+    }
+}
+
+/* --- LAYOUT MOBILE (< 1024px) --- */
+@media (max-width: 1023px) {
+    
+    /* Remove a margin-top do #main-container no mobile e usa padding-top no body/content */
+    #main-container {
+        margin-top: 0;
+        padding-top: var(--layout-gap);
+        padding-bottom: var(--layout-gap);
+    }
+
+    /* Reverte para FIXED como OVERLAY */
+    #sidebar-menu {
+        position: fixed; 
+        top: 0; 
+        height: 100vh;
+        z-index: 40; 
+        transform: translateX(-100%); 
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+        /* Volta a ter scroll interno no mobile (necessário para o overlay) */
+        overflow-y: auto; 
+    }
+    
+    /* Classe para abrir o menu no mobile */
+    .sidebar-open {
+        transform: translateX(0) !important; 
+    }
+    
+    /* Ocultar a scrollbar no mobile */
+    #sidebar-menu::-webkit-scrollbar {
+        display: none;
+    }
+    #sidebar-menu {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    
+    /* Garante que o backdrop cubra a Navbar no mobile */
+    #menu-backdrop {
+        top: 0 !important;
+    }
+}
+
+
+/* --- CONTEÚDO PRINCIPAL (GALERIA) --- */
+
+#gallery-content {
+    flex-grow: 1; /* Ocupa o espaço restante */
+    overflow-y: visible; 
+    height: auto; 
+    min-width: 0; /* Essencial para layouts flexíveis */
+}
+
+
+/* --- OUTROS ESTILOS DA GALERIA --- */
+
+/* Estilo do Card da Galeria */
+.gallery-card {
+    aspect-ratio: 4/3;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.gallery-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilo do Spinner de Loading */
+.spinner {
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+ .chatbot-hidden {
+            transform: scale(0.5);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+        }
+        .chatbot-visible {
+            transform: scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }

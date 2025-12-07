@@ -1,0 +1,42 @@
+{
+  "name": "cogim-website",
+  "version": "1.0.0",
+  "description": "Site da Cogim - Móveis por Medida",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "build": "npm run build-css",
+    "build-css": "tailwindcss -i ./frontend/src/input.css -o ./frontend/styles-clean.css --minify",
+    "build-css:watch": "tailwindcss -i ./frontend/src/input.css -o ./frontend/styles-clean.css --watch"
+  },
+  "keywords": [
+    "website",
+    "moveis",
+    "cozinhas",
+    "closets"
+  ],
+  "author": "Cogim",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "tailwindcss": "^3.4.18"
+  },
+  "dependencies": {
+    "@azure/identity": "^4.13.0",
+    "@azure/storage-blob": "^12.29.1",
+    "caniuse-lite": "^1.0.30001757",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.22.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/username229/cogim.git"
+  },
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/username229/cogim/issues"
+  },
+  "homepage": "https://github.com/username229/cogim#readme"
+}

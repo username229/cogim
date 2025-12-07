@@ -1,0 +1,28 @@
+{
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/assets/*.{js,css,png,jpg,gif}", "/api/*"]
+  },
+  "auth": {
+    "identityProviders": {
+      "azureActiveDirectory": {
+        "enabled": true,
+        "registration": {
+          // O Client ID do seu Registro de Aplicativo no Entra ID.
+          // O valor real do ID é salvo em Configurações > Application Settings do SWA.
+          "clientIdSettingName": "AZURE_CLIENT_ID",
+          
+          // O Segredo do Cliente (Client Secret).
+          // O valor real é salvo em Application Settings do SWA.
+          "clientSecretSettingName": "AZURE_CLIENT_SECRET"
+          
+          // O campo 'authority' (https://login.microsoftonline.com/YOUR_TENANT_ID)
+          // NÃO é necessário no SWA, pois ele infere isso do Azure.
+        }
+      }
+    }
+  },
+  "globalHeaders": {
+    "Content-Security-Policy": "default-src https: 'unsafe-eval' 'unsafe-inline'; object-src 'none';"
+  }
+}

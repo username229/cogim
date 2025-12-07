@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # 1. Serviço do Backend (Node.js Express)
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: cogim-backend
+    # Mapeia as variáveis de ambiente do seu .env local se necessário
+    env_file:
+      - .env.backend
+    expose:
+      - "3000" # expõe a porta internamente (para o Nginx)
+    networks:
+      - app-network
+
+  # 2. Serviço do Frontend (Nginx Estático)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: cogim-frontend
+    networks:
+      - app-network
+
+  # 3. Serviço do Proxy Reverso (Nginx)
+  proxy:
+    image: nginx:alpine
+    container_name: cogim-proxy
+    # Copia a configuração personalizada do Nginx para dentro do contêiner
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80" # Mapeia a porta 80 do contêiner para a porta 80 do seu host (http://localhost)
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
