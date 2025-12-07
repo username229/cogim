@@ -37,7 +37,7 @@ jobs:
           api_location: ""
           
           # 3. Built app content directory: O conteúdo servível está na raiz da pasta 'frontend'
-          output_location: "/"
+          output_location: "out"
           ###### Fim das Configurações de Repositório/Build ######
 
   close_pull_request_job:
@@ -51,3 +51,4 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ZEALOUS_BEACH_0A5AABE03 }}
           action: "close"
+
