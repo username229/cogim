@@ -15,41 +15,46 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
-      # 1. Checkout do Código
+      # 1. Checkout do código
       - uses: actions/checkout@v3
         with:
           submodules: true
           lfs: false
           
-      # 2. 💡 NOVO PASSO: Instalar Dependências (Executado na Raiz, onde está o package.json)
-      # Isso resolve o erro de deteção do Oryx.
+      # 2. 🛠️ Instalar Dependências (Obrigatório, executado na Raiz)
       - name: Install Node Dependencies
         run: npm install
 
-      # 3. 💡 NOVO PASSO: Executar o Build do Frontend
-      # Executa o script 'build' definido no seu package.json, direcionando-o para a subpasta 'frontend'.
+      # 3. 🛠️ CORREÇÃO FINAL: Executar o Build
+      # Executa o script "build": "npm run build-css" diretamente da Raiz, 
+      # que é onde o package.json está.
       - name: Run Frontend Build
-        run: npm run build --prefix frontend
+        run: npm run build 
+        # ATENÇÃO: Nenhum prefixo ou working-directory é necessário aqui.
 
-      # 4. Deploy para o Azure Static Web Apps (Ação Final)
-      # Esta ação agora APENAS faz o upload dos ficheiros que foram gerados nos passos anteriores.
+      # 4. Deploy para o Azure Static Web Apps (Apenas Upload)
       - name: Deploy to Azure Static Web Apps
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
-          # TOKEN SECRETO
+          # TOKEN SECRETO OBRIGATÓRIO
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ZEALOUS_BEACH_0A5AABE03 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
           
           # CONFIGURAÇÕES DE CAMINHO
-          # O código está em 'frontend'
+          # A aplicação final (index.html) está na pasta 'frontend'
           app_location: "frontend" 
+          # O Tailwind NÃO CRIA uma pasta 'build', ele apenas cria o styles-clean.css. 
+          # O output location deve ser a pasta que contém o index.html, que é 'frontend'.
+          # No entanto, se o Azure Static Web App espera um output_location separado (como 'build') 
+          # e o seu código React/Vue está em 'frontend', você DEVE AJUSTAR SEU BUILD.
+          #
+          # Se este é um projeto HTML/CSS/JS simples (sem framework):
+          output_location: "" # <--- DEIXE VAZIO SE NÃO HOUVER PASTA DE SAÍDA (Tudo está em frontend)
           
-          # A saída do build está em 'frontend/build' (ou a sua pasta de saída real)
-          output_location: "build" 
-          
-          # Não temos API (Azure Functions)
+          # Se o 'output_location' não for reconhecido, use 'frontend' como saída, 
+          # mas vamos tentar "" primeiro.
           api_location: ""
           
   close_pull_request_job:
