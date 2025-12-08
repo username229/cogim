@@ -1,19 +1,16 @@
 const { BlobServiceClient } = require("@azure/storage-blob");
-// IMPORTAR A CLASSE DE CREDENCIAL PADRÃO
 const { DefaultAzureCredential } = require("@azure/identity");
 
 // Função auxiliar para processar cada blob encontrado
-function processBlob(blob, prefix) {
+function processBlob(blob, prefix, accountName, containerName) {
     const fullPath = blob.name;
     const name = fullPath.substring(fullPath.lastIndexOf('/') + 1); // Apenas o nome do arquivo final
     
     // Ignora a entrada se for apenas o nome da 'pasta' (prefixo)
     if (name.length === 0) return null;
 
-    // Constrói a URL pública do Blob (IMPORTANTE: SUBSTITUIR PELO SEU ENDPOINT REAL)
-    // Se o seu Blob Storage for público ou usar SAS, defina a URL base aqui.
-    // Exemplo: https://cogimstorage.blob.core.windows.net
-    const BLOB_BASE_URL = "https://cogimfotos.blob.core.windows.net"; 
+    // Constrói a URL base para acesso público (ex: https://cogimfotos.blob.core.windows.net)
+    const BLOB_BASE_URL = `https://${accountName}.blob.core.windows.net`; 
     
     return {
         // Nome do arquivo (ex: 'minhafoto.jpg')
@@ -23,7 +20,8 @@ function processBlob(blob, prefix) {
         // A 'categoria' é o prefixo que o frontend usará (ex: 'cozinhas/ilha')
         categoria: prefix, 
         // A URL que o frontend usará para carregar a imagem
-        url: `${BLOB_BASE_URL}/${process.env.CONTAINER_NAME_BLOB}/${fullPath}`,
+        // Exemplo: https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinhas/ilha/minhafoto.jpg
+        url: `${BLOB_BASE_URL}/${containerName}/${fullPath}`, // 👈 CORRIGIDO: Usa a URL base dinâmica
         sizeBytes: blob.properties.contentLength,
         lastModified: blob.properties.lastModified
     };
@@ -46,11 +44,8 @@ module.exports = async function (context, req) {
         };
         return;
     }
-
     
-
     // LER OS FILTROS DO PARÂMETRO 'filters' NA QUERY STRING
-    // Recebemos uma string separada por vírgulas (ex: "cozinhas,salas-de-estar/sofás")
     const filtersString = req.query.filters || '';
     
     // Divide a string em um array de prefixos ativos
@@ -68,6 +63,7 @@ module.exports = async function (context, req) {
     const allFiles = [];
 
     try {
+        // Usa DefaultAzureCredential (Managed Identity, se configurado)
         const credential = new DefaultAzureCredential();
 
         const blobServiceClient = new BlobServiceClient(
@@ -85,7 +81,8 @@ module.exports = async function (context, req) {
 
             // Listar blobs usando o prefixo
             for await (const blob of containerClient.listBlobsFlat({ prefix: searchPrefix })) {
-                const fileData = processBlob(blob, prefix);
+                // Passa accountName e containerName para processBlob
+                const fileData = processBlob(blob, prefix, accountName, containerName); 
                 if (fileData) {
                     allFiles.push(fileData);
                 }
@@ -101,6 +98,7 @@ module.exports = async function (context, req) {
         };
 
     } catch (error) {
+        // Se a falha for de autenticação (o que tem acontecido), o erro será capturado aqui.
         context.log.error(`Erro ao processar blobs: ${error.message}`);
         context.res = {
             status: 500,

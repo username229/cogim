@@ -11,5 +11,15 @@
   "extensionBundle": {
     "id": "Microsoft.Azure.Functions.ExtensionBundle",
     "version": "[4.*, 5.0.0)"
+  },
+  "http": {
+    "maxConcurrentRequests": 50,
+    "maxOutstandingRequests": 200
+  },
+  "concurrency": {
+    "dynamicConcurrencyEnabled": true,
+    "snapshotPersistenceEnabled": true,
+    "maximumFunctionConcurrency": 10,
+    "defaultFunctionConcurrency": 5
   }
 }
