@@ -2,8 +2,8 @@
 const AZURE_BLOB_BASE_URL = "https://cogimfotos.blob.core.windows.net/cogim-gallery/";
 
 // --- CONFIGURAÇÃO DE DADOS ---
-const GALLERY_DATA_URL = "gallery_data.json"; 
-const FILTER_CONFIG_URL = "filter_config.json"; // NOVO/RESTAURADO: URL para o ficheiro de filtros
+const GALLERY_DATA_URL = "/frontend/gallery_data.json";
+const FILTER_CONFIG_URL = "/frontend/filter_config.json";
 
 // Variável global para armazenar todos os dados de imagem (a lista PLANA de URLs e metadados)
 let galleryImages = [];
