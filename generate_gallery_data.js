@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 
 // --- CONFIGURAÇÃO ---
-const CONNECTION_STRING = process.env.AZURE_STORAGE_CONNECTION_STRING;
+const CONNECTION_STRING = process.env.AZURE_STORAGE_CONNECTION_STRING ? process.env.AZURE_STORAGE_CONNECTION_STRING.trim() : null; 
 const CONTAINER_NAME = "cogim-gallery";
 const OUTPUT_FILE = "gallery_data.json";
 
