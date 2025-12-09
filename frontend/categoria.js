@@ -3,17 +3,20 @@
 // =======================================================
 const BLOB_BASE_URL = "https://cogimfotos.blob.core.windows.net/cogim-gallery";
 
-// Mapa de categorias/subcategorias → pastas no Blob
+// Mapa de categorias/subcategorias → pastas REAIS do Blob
 const pastaPorCategoria = {
+  // Cozinhas
   "cozinhas": "cozinha",
   "cozinha-bancada": "bancada",
   "cozinha-peninsula": "peninsula",
   "cozinha-ilha": "ilha",
 
+  // Guarda-fatos
   "guardafatos": "closet",
   "guardafato-portas-correr": "closetdoorcorrer",
   "guardafato-espelho": "closetdoorespelho",
 
+  // Simples
   "tetofalso": "teto-falso",
   "casa-de-banho": "bathroom",
   "racks": "rack",
@@ -24,39 +27,31 @@ const pastaPorCategoria = {
   "diverso": "diverso"
 };
 
+// Variáveis globais
 let imagensAtuais = [];
 let paginaAtual = 1;
 const itensPorPagina = 20;
 
 // =======================================================
-// LISTAR ARQUIVOS DO BLOB (SEM / NO FINAL!)
+// Função para listar arquivos do Blob de uma pasta real
 // =======================================================
 async function listarImagensBlob(pasta) {
-  const url = `${BLOB_BASE_URL}?restype=container&comp=list&prefix=${pasta}`;
-
-  console.log("🔎 Buscando Blob:", url);
+  const url = `${BLOB_BASE_URL}?restype=container&comp=list&prefix=${pasta}/`;
 
   const resp = await fetch(url);
-
   if (!resp.ok) {
-    console.error("❌ Erro Blob", resp.status, url);
+    console.error("Erro ao listar Blob:", resp.status, url);
     return [];
   }
 
   const xml = await resp.text();
-
-  // Captura todos os nomes <Name>FOLDER/arquivo.jpg</Name>
   const nomes = [...xml.matchAll(/<Name>(.*?)<\/Name>/g)].map(m => m[1]);
 
-  // Mantém apenas os arquivos dentro dessa pasta
-  const filtrados = nomes.filter(n => n.startsWith(pasta + "/"));
-
-  // Retorna URLs completas
-  return filtrados.map(name => `${BLOB_BASE_URL}/${name}`);
+  return nomes.map(name => `${BLOB_BASE_URL}/${name}`);
 }
 
 // =======================================================
-// Loading
+// Loading Spinner
 // =======================================================
 function mostrarLoading(show) {
   const spinner = document.getElementById("loading-spinner");
@@ -65,7 +60,7 @@ function mostrarLoading(show) {
 }
 
 // =======================================================
-// Render da galeria
+// Renderizar Galeria
 // =======================================================
 function renderGaleria() {
   const grid = document.getElementById("galeria-grid");
@@ -74,7 +69,10 @@ function renderGaleria() {
   grid.innerHTML = "";
 
   if (imagensAtuais.length === 0) {
-    grid.innerHTML = `<p class="col-span-full text-center text-gray-500 py-10">Nenhuma imagem encontrada.</p>`;
+    grid.innerHTML = `
+      <p class="col-span-full text-center text-gray-500 py-10">
+        Nenhuma imagem encontrada.
+      </p>`;
     return;
   }
 
@@ -86,8 +84,7 @@ function renderGaleria() {
     grid.innerHTML += `
       <div class="rounded-lg shadow-md overflow-hidden hover:scale-105 transition border border-gray-200">
         <img src="${url}" class="w-full h-48 object-cover"/>
-      </div>
-    `;
+      </div>`;
   });
 
   renderPaginacao();
@@ -108,8 +105,7 @@ function renderPaginacao() {
       <button onclick="irParaPagina(${i})"
         class="px-4 py-2 rounded-lg border ${i === paginaAtual ? "bg-indigo-600 text-white" : "bg-white text-gray-700"} shadow">
         ${i}
-      </button>
-    `;
+      </button>`;
   }
 }
 
@@ -119,40 +115,39 @@ function irParaPagina(p) {
 }
 
 // =======================================================
-// Aplicar filtros
+// Aplicar Filtros
 // =======================================================
 async function aplicarFiltros() {
   mostrarLoading(true);
 
-  const selecionadas = [];
+  let selecionadas = [];
 
+  // Categorias gerais
   document.querySelectorAll(".filtro-categoria:checked").forEach(c => {
     if (pastaPorCategoria[c.value]) {
       selecionadas.push(pastaPorCategoria[c.value]);
     }
   });
 
+  // Subcategorias
   document.querySelectorAll(".filtro-subcategoria:checked").forEach(s => {
     if (pastaPorCategoria[s.value]) {
       selecionadas.push(pastaPorCategoria[s.value]);
     }
   });
 
+  // Se "Tudo" está marcado
   const tudo = document.getElementById("tudo");
+  if (tudo && tudo.checked) {
+    selecionadas = Object.values(pastaPorCategoria);
+  }
 
   imagensAtuais = [];
 
-  if (tudo && tudo.checked) {
-    const pastas = Object.values(pastaPorCategoria);
-    for (const p of pastas) {
-      const imgs = await listarImagensBlob(p);
-      imagensAtuais.push(...imgs);
-    }
-  } else {
-    for (const p of selecionadas) {
-      const imgs = await listarImagensBlob(p);
-      imagensAtuais.push(...imgs);
-    }
+  // Carregar todas pastas selecionadas
+  for (const pasta of selecionadas) {
+    const imgs = await listarImagensBlob(pasta);
+    imagensAtuais.push(...imgs);
   }
 
   paginaAtual = 1;
@@ -161,7 +156,25 @@ async function aplicarFiltros() {
 }
 
 // =======================================================
-// Inicialização
+// Sidebar (Mobile e Desktop)
+// =======================================================
+function toggleMenu() {
+  const sidebar = document.getElementById("sidebar-menu");
+  const backdrop = document.getElementById("menu-backdrop");
+
+  sidebar.classList.toggle("-translate-x-full");
+  backdrop.classList.toggle("hidden");
+  backdrop.classList.toggle("opacity-0");
+  document.body.classList.toggle("overflow-hidden");
+}
+
+function toggleDesktopSidebar() {
+  const sidebar = document.getElementById("sidebar-menu");
+  sidebar.classList.toggle("collapsed");
+}
+
+// =======================================================
+// Início
 // =======================================================
 document.addEventListener("DOMContentLoaded", async () => {
   await aplicarFiltros();
