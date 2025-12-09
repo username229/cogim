@@ -3,6 +3,7 @@
     "id": "tudo",
     "nome_exibicao": "Tudo",
     "valor_filtro": "",
+    "pasta": "",
     "icone": "ri-layout-grid-line",
     "tipo": "principal",
     "cor": "indigo",
@@ -12,21 +13,25 @@
     "id": "cozinhas",
     "nome_exibicao": "Cozinhas",
     "valor_filtro": "cozinhas",
+    "pasta": "cozinha",
     "icone": "ri-restaurant-line",
     "tipo": "principal",
     "cor": "blue",
     "subcategorias": [
       {
         "nome_exibicao": "Com Bancada",
-        "valor_filtro": "cozinha-bancada"
+        "valor_filtro": "cozinha-bancada",
+        "pasta": "bancada"
       },
       {
         "nome_exibicao": "Península",
-        "valor_filtro": "cozinha-peninsula"
+        "valor_filtro": "peninsula",
+        "pasta": "cozinhas/cozinha-peninsula"
       },
       {
         "nome_exibicao": "Ilha",
-        "valor_filtro": "cozinha-ilha"
+        "valor_filtro": "cozinha-ilha",
+        "pasta": "ilha"
       }
     ]
   },
@@ -34,17 +39,20 @@
     "id": "guardafatos",
     "nome_exibicao": "Guarda-fatos",
     "valor_filtro": "guardafatos",
+    "pasta": "closet",
     "icone": "ri-closet-line",
     "tipo": "principal",
     "cor": "green",
     "subcategorias": [
       {
         "nome_exibicao": "Com Espelho",
-        "valor_filtro": "guardafato-espelho"
+        "valor_filtro": "guardafato-espelho",
+        "pasta": "closetdoorespelho"
       },
       {
         "nome_exibicao": "Porta de Correr",
-        "valor_filtro": "guardafato-portas-correr"
+        "valor_filtro": "guardafato-portas-correr",
+        "pasta": "closetdoorcorrer"
       }
     ]
   },
@@ -52,6 +60,7 @@
     "id": "tetofalso",
     "nome_exibicao": "Teto Falso",
     "valor_filtro": "tetofalso",
+    "pasta": "teto-falso",
     "icone": "ri-building-2-line",
     "tipo": "simples",
     "cor": "purple",
@@ -61,6 +70,7 @@
     "id": "casa-de-banho",
     "nome_exibicao": "Casa de Banho",
     "valor_filtro": "casa-de-banho",
+    "pasta": "bathroom",
     "icone": "ri-toilet-line",
     "tipo": "simples",
     "cor": "cyan",
@@ -70,6 +80,7 @@
     "id": "racks",
     "nome_exibicao": "Racks",
     "valor_filtro": "racks",
+    "pasta": "racks",
     "icone": "ri-tv-line",
     "tipo": "simples",
     "cor": "orange",
@@ -79,6 +90,7 @@
     "id": "camas",
     "nome_exibicao": "Camas",
     "valor_filtro": "camas",
+    "pasta": "camas",
     "icone": "ri-hotel-line",
     "tipo": "simples",
     "cor": "pink",
@@ -88,6 +100,7 @@
     "id": "cadeiras-sofas-e-mesas",
     "nome_exibicao": "Cadeiras, Sofás e Mesas",
     "valor_filtro": "cadeiras-sofas-e-mesas",
+    "pasta": "cadeirasofacama",
     "icone": "ri-sofa-line",
     "tipo": "simples",
     "cor": "indigo",
