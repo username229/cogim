@@ -3,13 +3,15 @@ const AZURE_BLOB_BASE_URL = "https://cogimfotos.blob.core.windows.net/cogim-gall
 
 // --- CONFIGURAÇÃO DE DADOS ---
 const GALLERY_DATA_URL = "gallery_data.json"; 
-const FILTER_CONFIG_URL = "filter_config.json"; // NOVO: URL para a configuração de filtros
+const FILTER_CONFIG_URL = "filter_config.json"; // NOVO/RESTAURADO: URL para o ficheiro de filtros
 
 // Variável global para armazenar todos os dados de imagem (a lista PLANA de URLs e metadados)
 let galleryImages = [];
 
+// REMOVIDO: O array FILTER_CONFIG_DATA foi removido, pois agora o conteúdo está no ficheiro JSON.
+
 // ==================================================================================================================================
-// FUNÇÕES DE CONTROLE DE LAYOUT (Sem Alterações)
+// FUNÇÕES DE CONTROLE DE LAYOUT
 // ==================================================================================================================================
 
 /**
@@ -87,22 +89,24 @@ async function fetchAndPrepareImageData() {
  * Cria o HTML para o card de imagem. 
  */
 function createImageCard(image) {
+    // CORREÇÃO: Garante que image.categoria é uma string para evitar erro .toUpperCase
+    const categoryName = image.categoria || 'desconhecida'; 
     const imageUrl = image.photoUrl; 
     const shortFileName = (image.file || 'projeto-sem-nome').split('.')[0].replace(/_/g, ' '); 
-    const placeholder = `https://placehold.co/400x300/e0e7ff/4338ca?text=Projeto+${image.categoria}`;
+    const placeholder = `https://placehold.co/400x300/e0e7ff/4338ca?text=Projeto+${categoryName}`;
 
     return `
         <div class="image-card bg-white rounded-xl shadow-md overflow-hidden transform hover:scale-[1.02] transition duration-300 ease-in-out cursor-pointer" 
-             data-categoria="${image.categoria}">
+             data-categoria="${categoryName}">
             <img 
                 src="${imageUrl}" 
-                alt="Projeto de ${image.categoria} ${shortFileName}" 
+                alt="Projeto de ${categoryName} ${shortFileName}" 
                 class="w-full h-40 object-cover" 
                 onerror="this.onerror=null; this.src='${placeholder}';"
             >
             <div class="p-3 text-center">
                 <p class="text-sm font-semibold text-gray-800 truncate">${shortFileName.charAt(0).toUpperCase() + shortFileName.slice(1)}</p>
-                <p class="text-xs text-indigo-500">${image.categoria.toUpperCase().replace('-', ' ')}</p>
+                <p class="text-xs text-indigo-500">${categoryName.toUpperCase().replace('-', ' ')}</p>
             </div>
         </div>
     `;
@@ -159,7 +163,7 @@ function filterAndRenderImages(allImages) {
 
     // 3. Aplica a filtragem com lógica OR
     const filteredImages = allImages.filter(image => {
-        // CORREÇÃO CRÍTICA: Adicionado (image.categorias || []) para prevenir o erro 'undefined.includes'
+        // CORREÇÃO: Usa (image.categorias || []) para evitar ReferenceError caso a chave falte
         return activeFilters.some(filterSlug => (image.categorias || []).includes(filterSlug));
     });
 
@@ -201,15 +205,16 @@ function toggleLoading(show) {
 }
 
 // ==================================================================================================================================
-// FUNÇÕES PARA CONSTRUÇÃO DINÂMICA DA SIDEBAR
+// FUNÇÕES PARA CONSTRUÇÃO DINÂMICA DA SIDEBAR (RESTAURADA)
 // ==================================================================================================================================
 
 /**
- * Faz o fetch da configuração dos filtros.
+ * Faz o fetch da configuração dos filtros a partir do ficheiro JSON.
+ * RESTAURADO: Usa fetch(FILTER_CONFIG_URL).
  */
 async function fetchFilterConfig() {
     try {
-        const response = await fetch(FILTER_CONFIG_URL);
+        const response = await fetch(FILTER_CONFIG_URL); 
         if (!response.ok) {
             throw new Error(`Falha ao carregar a configuração de filtros: ${response.status}`);
         }
@@ -295,7 +300,8 @@ function createCategoryHtml(category) {
  * Carrega a configuração e renderiza toda a sidebar de filtros.
  */
 async function generateSidebarFilters() {
-    const filterConfig = await fetchFilterConfig();
+    // Chama a função que faz o fetch do ficheiro filter_config.json
+    const filterConfig = await fetchFilterConfig(); 
     const ulList = document.getElementById('filter-list');
     
     if (!ulList) {
@@ -341,4 +347,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (sidebar) {
         sidebar.style.width = '20rem';
     }
-});
+}); 
