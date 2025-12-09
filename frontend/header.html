@@ -1,6 +1,9 @@
+
+
 <header class="w-full bg-white shadow-sm fixed top-0 left-0 right-0 z-50">
     <div class="container mx-auto px-4 py-3 flex items-center justify-between">
         
+        <!-- Logo -->
         <a href="index.html" class="flex items-center flex-shrink-0">
             <img 
                 src="https://cogimfotos.blob.core.windows.net/cogim-gallery/logo.png" 
@@ -11,6 +14,7 @@
         
         <div class="flex items-center space-x-4">
             
+            <!-- Menu Desktop -->
             <nav id="main-nav" class="hidden lg:flex space-x-6 font-medium text-gray-700">
                 <a href="index.html#inicio" class="hover:text-indigo-600 transition duration-200" data-translate="nav-home">Início</a>
                 <a href="categoria.html" class="hover:text-indigo-600 transition duration-200" data-translate="nav-gallery">Galeria</a>
@@ -19,101 +23,109 @@
                 <a href="tel:+258827288888" class="hover:text-indigo-600 transition duration-200" data-translate="footer-contact-link">Contacto</a>
             </nav>
             
-            <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-3">
                 
-                <div class="flex space-x-2 hidden sm:flex">
-                    <a class="language-btn text-gray-700 hover:text-indigo-600 transition duration-200 cursor-pointer" 
+                <!-- Botões de Idioma - AGORA VISÍVEL EM MOBILE -->
+                <div class="flex space-x-2">
+                    <a class="language-btn text-gray-700 hover:text-indigo-600 transition duration-200 cursor-pointer text-sm font-medium" 
                        data-lang="pt" 
                        onclick="changeLanguage('pt')">PT</a>
-                    <a class="language-btn text-gray-700 hover:text-indigo-600 transition duration-200 cursor-pointer" 
+                    <span class="text-gray-400">|</span>
+                    <a class="language-btn text-gray-700 hover:text-indigo-600 transition duration-200 cursor-pointer text-sm font-medium" 
                        data-lang="en" 
                        onclick="changeLanguage('en')">EN</a>
                 </div>
                 
-                <a href="https://wa.me/258827288888" target="_blank" rel="noopener" class="whatsapp-contact-btn bg-green-500 text-white px-2 py-1 rounded-full flex items-center text-sm space-x-1 hover:bg-green-600 transition duration-200 flex-shrink-0">
-                    <i class="fa-brands fa-whatsapp whatsapp-icon-header text-lg"></i> 
+                <!-- Botão WhatsApp - AGORA VISÍVEL EM MOBILE -->
+                <a href="https://wa.me/258827288888" 
+                   target="_blank" 
+                   rel="noopener" 
+                   class="whatsapp-contact-btn bg-green-500 text-white px-3 py-2 rounded-full flex items-center text-sm space-x-1 hover:bg-green-600 transition duration-200 flex-shrink-0">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> 
                     <span class="hidden md:inline" data-translate="whatsapp-contact">Entre em contacto</span> 
                 </a>
             </div>
             
-            <button id="mobile-menu-btn" onclick="toggleMenu()" class="lg:hidden w-10 h-10 flex items-center justify-center text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-lg" aria-label="Abrir Menu">
+            <!-- Botão Menu Mobile -->
+            <button id="mobile-menu-btn" 
+                    onclick="toggleMenu()" 
+                    class="lg:hidden w-10 h-10 flex items-center justify-center text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-lg" 
+                    aria-label="Abrir Menu">
                 <i id="menu-icon" class="ri-menu-line ri-2x"></i>
             </button>
         </div>
         
     </div>
     
+    <!-- Menu Mobile -->
     <div id="mobile-menu-panel" class="hidden lg:hidden bg-white shadow-lg border-t border-gray-100 absolute top-[70px] w-full pb-4">
         <nav class="flex flex-col space-y-2 px-4 py-3 font-medium text-gray-700">
             <a href="index.html#inicio" onclick="toggleMenu()" class="mobile-link block py-2 hover:bg-gray-100 px-2 rounded transition duration-200" data-translate="nav-home">Início</a>
             <a href="categoria.html" onclick="toggleMenu()" class="mobile-link block py-2 hover:bg-gray-100 px-2 rounded transition duration-200" data-translate="nav-gallery">Galeria</a>
             <a href="index.html#sobre" onclick="toggleMenu()" class="mobile-link block py-2 hover:bg-gray-100 px-2 rounded transition duration-200" data-translate="nav-about">Sobre</a>
             <a href="#localizacao" onclick="toggleMenu()" class="mobile-link block py-2 hover:bg-gray-100 px-2 rounded transition duration-200" data-translate="nav-location">Localização</a>
-            
             <a href="tel:+258827288888" onclick="toggleMenu()" class="mobile-link block py-2 hover:bg-gray-100 px-2 rounded transition duration-200" data-translate="footer-contact-link">Contacto</a>
-            
-            <hr class="border-gray-100 mt-2 mb-2"/>
-            
-            <div class="flex justify-center pt-2">
-    <a href="https://wa.me/258827288888" 
-       target="_blank" 
-       rel="noopener" 
-       class="whatsapp-contact-btn bg-green-500 text-white p-4 rounded-full flex items-center justify-center hover:bg-green-600 transition duration-200 flex-shrink-0"
-       aria-label="Entre em contacto via WhatsApp">
-        
-        <i class="fa-brands fa-whatsapp whatsapp-icon-header text-3xl **text-white**"></i> 
-    </a> 
-</div>
-            
-            </nav>
+        </nav>
     </div>
 </header>
 
+<!-- Espaçador para compensar o header fixo -->
+<div class="h-20"></div>
+
+<!-- Conteúdo de exemplo -->
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-4">Teste o Header em Mobile</h1>
+    <p class="text-gray-700">Redimensione a janela ou abra no celular para ver os botões PT/EN e WhatsApp visíveis.</p>
+    <div class="mt-8 space-y-4">
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        <p>Scroll para testar o header fixo.</p>
+        <div class="h-screen bg-gray-100 flex items-center justify-center">
+            <p class="text-gray-500">Continue scrolling...</p>
+        </div>
+    </div>
+</div>
+
 <script>
-    // Seleciona os elementos do HTML usando seus IDs
+    // Função de troca de idioma (placeholder)
+    function changeLanguage(lang) {
+        console.log('Idioma alterado para:', lang);
+        alert('Idioma alterado para: ' + lang.toUpperCase());
+    }
+
+    // Seleciona os elementos do HTML
     const mobileMenuPanel = document.getElementById('mobile-menu-panel');
     const menuIcon = document.getElementById('menu-icon');
     
-    // Função principal para abrir/fechar o menu móvel
+    // Função para abrir/fechar o menu móvel
     function toggleMenu() {
-        // 1. Alterna a classe 'hidden' no painel do menu
-        // Esta classe é o que o Tailwind usa para ocultar/mostrar elementos
         mobileMenuPanel.classList.toggle('hidden');
         
-        // 2. Troca o ícone (Menu <-> Fechar) para feedback visual
         if (mobileMenuPanel.classList.contains('hidden')) {
-            // Menu está fechado: mostra o ícone de menu (3 barras)
             menuIcon.classList.remove('ri-close-line');
             menuIcon.classList.add('ri-menu-line');
         } else {
-            // Menu está aberto: mostra o ícone de fechar (X)
             menuIcon.classList.remove('ri-menu-line');
             menuIcon.classList.add('ri-close-line');
         }
     }
     
-    // 3. Lógica para fechar o menu automaticamente ao redimensionar (volta para o desktop)
+    // Fecha o menu ao redimensionar para desktop
     window.addEventListener('resize', () => {
-        // 1024px é o breakpoint 'lg' do Tailwind
         if (window.innerWidth >= 1024) { 
-            // Se o menu estiver aberto, feche-o
             if (!mobileMenuPanel.classList.contains('hidden')) {
                 toggleMenu(); 
             }
         }
     });
 
-    // 4. Fecha o menu se um link interno for clicado (melhora a experiência do usuário)
+    // Fecha o menu ao clicar em links
     document.querySelectorAll('#mobile-menu-panel a').forEach(link => {
         link.addEventListener('click', () => {
-            // Se o menu estiver aberto e um link for clicado, feche-o
             if (!mobileMenuPanel.classList.contains('hidden')) {
-                // Atraso de 100ms para permitir que a navegação comece
                 setTimeout(toggleMenu, 100); 
             }
         });
     });
-
-    // Observação: Certifique-se de que a função changeLanguage(lang) também está definida em seu script.
-
 </script>
+
+<
