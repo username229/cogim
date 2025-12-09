@@ -1,0 +1,96 @@
+[
+  {
+    "id": "tudo",
+    "nome_exibicao": "Tudo",
+    "valor_filtro": "",
+    "icone": "ri-layout-grid-line",
+    "tipo": "principal",
+    "cor": "indigo",
+    "subcategorias": []
+  },
+  {
+    "id": "cozinhas",
+    "nome_exibicao": "Cozinhas",
+    "valor_filtro": "cozinhas",
+    "icone": "ri-restaurant-line",
+    "tipo": "principal",
+    "cor": "blue",
+    "subcategorias": [
+      {
+        "nome_exibicao": "Com Bancada",
+        "valor_filtro": "cozinha-bancada"
+      },
+      {
+        "nome_exibicao": "Península",
+        "valor_filtro": "cozinha-peninsula"
+      },
+      {
+        "nome_exibicao": "Ilha",
+        "valor_filtro": "cozinha-ilha"
+      }
+    ]
+  },
+  {
+    "id": "guardafatos",
+    "nome_exibicao": "Guarda-fatos",
+    "valor_filtro": "guardafatos",
+    "icone": "ri-closet-line",
+    "tipo": "principal",
+    "cor": "green",
+    "subcategorias": [
+      {
+        "nome_exibicao": "Com Espelho",
+        "valor_filtro": "guardafato-espelho"
+      },
+      {
+        "nome_exibicao": "Porta de Correr",
+        "valor_filtro": "guardafato-portas-correr"
+      }
+    ]
+  },
+  {
+    "id": "tetofalso",
+    "nome_exibicao": "Teto Falso",
+    "valor_filtro": "tetofalso",
+    "icone": "ri-building-2-line",
+    "tipo": "simples",
+    "cor": "purple",
+    "subcategorias": []
+  },
+  {
+    "id": "casa-de-banho",
+    "nome_exibicao": "Casa de Banho",
+    "valor_filtro": "casa-de-banho",
+    "icone": "ri-toilet-line",
+    "tipo": "simples",
+    "cor": "cyan",
+    "subcategorias": []
+  },
+  {
+    "id": "racks",
+    "nome_exibicao": "Racks",
+    "valor_filtro": "racks",
+    "icone": "ri-tv-line",
+    "tipo": "simples",
+    "cor": "orange",
+    "subcategorias": []
+  },
+  {
+    "id": "camas",
+    "nome_exibicao": "Camas",
+    "valor_filtro": "camas",
+    "icone": "ri-hotel-line",
+    "tipo": "simples",
+    "cor": "pink",
+    "subcategorias": []
+  },
+  {
+    "id": "cadeiras-sofas-e-mesas",
+    "nome_exibicao": "Cadeiras, Sofás e Mesas",
+    "valor_filtro": "cadeiras-sofas-e-mesas",
+    "icone": "ri-sofa-line",
+    "tipo": "simples",
+    "cor": "indigo",
+    "subcategorias": []
+  }
+]
