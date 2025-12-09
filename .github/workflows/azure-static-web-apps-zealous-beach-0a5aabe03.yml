@@ -34,6 +34,9 @@ jobs:
         env:
           # Passa o segredo do GitHub para o script Node.js
           AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
       
       # 3. 🛠️ Executar o Build
       # O ficheiro gallery_data.json agora existe e é incluído na próxima etapa de deployment.
