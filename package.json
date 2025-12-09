@@ -7,9 +7,7 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "build": "npm run build-css",
-    "build-css": "tailwindcss -i ./frontend/src/input.css -o ./frontend/styles-clean.css --minify",
-    "build-css:watch": "tailwindcss -i ./frontend/src/input.css -o ./frontend/styles-clean.css --watch"
-  },
+"build-css": "npx tailwindcss -i ./frontend/src/input.css -o ./frontend/styles-clean.css --minify"  },
   "keywords": [
     "website",
     "moveis",
