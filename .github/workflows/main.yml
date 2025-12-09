@@ -8,59 +8,50 @@ on:
     types: [opened, synchronize, reopened, closed]
     branches:
       - main
+
 jobs:
   build_and_deploy_job:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: Build and Deploy Job
+
     steps:
-      # 1. Checkout do código
       - uses: actions/checkout@v3
         with:
           submodules: true
           lfs: false
-          
-      # 2. 🛠️ Instalar Dependências (Obrigatório)
-      # Isto instalará @azure/storage-blob e outras dependências listadas no package.json.
+
+      # 1️⃣ Instalar dependências dentro do frontend/
       - name: Install Node Dependencies
+        working-directory: frontend
         run: npm install
 
-      # ====================================================================================
-      # 💥 PASSO NOVO: Geração de Dados a partir do Azure Blob Storage
-      # Este script cria o ficheiro gallery_data.json na raiz do projeto.
-      # ====================================================================================
+      # 2️⃣ Gerar gallery_data.json na raiz (continua igual)
       - name: ⚙️ Gerar gallery_data.json a partir do Blob Storage
         run: node generate_gallery_data.js
         env:
-          # Passa o segredo do GitHub para o script Node.js
           AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
-      
-      # 3. 🛠️ Executar o Build
-      # O ficheiro gallery_data.json agora existe e é incluído na próxima etapa de deployment.
+
+      # 3️⃣ Build do frontend — AGORA NO DIRETÓRIO CORRETO
       - name: Run Frontend Build
-        run: npm run build 
-        
-      # 4. Deploy para o Azure Static Web Apps (Apenas Upload)
-      # O deploy irá agora incluir o ficheiro gallery_data.json gerado.
+        working-directory: frontend
+        run: npm run build
+
+      # 4️⃣ Deploy na Static Web App
       - name: Deploy to Azure Static Web Apps
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
-          # TOKEN SECRETO OBRIGATÓRIO (MANTIDO)
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ZEALOUS_BEACH_0A5AABE03 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          
-          # CONFIGURAÇÕES DE CAMINHO (MANTIDAS)
-          app_location: "frontend" 
-          output_location: "" 
+          app_location: "frontend"
+          output_location: ""
           api_location: ""
-          
 
-          
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
     runs-on: ubuntu-latest
