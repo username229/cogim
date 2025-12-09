@@ -25,8 +25,8 @@
       },
       {
         "nome_exibicao": "Península",
-        "valor_filtro": "peninsula",
-        "pasta": "cozinhas/cozinha-peninsula"
+        "valor_filtro": "cozinha-peninsula",
+        "pasta": "peninsula"
       },
       {
         "nome_exibicao": "Ilha",
@@ -80,7 +80,7 @@
     "id": "racks",
     "nome_exibicao": "Racks",
     "valor_filtro": "racks",
-    "pasta": "racks",
+    "pasta": "rack",
     "icone": "ri-tv-line",
     "tipo": "simples",
     "cor": "orange",
@@ -90,7 +90,7 @@
     "id": "camas",
     "nome_exibicao": "Camas",
     "valor_filtro": "camas",
-    "pasta": "camas",
+    "pasta": "cama",
     "icone": "ri-hotel-line",
     "tipo": "simples",
     "cor": "pink",
@@ -104,6 +104,26 @@
     "icone": "ri-sofa-line",
     "tipo": "simples",
     "cor": "indigo",
+    "subcategorias": []
+  },
+  {
+    "id": "customizado",
+    "nome_exibicao": "Customizado",
+    "valor_filtro": "customizado",
+    "pasta": "customizado",
+    "icone": "ri-tools-line",
+    "tipo": "simples",
+    "cor": "yellow",
+    "subcategorias": []
+  },
+  {
+    "id": "diverso",
+    "nome_exibicao": "Diverso",
+    "valor_filtro": "diverso",
+    "pasta": "diverso",
+    "icone": "ri-gallery-line",
+    "tipo": "simples",
+    "cor": "gray",
     "subcategorias": []
   }
 ]

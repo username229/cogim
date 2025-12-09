@@ -18,15 +18,18 @@
     "subcategorias": [
       {
         "nome_exibicao": "Com Bancada",
-        "valor_filtro": "cozinha-bancada"
+        "valor_filtro": "cozinha-bancada",
+        "pasta": "bancada"
       },
       {
         "nome_exibicao": "Península",
-        "valor_filtro": "cozinha-peninsula"
+        "valor_filtro": "cozinha-peninsula",
+        "pasta": "peninsula"
       },
       {
         "nome_exibicao": "Ilha",
-        "valor_filtro": "cozinha-ilha"
+        "valor_filtro": "cozinha-ilha",
+        "pasta": "ilha"
       }
     ]
   },
@@ -40,11 +43,13 @@
     "subcategorias": [
       {
         "nome_exibicao": "Com Espelho",
-        "valor_filtro": "guardafato-espelho"
+        "valor_filtro": "guardafato-espelho",
+        "pasta": "closetdoorespelho"
       },
       {
         "nome_exibicao": "Porta de Correr",
-        "valor_filtro": "guardafato-portas-correr"
+        "valor_filtro": "guardafato-portas-correr",
+        "pasta": "closetdoorcorrer"
       }
     ]
   },
@@ -73,7 +78,8 @@
     "icone": "ri-tv-line",
     "tipo": "simples",
     "cor": "orange",
-    "subcategorias": []
+    "subcategorias": [],
+    "pasta": "rack"
   },
   {
     "id": "camas",
@@ -82,7 +88,8 @@
     "icone": "ri-hotel-line",
     "tipo": "simples",
     "cor": "pink",
-    "subcategorias": []
+    "subcategorias": [],
+    "pasta": "cama"
   },
   {
     "id": "cadeiras-sofas-e-mesas",
@@ -91,6 +98,27 @@
     "icone": "ri-sofa-line",
     "tipo": "simples",
     "cor": "indigo",
-    "subcategorias": []
+    "subcategorias": [],
+    "pasta": "cadeirasofacama"
+  },
+  {
+    "id": "customizado",
+    "nome_exibicao": "Customizado",
+    "valor_filtro": "customizado",
+    "icone": "ri-tools-line",
+    "tipo": "simples",
+    "cor": "yellow",
+    "subcategorias": [],
+    "pasta": "customizado"
+  },
+  {
+    "id": "diverso",
+    "nome_exibicao": "Diverso",
+    "valor_filtro": "diverso",
+    "icone": "ri-gallery-line",
+    "tipo": "simples",
+    "cor": "gray",
+    "subcategorias": [],
+    "pasta": "diverso"
   }
 ]
