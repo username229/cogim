@@ -1,33 +1,31 @@
 // URL Base do seu Azure Blob Storage Container.
 const AZURE_BLOB_BASE_URL = "https://cogimfotos.blob.core.windows.net/cogim-gallery/";
 
-// ENDPOINT SEGURO DO SEU BACKEND
-const AZURE_API_ENDPOINT = "https://listfotoscogim-hwa0hegmfcd7hrh0.southafricanorth-01.azurewebsites.net/api/gallery-data";
+// --- CONFIGURAÇÃO DE DADOS ---
+const GALLERY_DATA_URL = "gallery_data.json"; 
+const FILTER_CONFIG_URL = "filter_config.json"; // NOVO: URL para a configuração de filtros
+
 // Variável global para armazenar todos os dados de imagem (a lista PLANA de URLs e metadados)
 let galleryImages = [];
 
 // ==================================================================================================================================
-// FUNÇÕES DE CONTROLE DE LAYOUT
+// FUNÇÕES DE CONTROLE DE LAYOUT (Sem Alterações)
 // ==================================================================================================================================
 
 /**
  * Alterna a visibilidade do menu lateral (Sidebar) em dispositivos móveis.
- * Manipula o backdrop e a visibilidade da sidebar.
  */
 function toggleMenu() {
     const sidebar = document.getElementById('sidebar-menu');
     const backdrop = document.getElementById('menu-backdrop');
     
-    // Alterna a classe que move a sidebar para dentro/fora do ecrã
     sidebar.classList.toggle('translate-x-0');
     sidebar.classList.toggle('-translate-x-full');
     
-    // Alterna a visibilidade do backdrop e permite/impede cliques
     backdrop.classList.toggle('hidden');
     backdrop.classList.toggle('pointer-events-auto');
     backdrop.classList.toggle('opacity-0');
     
-    // Trava o scroll no body enquanto o menu estiver aberto
     document.body.classList.toggle('overflow-hidden');
 }
 
@@ -40,22 +38,16 @@ function toggleDesktopSidebar() {
     const titles = document.querySelectorAll('.sidebar-title');
     const textElements = document.querySelectorAll('.sidebar-text');
 
-    // 1. Alterna a classe 'collapsed' na sidebar
     sidebar.classList.toggle('collapsed');
     
-    // 2. Alterna as larguras via classes Tailwind
     if (sidebar.classList.contains('collapsed')) {
-        // Estado Recolhido
         sidebar.style.width = '5rem'; 
         icon.classList.add('rotate-180');
-        // Esconde o texto/títulos
         titles.forEach(el => el.classList.add('hidden'));
         textElements.forEach(el => el.classList.add('hidden'));
     } else {
-        // Estado Expandido (Padrão)
         sidebar.style.width = '20rem'; 
         icon.classList.remove('rotate-180');
-        // Mostra o texto/títulos
         titles.forEach(el => el.classList.remove('hidden'));
         textElements.forEach(el => el.classList.remove('hidden'));
     }
@@ -67,72 +59,32 @@ function toggleDesktopSidebar() {
 // ==================================================================================================================================
 
 /**
- * Faz a requisição ao seu Endpoint de Backend, obtém os dados e os achata (flatten).
- * 🔑 IMPLEMENTAÇÃO: Infere TODOS os slugs de pastas (categorias/subcategorias) a partir do URL do blob.
- * @returns {Promise<Array<object>>} Uma promessa que resolve para um array plano de objetos de foto.
- */
-/**
- * 从Azure API获取并处理图片数据
- * 该函数异步获取图片数据，将其扁平化处理，并提取相关分类信息
- * @returns {Promise<Array>} 返回一个包含处理后图片数据的Promise，每个图片对象包含URL、分类、主分类和文件名
+ * Faz a requisição ao ficheiro JSON estático e obtém a lista plana de imagens.
  */
 async function fetchAndPrepareImageData() {
-        // 使用fetch API调用Azure API端点获取数据
+    toggleLoading(true);
+    
     try {
-        const response = await fetch(AZURE_API_ENDPOINT);
+        const response = await fetch(GALLERY_DATA_URL);
         
         if (!response.ok) {
-            throw new Error(`Falha ao buscar dados da galeria. Status: ${response.status}`);
+             throw new Error(`Falha ao carregar o ficheiro de dados: ${response.status}`);
         }
         
-        const categorizedData = await response.json();
-        const flatImages = [];
-
-        categorizedData.forEach(category => {
-            const mainCategorySlug = category.slug; // Ex: 'cozinhas'
-
-            category.fotos.forEach(photoUrl => {
-                
-                // --- LÓGICA ROBUSTA DE EXTRAÇÃO DE SLUGS DE PASTAS DO URL ---
-                
-                // 1. Remove a URL base (ex: 'cozinhas/modernas/ilhadas/foto.jpg')
-                const path = photoUrl.replace(AZURE_BLOB_BASE_URL, '');
-                
-                // 2. Pega o caminho das pastas (ex: 'cozinhas/modernas/ilhadas')
-                const folderPath = path.substring(0, path.lastIndexOf('/'));
-                
-                // 3. Cria um array de slugs. Filtra vazios.
-                let imageSlugs = folderPath.split('/').filter(slug => slug.length > 0);
-                
-                // 4. Garante que o slug principal do seu backend e os slugs da pasta sejam incluídos
-                const allSlugs = new Set([mainCategorySlug, ...imageSlugs]);
-                
-                // ----------------------------------------------------------------------
-                
-                flatImages.push({
-                    photoUrl: photoUrl,
-                    // Novo: array de todos os slugs de pastas/categorias
-                    categorias: Array.from(allSlugs), 
-                    // Mantém a categoria principal (slug) para placeholders, etc.
-                    categoria: mainCategorySlug,
-                    file: path.split('/').pop()
-                });
-            });
-        });
-        
+        const flatImages = await response.json(); 
         return flatImages;
         
     } catch (error) {
-        console.error("Erro CRÍTICO ao buscar dados do Azure API. As imagens não serão carregadas.", error);
+        console.error("Erro CRÍTICO ao buscar dados do ficheiro JSON.", error);
         return []; 
+    } finally {
+        toggleLoading(false);
     }
 }
 
 
 /**
- * Cria o HTML para o card de imagem.
- * @param {object} image - Objeto de dados da imagem (agora deve ter .photoUrl, .categoria, .file e .categorias).
- * @returns {string} HTML do card.
+ * Cria o HTML para o card de imagem. 
  */
 function createImageCard(image) {
     const imageUrl = image.photoUrl; 
@@ -159,9 +111,7 @@ function createImageCard(image) {
 // ----------------------------------------------------------------------------------------------------------------------------------
 
 /**
- * Alterna a visibilidade das subcategorias ao clicar na categoria principal.
- * @param {string} subcategoryId - ID da div das subcategorias (ex: 'cozinhas-sub')
- * @param {string} arrowId - ID do ícone de seta para rotação (ex: 'cozinhas-arrow')
+ * Alterna a visibilidade das subcategorias ao clicar na categoria principal. 
  */
 function toggleSubcategories(subcategoryId, arrowId) {
     const submenu = document.getElementById(subcategoryId);
@@ -176,20 +126,18 @@ function toggleSubcategories(subcategoryId, arrowId) {
 
 /**
  * Filtra e renderiza as imagens com base nos checkboxes ativos.
- * 🔑 IMPLEMENTAÇÃO: Usa a lógica OR em relação a todos os slugs inferidos da imagem.
  */
 function filterAndRenderImages(allImages) {
     const grid = document.getElementById('galeria-grid');
     if (!grid) return;
 
     if (allImages.length === 0) {
-         grid.innerHTML = '<p class="col-span-full text-center py-10 text-red-500 font-semibold">Falha ao carregar as imagens da galeria. Verifique as permissões do Azure e a conexão da API.</p>';
-         return;
+        grid.innerHTML = '<p class="col-span-full text-center py-10 text-red-500 font-semibold">Falha ao carregar os dados da galeria. Verifique se o ficheiro gallery_data.json existe e está formatado corretamente.</p>';
+        return;
     }
     
     const activeFilters = [];
     
-    // Obtém os VALORES (slugs) de TODOS os filtros ativos (Categoria e Subcategoria)
     document.querySelectorAll('.filtro-categoria:checked, .filtro-subcategoria:checked').forEach(checkbox => {
         activeFilters.push(checkbox.value);
     });
@@ -209,14 +157,12 @@ function filterAndRenderImages(allImages) {
         return;
     }
 
-    // 3. Aplica a filtragem com lógica OR (Mostra imagens que correspondam a QUALQUER filtro ativo)
+    // 3. Aplica a filtragem com lógica OR
     const filteredImages = allImages.filter(image => {
-        // Verifica se PELO MENOS UM dos filtros ativos (filterSlug) 
-        // está contido no array 'image.categorias' (que contém todos os slugs de pastas).
-        return activeFilters.some(filterSlug => image.categorias.includes(filterSlug));
+        // CORREÇÃO CRÍTICA: Adicionado (image.categorias || []) para prevenir o erro 'undefined.includes'
+        return activeFilters.some(filterSlug => (image.categorias || []).includes(filterSlug));
     });
 
-    // Renderiza o resultado
     const html = filteredImages.map(createImageCard).join('');
     grid.innerHTML = html || '<p class="col-span-full text-center py-10 text-gray-500">Nenhum projeto encontrado para os filtros selecionados.</p>';
 }
@@ -226,19 +172,15 @@ function filterAndRenderImages(allImages) {
  * Configura os event listeners para todos os checkboxes de filtro.
  */
 function setupFilterListeners() {
-    // Escuta mudanças em qualquer checkbox de filtro (Categoria ou Subcategoria)
+    // É importante chamar esta função SOMENTE DEPOIS que a sidebar for gerada dinamicamente.
     document.querySelectorAll('.filtro-categoria, .filtro-subcategoria').forEach(checkbox => {
         checkbox.addEventListener('change', () => {
             
-            // Lógica para desmarcar 'Tudo' se outra categoria for selecionada, 
-            // e vice-versa (melhora a UX)
             if (checkbox.id === 'tudo' && checkbox.checked) {
-                // Se 'Tudo' for marcado, desmarque todos os outros
                 document.querySelectorAll('.filtro-categoria:not(#tudo), .filtro-subcategoria').forEach(other => {
                     other.checked = false;
                 });
             } else if (checkbox.id !== 'tudo' && checkbox.checked) {
-                // Se qualquer outra categoria for marcada, desmarque 'Tudo'
                 const tudoCheckbox = document.getElementById('tudo');
                 if (tudoCheckbox) tudoCheckbox.checked = false;
             }
@@ -246,14 +188,10 @@ function setupFilterListeners() {
             filterAndRenderImages(galleryImages);
         });
     });
-
-    // Removendo o listener duplicado para o 'tudo' que estava no seu código original, 
-    // pois a lógica agora está unificada no listener acima.
 }
 
 /**
- * Mostra ou esconde o spinner de carregamento
- * @param {boolean} show - true para mostrar, false para esconder
+ * Mostra ou esconde o spinner de carregamento 
  */
 function toggleLoading(show) {
     const spinner = document.getElementById('loading-spinner');
@@ -262,15 +200,130 @@ function toggleLoading(show) {
     }
 }
 
+// ==================================================================================================================================
+// FUNÇÕES PARA CONSTRUÇÃO DINÂMICA DA SIDEBAR
+// ==================================================================================================================================
+
+/**
+ * Faz o fetch da configuração dos filtros.
+ */
+async function fetchFilterConfig() {
+    try {
+        const response = await fetch(FILTER_CONFIG_URL);
+        if (!response.ok) {
+            throw new Error(`Falha ao carregar a configuração de filtros: ${response.status}`);
+        }
+        return await response.json(); 
+    } catch (error) {
+        console.error("Erro CRÍTICO ao buscar configuração de filtros.", error);
+        return [];
+    }
+}
+
+/**
+ * Gera o HTML para uma única subcategoria (checkbox).
+ */
+function createSubcategoryHtml(sub, categoryId, cor) {
+    const corClass = `text-${cor || 'indigo'}-600`;
+    return `
+        <li class="pl-8 py-1">
+            <label class="flex items-center space-x-2 cursor-pointer text-gray-600 hover:text-gray-900 transition duration-150">
+                <input type="checkbox" 
+                       value="${sub.valor_filtro}" 
+                       class="filtro-subcategoria rounded ${corClass} focus:ring-${cor || 'indigo'}-500"
+                       data-parent="${categoryId}">
+                <span class="text-sm sidebar-text">${sub.nome_exibicao}</span>
+            </label>
+        </li>
+    `;
+}
+
+/**
+ * Gera o HTML para uma categoria principal e suas subcategorias.
+ */
+function createCategoryHtml(category) {
+    const hasSubcategories = category.subcategorias && category.subcategorias.length > 0;
+    const arrowId = `arrow-${category.id}`;
+    const submenuId = `submenu-${category.id}`;
+    const corClass = `text-${category.cor}-600`;
+
+    let html = `
+        <li class="relative">
+            <div class="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-100 transition duration-150 rounded-lg">
+                <label class="flex items-center space-x-3 w-full" ${category.id !== 'tudo' ? `for="${category.id}"` : ''}>
+                    <i class="${category.icone} text-lg ${corClass}"></i>
+                    <span class="font-semibold text-gray-800 sidebar-text sidebar-title">${category.nome_exibicao}</span>
+                </label>
+    `;
+
+    // Botão de Toggle para subcategorias
+    if (hasSubcategories) {
+        html += `
+            <button onclick="toggleSubcategories('${submenuId}', '${arrowId}')" class="p-1 rounded-full hover:bg-gray-200 transition duration-150" type="button">
+                <i id="${arrowId}" class="ri-arrow-down-s-line transform transition-transform duration-300"></i>
+            </button>
+        `;
+    }
+    html += `</div>`; // Fim do flex container principal
+
+    // Checkbox (posição absoluta à direita)
+    html += `
+        <label class="absolute right-3 top-3.5 flex items-center space-x-2 cursor-pointer">
+            <input type="checkbox" 
+                   id="${category.id}"
+                   value="${category.valor_filtro}" 
+                   ${category.id === 'tudo' ? 'checked' : ''} 
+                   class="filtro-categoria rounded ${corClass} focus:ring-${category.cor}-500">
+        </label>
+    `;
+
+    // Subcategorias (escondidas por defeito)
+    if (hasSubcategories) {
+        const subcategoriesHtml = category.subcategorias.map(sub => createSubcategoryHtml(sub, category.id, category.cor)).join('');
+        html += `
+            <ul id="${submenuId}" class="submenu-list mt-1 space-y-1 hidden">
+                ${subcategoriesHtml}
+            </ul>
+        `;
+    }
+
+    html += `</li>`;
+    return html;
+}
+
+/**
+ * Carrega a configuração e renderiza toda a sidebar de filtros.
+ */
+async function generateSidebarFilters() {
+    const filterConfig = await fetchFilterConfig();
+    const ulList = document.getElementById('filter-list');
+    
+    if (!ulList) {
+        console.error("Elemento #filter-list não encontrado no HTML.");
+        return;
+    }
+
+    if (filterConfig.length > 0) {
+        const filtersHtml = filterConfig.map(createCategoryHtml).join('');
+        ulList.innerHTML = filtersHtml;
+    } else {
+        ulList.innerHTML = '<li class="p-3 text-red-500">Falha ao carregar filtros.</li>';
+    }
+}
+
+
 // ----------------------------------------------------------------------------------------------------------------------------------
 // INICIALIZAÇÃO DA GALERIA
 // ----------------------------------------------------------------------------------------------------------------------------------
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Inicia os Listeners de Filtro ANTES do carregamento dos dados.
+    // 1. Constrói a sidebar de filtros dinamicamente
+    await generateSidebarFilters(); 
+
+    // 2. Inicia os Listeners de Filtro (AGORA os elementos existem no DOM)
     setupFilterListeners();
     
-    // 2. Carrega os dados de imagem da API de forma assíncrona
+    // 3. Carrega os dados de imagem do ficheiro JSON
     toggleLoading(true);
     try {
         galleryImages = await fetchAndPrepareImageData();
@@ -280,12 +333,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         toggleLoading(false);
     }
     
-    // 3. Renderiza as imagens iniciais
-    // A lógica de filtragem mostrará 'Tudo' se a checkbox 'tudo' estiver marcada por padrão no HTML.
+    // 4. Renderiza as imagens iniciais
     filterAndRenderImages(galleryImages);
     
-    // 4. Inicializa o estado da sidebar (para desktop)
+    // 5. Inicializa o estado da sidebar
     const sidebar = document.getElementById('sidebar-menu');
-    sidebar.style.width = '20rem';
-    sidebar.classList.add('fixed', 'inset-y-0', 'left-0', 'z-40', 'w-80', 'transform', '-translate-x-full', 'lg:translate-x-0', 'lg:static', 'lg:w-80', 'transition-all', 'duration-300', 'ease-in-out');
+    if (sidebar) {
+        sidebar.style.width = '20rem';
+    }
 });

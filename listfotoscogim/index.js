@@ -11,6 +11,7 @@ function processBlob(blob, prefix, accountName, containerName) {
 
     // Constrói a URL base para acesso público (ex: https://cogimfotos.blob.core.windows.net)
     const BLOB_BASE_URL = `https://${accountName}.blob.core.windows.net`; 
+    // https://cogimfotos.blob.core.windows.net/cogim-gallery
     
     return {
         // Nome do arquivo (ex: 'minhafoto.jpg')
