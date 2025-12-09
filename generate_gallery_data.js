@@ -21,7 +21,7 @@ const CATEGORY_MAP = [
     // Adicione mais prefixos aqui se precisar
 ];
 
-const AZURE_BLOB_BASE_URL = "https://cogimfotos.blob.core.windows.net/cogim-gallery/";
+const AZURE_BLOB_BASE_URL = "https://cogimfotos.blob.core.windows.net/cogim-gallery";
 
 async function generateGalleryData() {
     if (!CONNECTION_STRING) {
