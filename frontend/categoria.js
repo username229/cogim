@@ -27,27 +27,64 @@ const pastaPorCategoria = {
     "diverso": "diverso"
 };
 
+// Lista manual de imagens por pasta (SOLUÇÃO TEMPORÁRIA)
+// Esta é a solução mais simples se você não conseguir listar via API
+const imagensPorPasta = {
+    "cozinha": [
+        `${BLOB_BASE_URL}/cozinha/img1.jpg`,
+        `${BLOB_BASE_URL}/cozinha/img2.jpg`,
+        // Adicione todas as suas imagens aqui
+    ],
+    "bancada": [
+        `${BLOB_BASE_URL}/bancada/img1.jpg`,
+        // Continue para todas as pastas...
+    ],
+    // ... continue para todas as pastas
+};
+
 // Variáveis globais
 let imagensAtuais = [];
 let paginaAtual = 1;
 const itensPorPagina = 20;
 
 // =======================================================
-// Função para listar arquivos do Blob de uma pasta real
+// SOLUÇÃO 1: Listar via API REST (requer CORS configurado)
 // =======================================================
 async function listarImagensBlob(pasta) {
-    const url = `${BLOB_BASE_URL}?restype=container&comp=list&prefix=${pasta}/`;
+    try {
+        // URL correta da API REST do Azure
+        const url = `${BLOB_BASE_URL}?restype=container&comp=list&prefix=${pasta}/`;
 
-    const resp = await fetch(url);
-    if (!resp.ok) {
-        console.error("Erro ao listar Blob:", resp.status, url);
-        return [];
+        console.log("Tentando listar:", url);
+
+        const resp = await fetch(url);
+        
+        if (!resp.ok) {
+            console.error("Erro ao listar Blob:", resp.status, resp.statusText);
+            console.error("URL tentada:", url);
+            
+            // Se der erro 403 ou CORS, use a lista manual
+            console.warn("Usando lista manual de imagens para:", pasta);
+            return imagensPorPasta[pasta] || [];
+        }
+
+        const xml = await resp.text();
+        const nomes = [...xml.matchAll(/<Name>(.*?)<\/Name>/g)].map(m => m[1]);
+
+        return nomes.map(name => `${BLOB_BASE_URL}/${name}`);
+    } catch (error) {
+        console.error("Erro CORS ou de rede:", error);
+        console.warn("Usando lista manual de imagens para:", pasta);
+        return imagensPorPasta[pasta] || [];
     }
+}
 
-    const xml = await resp.text();
-    const nomes = [...xml.matchAll(/<Name>(.*?)<\/Name>/g)].map(m => m[1]);
-
-    return nomes.map(name => `${BLOB_BASE_URL}/${name}`);
+// =======================================================
+// SOLUÇÃO 2: Lista manual de imagens (SEM necessidade de API)
+// =======================================================
+function listarImagensManual(pasta) {
+    // Retorna as imagens da lista manual
+    return imagensPorPasta[pasta] || [];
 }
 
 // =======================================================
@@ -83,7 +120,10 @@ function renderGaleria() {
     slice.forEach(url => {
         grid.innerHTML += `
             <div class="rounded-lg shadow-md overflow-hidden hover:scale-105 transition border border-gray-200">
-                <img src="${url}" class="w-full h-48 object-cover"/>
+                <img src="${url}" 
+                     class="w-full h-48 object-cover"
+                     onerror="this.parentElement.style.display='none'"
+                     loading="lazy"/>
             </div>`;
     });
 
@@ -115,40 +155,40 @@ function irParaPagina(p) {
 }
 
 // =======================================================
-// Aplicar Filtros
+// Aplicar Filtros (CORRIGIDO)
 // =======================================================
 async function aplicarFiltros() {
     mostrarLoading(true);
 
     let selecionadas = [];
 
-    // Categorias gerais
-    document.querySelectorAll(".filtro-categoria:checked").forEach(c => {
-        if (pastaPorCategoria[c.value]) {
-            selecionadas.push(pastaPorCategoria[c.value]);
-        }
-    });
-
-    // Subcategorias
-    document.querySelectorAll(".filtro-subcategoria:checked").forEach(s => {
-        if (pastaPorCategoria[s.value]) {
-            selecionadas.push(pastaPorCategoria[s.value]);
-        }
-    });
-
-    // Se "Tudo" está marcado
+    // Verifica se "Tudo" está marcado
     const tudo = document.getElementById("tudo");
-    if (tudo && tudo.checked) {
+    const tudoMarcado = tudo && tudo.checked;
+
+    if (tudoMarcado) {
+        // Se "Tudo" estiver marcado, pega todas as pastas
+        selecionadas = Object.values(pastaPorCategoria);
+    } else {
+        // Categorias gerais
+        document.querySelectorAll(".filtro-categoria:checked").forEach(c => {
+            if (pastaPorCategoria[c.value]) {
+                selecionadas.push(pastaPorCategoria[c.value]);
+            }
+        });
+
+        // Subcategorias
+        document.querySelectorAll(".filtro-subcategoria:checked").forEach(s => {
+            if (pastaPorCategoria[s.value]) {
+                selecionadas.push(pastaPorCategoria[s.value]);
+            }
+        });
+    }
+
+    // Se nada foi selecionado, mostra todas por padrão
+    if (selecionadas.length === 0) {
         selecionadas = Object.values(pastaPorCategoria);
     }
-    
-    // Se nada estiver selecionado e "Tudo" estiver desmarcado, lista todas as pastas por padrão
-    // OU simplesmente não lista nada se for o caso
-    if (selecionadas.length === 0 && (!tudo || !tudo.checked)) {
-        // Neste caso, você pode decidir se quer mostrar TUDO ou NADA. 
-        // Vou manter a lógica original: se nada foi marcado, não faça nada (imagensAtuais = []).
-    }
-
 
     imagensAtuais = [];
 
@@ -157,6 +197,8 @@ async function aplicarFiltros() {
         const imgs = await listarImagensBlob(pasta);
         imagensAtuais.push(...imgs);
     }
+
+    console.log("Total de imagens carregadas:", imagensAtuais.length);
 
     paginaAtual = 1;
     mostrarLoading(false);
@@ -181,10 +223,8 @@ function toggleDesktopSidebar() {
     sidebar.classList.toggle("collapsed");
 }
 
-
-// NOVO: Adicione esta função para alternar as subcategorias
 // =======================================================
-// Alternar Visibilidade das Subcategorias e Rotacionar Seta
+// Alternar Visibilidade das Subcategorias
 // =======================================================
 function toggleSubcategories(subContainerId, arrowId) {
     const subContainer = document.getElementById(subContainerId);
@@ -195,13 +235,10 @@ function toggleSubcategories(subContainerId, arrowId) {
     }
 
     if (arrow) {
-        // Assume que 'rotate-180' é uma classe CSS que rotaciona o ícone
         arrow.classList.toggle("rotate-180");
     }
 }
 
-
-// NOVO: Altere esta seção para incluir Listeners de 'change'
 // =======================================================
 // Início e Listeners de Filtro
 // =======================================================
@@ -216,6 +253,6 @@ document.addEventListener("DOMContentLoaded", () => {
         checkbox.addEventListener("change", aplicarFiltros);
     });
     
-    // Aplica os filtros iniciais (para carregar o estado padrão da galeria)
+    // Aplica os filtros iniciais
     aplicarFiltros();
 });
