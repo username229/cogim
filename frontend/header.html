@@ -68,3 +68,52 @@
             </nav>
     </div>
 </header>
+
+<script>
+    // Seleciona os elementos do HTML usando seus IDs
+    const mobileMenuPanel = document.getElementById('mobile-menu-panel');
+    const menuIcon = document.getElementById('menu-icon');
+    
+    // Função principal para abrir/fechar o menu móvel
+    function toggleMenu() {
+        // 1. Alterna a classe 'hidden' no painel do menu
+        // Esta classe é o que o Tailwind usa para ocultar/mostrar elementos
+        mobileMenuPanel.classList.toggle('hidden');
+        
+        // 2. Troca o ícone (Menu <-> Fechar) para feedback visual
+        if (mobileMenuPanel.classList.contains('hidden')) {
+            // Menu está fechado: mostra o ícone de menu (3 barras)
+            menuIcon.classList.remove('ri-close-line');
+            menuIcon.classList.add('ri-menu-line');
+        } else {
+            // Menu está aberto: mostra o ícone de fechar (X)
+            menuIcon.classList.remove('ri-menu-line');
+            menuIcon.classList.add('ri-close-line');
+        }
+    }
+    
+    // 3. Lógica para fechar o menu automaticamente ao redimensionar (volta para o desktop)
+    window.addEventListener('resize', () => {
+        // 1024px é o breakpoint 'lg' do Tailwind
+        if (window.innerWidth >= 1024) { 
+            // Se o menu estiver aberto, feche-o
+            if (!mobileMenuPanel.classList.contains('hidden')) {
+                toggleMenu(); 
+            }
+        }
+    });
+
+    // 4. Fecha o menu se um link interno for clicado (melhora a experiência do usuário)
+    document.querySelectorAll('#mobile-menu-panel a').forEach(link => {
+        link.addEventListener('click', () => {
+            // Se o menu estiver aberto e um link for clicado, feche-o
+            if (!mobileMenuPanel.classList.contains('hidden')) {
+                // Atraso de 100ms para permitir que a navegação comece
+                setTimeout(toggleMenu, 100); 
+            }
+        });
+    });
+
+    // Observação: Certifique-se de que a função changeLanguage(lang) também está definida em seu script.
+
+</script>
