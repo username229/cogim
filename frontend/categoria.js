@@ -3,26 +3,28 @@
 // =======================================================
 const BLOB_BASE_URL = "https://cogimfotos.blob.core.windows.net/cogim-gallery";
 
+// 🆕 NOVO: Configuração de SAS Token (se disponível)
+// Adicione seu token SAS aqui se tiver permissões mais restritas
+const SAS_TOKEN = ""; // Exemplo: "?sv=2021-06-08&ss=b&srt=sco&sp=r&se=..."
+
+// 🆕 NOVO: Cache de imagens para performance
+const cacheImagens = new Map();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutos
+
 // Mapa de categorias/subcategorias → pastas REAIS do Blob
 const pastaPorCategoria = {
-    // Cozinhas
     "cozinhas": "cozinha",
     "cozinha-bancada": "bancada",
     "cozinha-peninsula": "peninsula",
     "cozinha-ilha": "ilha",
-
-    // Guarda-fatos
     "guardafatos": "closet",
     "guardafato-portas-correr": "closetdoorcorrer",
     "guardafato-espelho": "closetdoorespelho",
-
-    // Simples
     "tetofalso": "teto-falso",
     "casa-de-banho": "bathroom",
     "racks": "rack",
     "camas": "cama",
     "cadeiras-sofas-e-mesas": "cadeirasofacama",
-
     "customizado": "customizado",
     "diverso": "diverso"
 };
@@ -31,64 +33,123 @@ const pastaPorCategoria = {
 let imagensAtuais = [];
 let paginaAtual = 1;
 const itensPorPagina = 20;
+let imagemModalAtual = 0;
+
+// 🆕 NOVO: Estatísticas de carregamento
+let estatisticas = {
+    totalImagens: 0,
+    imagensCarregadas: 0,
+    errosCarregamento: 0,
+    tempoCarregamento: 0
+};
 
 // =======================================================
-// Listar imagens do Blob Storage via API
+// 🆕 NOVO: Sistema de Cache Inteligente
 // =======================================================
-async function listarImagensBlob(pasta) {
+function obterDoCache(chave) {
+    const item = cacheImagens.get(chave);
+    if (!item) return null;
+    
+    const agora = Date.now();
+    if (agora - item.timestamp > CACHE_DURATION) {
+        cacheImagens.delete(chave);
+        return null;
+    }
+    
+    return item.dados;
+}
+
+function salvarNoCache(chave, dados) {
+    cacheImagens.set(chave, {
+        dados,
+        timestamp: Date.now()
+    });
+}
+
+// =======================================================
+// 🆕 MELHORADO: Listar imagens do Blob Storage com retry
+// =======================================================
+async function listarImagensBlob(pasta, tentativa = 1) {
+    const maxTentativas = 3;
+    
+    // Verifica cache primeiro
+    const chaveCache = `pasta_${pasta}`;
+    const dadosCache = obterDoCache(chaveCache);
+    if (dadosCache) {
+        console.log(`💾 Cache hit para pasta: ${pasta}`);
+        return dadosCache;
+    }
+    
     try {
-        const url = `${BLOB_BASE_URL}?restype=container&comp=list&prefix=${pasta}/`;
+        let url = `${BLOB_BASE_URL}?restype=container&comp=list&prefix=${pasta}/`;
+        if (SAS_TOKEN) {
+            url += `&${SAS_TOKEN}`;
+        }
         
-        console.log(`🔍 Listando imagens da pasta: ${pasta}`);
-        console.log(`📡 URL da requisição: ${url}`);
+        console.log(`🔍 [Tentativa ${tentativa}/${maxTentativas}] Listando: ${pasta}`);
         
-        const resp = await fetch(url);
+        const resp = await fetch(url, {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'no-cache',
+            headers: {
+                'Accept': 'application/xml, text/xml, */*'
+            }
+        });
         
         if (!resp.ok) {
-            console.error(`❌ Erro HTTP ${resp.status}: ${resp.statusText}`);
-            console.error(`💡 Verifique se o CORS está configurado corretamente no Azure`);
-            return [];
+            throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
         }
 
         const xml = await resp.text();
-        
-        // Parse do XML usando DOMParser
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(xml, "text/xml");
         
-        // Busca todos os elementos <Name> no XML
+        // Verifica se houve erro no XML
+        const erroXml = xmlDoc.querySelector('Error');
+        if (erroXml) {
+            const codigo = erroXml.querySelector('Code')?.textContent;
+            const mensagem = erroXml.querySelector('Message')?.textContent;
+            throw new Error(`Azure Blob Error: ${codigo} - ${mensagem}`);
+        }
+        
         const nameElements = xmlDoc.getElementsByTagName("Name");
         const nomes = Array.from(nameElements).map(el => el.textContent);
         
-        // Filtra apenas arquivos de imagem
         const imagensValidas = nomes.filter(nome => {
             const ext = nome.toLowerCase().split('.').pop();
-            return ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext);
+            return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(ext);
         });
 
-        console.log(`✅ Encontradas ${imagensValidas.length} imagens na pasta ${pasta}`);
+        console.log(`✅ ${imagensValidas.length} imagens em ${pasta}`);
         
-        return imagensValidas.map(name => `${BLOB_BASE_URL}/${name}`);
+        const urls = imagensValidas.map(name => {
+            let imageUrl = `${BLOB_BASE_URL}/${name}`;
+            if (SAS_TOKEN) {
+                imageUrl += SAS_TOKEN;
+            }
+            return imageUrl;
+        });
+        
+        // Salva no cache
+        salvarNoCache(chaveCache, urls);
+        
+        return urls;
         
     } catch (error) {
-        console.error(`❌ Erro ao listar pasta ${pasta}:`, error);
+        console.error(`❌ Erro na pasta ${pasta} (tentativa ${tentativa}):`, error);
         
-        if (error.message.includes('CORS')) {
-            console.error(`
-🚫 ERRO DE CORS DETECTADO!
-
-Para resolver:
-1. Entre no Portal do Azure (portal.azure.com)
-2. Vá até Storage Account → cogimfotos
-3. No menu lateral: Settings → CORS
-4. Aba "Blob service", adicione:
-   - Allowed origins: *
-   - Allowed methods: GET, HEAD, OPTIONS
-   - Allowed headers: *
-   - Exposed headers: *
-   - Max age: 3600
-5. Salve e aguarde 5-15 minutos
-            `);
+        // Retry logic
+        if (tentativa < maxTentativas) {
+            const delay = Math.pow(2, tentativa) * 1000; // Exponential backoff
+            console.log(`⏳ Aguardando ${delay/1000}s antes de tentar novamente...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            return listarImagensBlob(pasta, tentativa + 1);
+        }
+        
+        // Diagnóstico de erro
+        if (error.message.includes('CORS') || error.message.includes('Failed to fetch')) {
+            mostrarErroCORS();
         }
         
         return [];
@@ -96,16 +157,97 @@ Para resolver:
 }
 
 // =======================================================
-// Loading Spinner
+// 🆕 NOVO: Modal de erro CORS com instruções
 // =======================================================
-function mostrarLoading(show) {
-    const spinner = document.getElementById("loading-spinner");
-    if (!spinner) return;
-    spinner.classList.toggle("hidden", !show);
+function mostrarErroCORS() {
+    const existe = document.getElementById('modal-erro-cors');
+    if (existe) return;
+    
+    const modal = document.createElement('div');
+    modal.id = 'modal-erro-cors';
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+    modal.innerHTML = `
+        <div class="bg-white rounded-lg max-w-2xl w-full p-6 shadow-2xl">
+            <div class="flex items-start mb-4">
+                <div class="flex-shrink-0 bg-red-100 rounded-full p-3">
+                    <i class="ri-alert-line text-3xl text-red-600"></i>
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">
+                        Erro de CORS Detectado
+                    </h3>
+                    <p class="text-gray-600 mb-4">
+                        As imagens não puderam ser carregadas devido a restrições de CORS no Azure Blob Storage.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
+                <p class="font-semibold text-blue-900 mb-2">📋 Solução (Azure Portal):</p>
+                <ol class="list-decimal list-inside space-y-1 text-sm text-blue-800">
+                    <li>Acesse <a href="https://portal.azure.com" target="_blank" class="underline">portal.azure.com</a></li>
+                    <li>Navegue até: Storage Account → cogimfotos</li>
+                    <li>Menu lateral: Settings → Resource sharing (CORS)</li>
+                    <li>Na aba "Blob service", configure:
+                        <ul class="list-disc list-inside ml-6 mt-1 space-y-0.5">
+                            <li>Allowed origins: <code class="bg-blue-100 px-1 rounded">*</code></li>
+                            <li>Allowed methods: <code class="bg-blue-100 px-1 rounded">GET,HEAD,OPTIONS</code></li>
+                            <li>Allowed headers: <code class="bg-blue-100 px-1 rounded">*</code></li>
+                            <li>Exposed headers: <code class="bg-blue-100 px-1 rounded">*</code></li>
+                            <li>Max age: <code class="bg-blue-100 px-1 rounded">3600</code></li>
+                        </ul>
+                    </li>
+                    <li>Clique em "Save" e aguarde 5-15 minutos</li>
+                </ol>
+            </div>
+            
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                <p class="font-semibold text-yellow-900 mb-2">💡 Alternativa Rápida:</p>
+                <p class="text-sm text-yellow-800">
+                    Use um SAS Token com permissões de leitura. Adicione-o na variável 
+                    <code class="bg-yellow-100 px-1 rounded">SAS_TOKEN</code> no início do código.
+                </p>
+            </div>
+            
+            <div class="flex justify-end gap-3">
+                <button onclick="document.getElementById('modal-erro-cors').remove()" 
+                        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+                    Fechar
+                </button>
+                <button onclick="document.getElementById('modal-erro-cors').remove(); aplicarFiltros();" 
+                        class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                    🔄 Tentar Novamente
+                </button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
 }
 
 // =======================================================
-// Renderizar Galeria
+// 🆕 NOVO: Loading Spinner com contador
+// =======================================================
+function mostrarLoading(show, progresso = null) {
+    const spinner = document.getElementById("loading-spinner");
+    if (!spinner) return;
+    
+    if (show) {
+        spinner.classList.remove("hidden");
+        if (progresso) {
+            spinner.innerHTML = `
+                <div class="flex flex-col items-center">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mb-3"></div>
+                    <p class="text-gray-600 font-medium">${progresso}</p>
+                </div>
+            `;
+        }
+    } else {
+        spinner.classList.add("hidden");
+    }
+}
+
+// =======================================================
+// 🆕 MELHORADO: Renderizar Galeria com lazy loading avançado
 // =======================================================
 function renderGaleria() {
     const grid = document.getElementById("galeria-grid");
@@ -114,21 +256,19 @@ function renderGaleria() {
         return;
     }
 
-    // Limpa a galeria mas mantém o spinner
-    const spinner = document.getElementById("loading-spinner");
     grid.innerHTML = "";
-    if (spinner) {
-        grid.appendChild(spinner);
-    }
 
     if (imagensAtuais.length === 0) {
         grid.innerHTML = `
-            <div class="col-span-full text-center py-10">
-                <i class="ri-image-line text-6xl text-gray-300 mb-4"></i>
-                <p class="text-gray-500 text-lg font-semibold">Nenhuma imagem encontrada</p>
-                <p class="text-gray-400 text-sm mt-2">Verifique se o CORS está configurado no Azure</p>
-                <button onclick="aplicarFiltros()" class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-                    🔄 Tentar Novamente
+            <div class="col-span-full text-center py-16">
+                <div class="inline-block p-6 bg-gray-100 rounded-full mb-4">
+                    <i class="ri-image-line text-6xl text-gray-400"></i>
+                </div>
+                <p class="text-gray-700 text-xl font-bold mb-2">Nenhuma imagem encontrada</p>
+                <p class="text-gray-500 mb-6">Selecione uma categoria ou verifique as configurações do Azure</p>
+                <button onclick="aplicarFiltros()" 
+                        class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition shadow-lg">
+                    <i class="ri-refresh-line mr-2"></i>Tentar Novamente
                 </button>
             </div>`;
         return;
@@ -138,35 +278,178 @@ function renderGaleria() {
     const end = start + itensPorPagina;
     const slice = imagensAtuais.slice(start, end);
 
-    console.log(`📸 Mostrando ${slice.length} imagens (${start + 1} a ${Math.min(end, imagensAtuais.length)} de ${imagensAtuais.length})`);
+    console.log(`📸 Página ${paginaAtual}: mostrando ${slice.length} imagens`);
 
     slice.forEach((url, index) => {
         const div = document.createElement('div');
-        div.className = 'rounded-lg shadow-md overflow-hidden hover:scale-105 transition-transform duration-300 border border-gray-200 cursor-pointer';
+        div.className = 'group relative rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-200 cursor-pointer bg-gray-100';
+        
+        // 🆕 Skeleton loader
+        div.innerHTML = `
+            <div class="skeleton-loader absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-pulse"></div>
+        `;
         
         const img = document.createElement('img');
         img.src = url;
         img.alt = `Imagem ${start + index + 1}`;
-        img.className = 'w-full h-48 object-cover';
+        img.className = 'w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110';
         img.loading = 'lazy';
         
+        // 🆕 Overlay com informações
+        const overlay = document.createElement('div');
+        overlay.className = 'absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center';
+        overlay.innerHTML = `
+            <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white">
+                <i class="ri-eye-line text-3xl"></i>
+            </div>
+        `;
+        
+        img.onload = function() {
+            const skeleton = div.querySelector('.skeleton-loader');
+            if (skeleton) skeleton.remove();
+            estatisticas.imagensCarregadas++;
+            atualizarBarraProgresso();
+        };
+        
         img.onerror = function() {
-            console.warn(`⚠️ Erro ao carregar imagem: ${url}`);
-            this.parentElement.innerHTML = `
-                <div class='flex items-center justify-center h-48 bg-gray-100'>
-                    <i class='ri-image-line text-4xl text-gray-300'></i>
+            console.warn(`⚠️ Erro: ${url}`);
+            estatisticas.errosCarregamento++;
+            div.innerHTML = `
+                <div class='flex flex-col items-center justify-center h-48 bg-gray-100 text-gray-400'>
+                    <i class='ri-image-off-line text-5xl mb-2'></i>
+                    <p class="text-xs">Erro ao carregar</p>
                 </div>`;
         };
         
+        // 🆕 Click para abrir modal
+        div.onclick = () => abrirModal(start + index);
+        
         div.appendChild(img);
+        div.appendChild(overlay);
         grid.appendChild(div);
     });
 
     renderPaginacao();
+    atualizarEstatisticas();
 }
 
 // =======================================================
-// Paginação
+// 🆕 NOVO: Modal de visualização em tela cheia
+// =======================================================
+function abrirModal(indice) {
+    imagemModalAtual = indice;
+    const url = imagensAtuais[indice];
+    
+    const modal = document.createElement('div');
+    modal.id = 'modal-imagem';
+    modal.className = 'fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4';
+    modal.innerHTML = `
+        <button onclick="fecharModal()" 
+                class="absolute top-4 right-4 text-white text-4xl hover:text-gray-300 transition z-10">
+            <i class="ri-close-line"></i>
+        </button>
+        
+        <button onclick="navegarModal(-1)" 
+                class="absolute left-4 text-white text-4xl hover:text-gray-300 transition z-10 ${indice === 0 ? 'opacity-50 cursor-not-allowed' : ''}">
+            <i class="ri-arrow-left-s-line"></i>
+        </button>
+        
+        <button onclick="navegarModal(1)" 
+                class="absolute right-4 text-white text-4xl hover:text-gray-300 transition z-10 ${indice === imagensAtuais.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}">
+            <i class="ri-arrow-right-s-line"></i>
+        </button>
+        
+        <div class="relative max-w-7xl max-h-full">
+            <img src="${url}" 
+                 alt="Imagem ${indice + 1}"
+                 class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl">
+            <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-full text-sm">
+                ${indice + 1} / ${imagensAtuais.length}
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+    
+    // Navegação por teclado
+    document.addEventListener('keydown', handleModalKeyboard);
+}
+
+function fecharModal() {
+    const modal = document.getElementById('modal-imagem');
+    if (modal) modal.remove();
+    document.body.style.overflow = '';
+    document.removeEventListener('keydown', handleModalKeyboard);
+}
+
+function navegarModal(direcao) {
+    const novoIndice = imagemModalAtual + direcao;
+    if (novoIndice >= 0 && novoIndice < imagensAtuais.length) {
+        fecharModal();
+        abrirModal(novoIndice);
+    }
+}
+
+function handleModalKeyboard(e) {
+    if (e.key === 'Escape') fecharModal();
+    if (e.key === 'ArrowLeft') navegarModal(-1);
+    if (e.key === 'ArrowRight') navegarModal(1);
+}
+
+// =======================================================
+// 🆕 NOVO: Barra de progresso de carregamento
+// =======================================================
+function atualizarBarraProgresso() {
+    let barra = document.getElementById('progress-bar');
+    if (!barra) {
+        barra = document.createElement('div');
+        barra.id = 'progress-bar';
+        barra.className = 'fixed top-0 left-0 w-full h-1 bg-gray-200 z-50';
+        barra.innerHTML = '<div class="h-full bg-indigo-600 transition-all duration-300"></div>';
+        document.body.appendChild(barra);
+    }
+    
+    const progresso = (estatisticas.imagensCarregadas / estatisticas.totalImagens) * 100;
+    const barraInterna = barra.querySelector('div');
+    barraInterna.style.width = `${progresso}%`;
+    
+    if (progresso >= 100) {
+        setTimeout(() => barra.remove(), 500);
+    }
+}
+
+// =======================================================
+// 🆕 NOVO: Painel de estatísticas
+// =======================================================
+function atualizarEstatisticas() {
+    let painel = document.getElementById('stats-panel');
+    if (!painel) {
+        painel = document.createElement('div');
+        painel.id = 'stats-panel';
+        painel.className = 'fixed bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 text-sm z-40 border border-gray-200';
+        document.body.appendChild(painel);
+    }
+    
+    painel.innerHTML = `
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+                <i class="ri-image-line text-indigo-600"></i>
+                <span class="font-semibold">${imagensAtuais.length}</span>
+                <span class="text-gray-500">imagens</span>
+            </div>
+            ${estatisticas.errosCarregamento > 0 ? `
+                <div class="flex items-center gap-2 text-red-600">
+                    <i class="ri-error-warning-line"></i>
+                    <span>${estatisticas.errosCarregamento} erros</span>
+                </div>
+            ` : ''}
+        </div>
+    `;
+}
+
+// =======================================================
+// Paginação (mantida do original)
 // =======================================================
 function renderPaginacao() {
     const total = Math.ceil(imagensAtuais.length / itensPorPagina);
@@ -174,10 +457,8 @@ function renderPaginacao() {
     if (!pag) return;
 
     pag.innerHTML = "";
-
     if (total <= 1) return;
 
-    // Botão Anterior
     if (paginaAtual > 1) {
         const btnPrev = document.createElement('button');
         btnPrev.onclick = () => irParaPagina(paginaAtual - 1);
@@ -186,7 +467,6 @@ function renderPaginacao() {
         pag.appendChild(btnPrev);
     }
 
-    // Números das páginas
     for (let i = 1; i <= total; i++) {
         if (i === 1 || i === total || (i >= paginaAtual - 1 && i <= paginaAtual + 1)) {
             const btn = document.createElement('button');
@@ -206,7 +486,6 @@ function renderPaginacao() {
         }
     }
 
-    // Botão Próximo
     if (paginaAtual < total) {
         const btnNext = document.createElement('button');
         btnNext.onclick = () => irParaPagina(paginaAtual + 1);
@@ -223,58 +502,61 @@ function irParaPagina(p) {
 }
 
 // =======================================================
-// Aplicar Filtros
+// 🆕 MELHORADO: Aplicar Filtros com progresso
 // =======================================================
 async function aplicarFiltros() {
     console.log("🔄 Aplicando filtros...");
-    mostrarLoading(true);
+    const inicioTempo = Date.now();
+    
+    mostrarLoading(true, "Carregando...");
 
     let selecionadas = [];
-
-    // Verifica se "Tudo" está marcado
     const tudo = document.getElementById("tudo");
     const tudoMarcado = tudo && tudo.checked;
 
     if (tudoMarcado) {
-        console.log("✅ Filtro 'Tudo' selecionado - carregando todas as categorias");
         selecionadas = Object.values(pastaPorCategoria);
     } else {
-        // Categorias gerais
         document.querySelectorAll(".filtro-categoria:checked").forEach(c => {
             if (pastaPorCategoria[c.value]) {
-                console.log(`✅ Categoria: ${c.value} → pasta: ${pastaPorCategoria[c.value]}`);
                 selecionadas.push(pastaPorCategoria[c.value]);
             }
         });
 
-        // Subcategorias
         document.querySelectorAll(".filtro-subcategoria:checked").forEach(s => {
             if (pastaPorCategoria[s.value]) {
-                console.log(`✅ Subcategoria: ${s.value} → pasta: ${pastaPorCategoria[s.value]}`);
                 selecionadas.push(pastaPorCategoria[s.value]);
             }
         });
     }
 
-    // Se nada foi selecionado, mostra todas por padrão
     if (selecionadas.length === 0) {
-        console.log("ℹ️ Nenhum filtro selecionado - mostrando todas as categorias por padrão");
         selecionadas = Object.values(pastaPorCategoria);
     }
 
-    // Remove duplicatas
     selecionadas = [...new Set(selecionadas)];
-    console.log(`📁 Carregando ${selecionadas.length} pasta(s):`, selecionadas);
+    console.log(`📁 Carregando ${selecionadas.length} pasta(s)`);
 
     imagensAtuais = [];
+    estatisticas = {
+        totalImagens: 0,
+        imagensCarregadas: 0,
+        errosCarregamento: 0,
+        tempoCarregamento: 0
+    };
 
-    // Carregar todas pastas selecionadas
-    for (const pasta of selecionadas) {
+    // Carrega com progresso
+    for (let i = 0; i < selecionadas.length; i++) {
+        const pasta = selecionadas[i];
+        mostrarLoading(true, `Carregando ${i + 1}/${selecionadas.length}: ${pasta}`);
         const imgs = await listarImagensBlob(pasta);
         imagensAtuais.push(...imgs);
     }
 
-    console.log(`✅ TOTAL: ${imagensAtuais.length} imagens carregadas`);
+    estatisticas.totalImagens = imagensAtuais.length;
+    estatisticas.tempoCarregamento = ((Date.now() - inicioTempo) / 1000).toFixed(2);
+
+    console.log(`✅ ${imagensAtuais.length} imagens em ${estatisticas.tempoCarregamento}s`);
 
     paginaAtual = 1;
     mostrarLoading(false);
@@ -282,12 +564,20 @@ async function aplicarFiltros() {
 }
 
 // =======================================================
-// Sidebar (Mobile e Desktop)
+// 🆕 NOVO: Limpar cache
+// =======================================================
+function limparCache() {
+    cacheImagens.clear();
+    console.log("🗑️ Cache limpo");
+    aplicarFiltros();
+}
+
+// =======================================================
+// Sidebar (mantido do original)
 // =======================================================
 function toggleMenu() {
     const sidebar = document.getElementById("sidebar-menu");
     const backdrop = document.getElementById("menu-backdrop");
-
     if (!sidebar || !backdrop) return;
 
     sidebar.classList.toggle("-translate-x-full");
@@ -306,61 +596,46 @@ function toggleMenu() {
 function toggleDesktopSidebar() {
     const sidebar = document.getElementById("sidebar-menu");
     if (!sidebar) return;
-    
     sidebar.classList.toggle("collapsed");
     
     const toggleBtn = document.querySelector("#toggle-desktop-btn i");
-    if (toggleBtn) {
-        toggleBtn.classList.toggle("rotate-180");
-    }
+    if (toggleBtn) toggleBtn.classList.toggle("rotate-180");
 }
 
-// =======================================================
-// Alternar Subcategorias
-// =======================================================
 function toggleSubcategories(subContainerId, arrowId) {
     const subContainer = document.getElementById(subContainerId);
     const arrow = document.getElementById(arrowId);
-
-    if (subContainer) {
-        subContainer.classList.toggle("hidden");
-    }
-
-    if (arrow) {
-        arrow.classList.toggle("rotate-180");
-    }
+    if (subContainer) subContainer.classList.toggle("hidden");
+    if (arrow) arrow.classList.toggle("rotate-180");
 }
-
-// =======================================================
-// Fechar menu ao clicar no backdrop
-// =======================================================
-document.addEventListener("DOMContentLoaded", () => {
-    const backdrop = document.getElementById("menu-backdrop");
-    if (backdrop) {
-        backdrop.addEventListener("click", toggleMenu);
-    }
-});
 
 // =======================================================
 // Inicialização
 // =======================================================
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("🚀 Sistema de galeria Cogim iniciado");
-    console.log("📍 Blob Storage URL:", BLOB_BASE_URL);
+    console.log("🚀 Sistema Cogim Gallery v2.0 iniciado");
+    console.log("📍 Blob Storage:", BLOB_BASE_URL);
 
-    // Seleciona todos os checkboxes de filtro
+    const backdrop = document.getElementById("menu-backdrop");
+    if (backdrop) backdrop.addEventListener("click", toggleMenu);
+
     const filterCheckboxes = document.querySelectorAll(
         ".filtro-categoria, .filtro-subcategoria, #tudo"
     );
 
-    console.log(`📋 ${filterCheckboxes.length} filtros encontrados`);
-
-    // Anexa evento aos checkboxes
     filterCheckboxes.forEach(checkbox => {
         checkbox.addEventListener("change", aplicarFiltros);
     });
     
-    // Carrega as imagens iniciais
+    // 🆕 Adiciona atalhos de teclado
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.key === 'k') {
+            e.preventDefault();
+            const searchInput = document.querySelector('input[type="search"]');
+            if (searchInput) searchInput.focus();
+        }
+    });
+    
     console.log("⏳ Carregando galeria inicial...");
     aplicarFiltros();
 });
