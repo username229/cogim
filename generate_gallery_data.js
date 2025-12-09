@@ -75,7 +75,7 @@ function findPrimaryCategory(fileName) {
         }
     }
     // Retorno de fallback: usa a primeira palavra do nome do ficheiro
-    return nameLower.split(/[_-\.]/)[0]; 
+    return nameLower.split(/[-_\.]/)[0]; 
 }
 
 generateGalleryData();
