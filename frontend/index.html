@@ -25,6 +25,7 @@
 <div id="header-placeholder">
 </div>
 
+<!-- component -->
 
 
 <section id="inicio" class="hero-section w-full min-h-[600px] flex items-center pt-24 mb-16">
@@ -51,6 +52,49 @@
         </div>
     </div>
 </section>
+
+<div id="cookie-modal" class="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-900 bg-opacity-80 z-50 hidden">
+    
+    <div>
+        <div class="w-72 bg-white rounded-lg shadow-md p-6 cookie-notice" style="cursor: auto;">
+            
+            <div class="w-16 mx-auto relative -mt-10 mb-3">
+                <img class="-mt-1" src="https://www.svgrepo.com/show/30963/cookie.svg" alt="Cookie Icon SVG">
+            </div>
+
+            <span class="w-full sm:w-48 block leading-normal text-gray-800 text-md mb-3">We use cookies to provide a better user experience.</span>
+
+            <div class="flex items-center justify-between">
+                <a class="text-xs text-gray-400 mr-1 hover:text-gray-800" href="#">Privacy Policy</a>
+                <div class="w-1/2">
+                    <button type="button" onclick="acceptCookies()" class="py-2 px-4 bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-offset-indigo-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg ">
+                        Accept
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // As funções JavaScript para controle de visibilidade (acceptCookies, declineCookies, e lógica de DOMContentLoaded)
+    // devem ser mantidas no seu arquivo JS principal ou no final do <body>.
+    const cookieModal = document.getElementById("cookie-modal");
+
+    const acceptCookies = () => {
+        localStorage.setItem('cookies_accepted', 'true');
+        cookieModal.classList.add('hidden');
+    };
+    
+    // Mostra o modal se o usuário ainda não aceitou (simulando a verificação de cookies)
+    document.addEventListener('DOMContentLoaded', () => {
+        const cookiesAccepted = localStorage.getItem('cookies_accepted');
+        if (cookiesAccepted !== 'true') {
+            cookieModal.classList.remove('hidden'); 
+        }
+    });
+</script>
+
 
 <section id="galeria" class="py-16 bg-gray-50">
 <div class="container mx-auto px-4">
@@ -252,6 +296,8 @@
     <script src="script.js"></script>
     <script src="translations.js"></script>  
     <script src="component_loader.js"></script>
+
+   
 
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
