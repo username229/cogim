@@ -301,7 +301,7 @@ function createCategoryHtml(category) {
  */
 async function generateSidebarFilters() {
     // Chama a função que faz o fetch do ficheiro filter_config.json
-    const filterConfig = await fetchFilterConfig(); 
+const response = await fetch("filter_config.json");
     const ulList = document.getElementById('filter-list');
     
     if (!ulList) {
