@@ -8,7 +8,6 @@ on:
     types: [opened, synchronize, reopened, closed]
     branches:
       - main
-
 jobs:
   build_and_deploy_job:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
@@ -21,41 +20,43 @@ jobs:
           submodules: true
           lfs: false
           
-      # 2. 🛠️ Instalar Dependências (Obrigatório, executado na Raiz)
+      # 2. 🛠️ Instalar Dependências (Obrigatório)
+      # Isto instalará @azure/storage-blob e outras dependências listadas no package.json.
       - name: Install Node Dependencies
         run: npm install
 
-      # 3. 🛠️ CORREÇÃO FINAL: Executar o Build
-      # Executa o script "build": "npm run build-css" diretamente da Raiz, 
-      # que é onde o package.json está.
+      # ====================================================================================
+      # 💥 PASSO NOVO: Geração de Dados a partir do Azure Blob Storage
+      # Este script cria o ficheiro gallery_data.json na raiz do projeto.
+      # ====================================================================================
+      - name: ⚙️ Gerar gallery_data.json a partir do Blob Storage
+        run: node generate_gallery_data.js
+        env:
+          # Passa o segredo do GitHub para o script Node.js
+          AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+      
+      # 3. 🛠️ Executar o Build
+      # O ficheiro gallery_data.json agora existe e é incluído na próxima etapa de deployment.
       - name: Run Frontend Build
         run: npm run build 
-        # ATENÇÃO: Nenhum prefixo ou working-directory é necessário aqui.
-
+        
       # 4. Deploy para o Azure Static Web Apps (Apenas Upload)
+      # O deploy irá agora incluir o ficheiro gallery_data.json gerado.
       - name: Deploy to Azure Static Web Apps
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
-          # TOKEN SECRETO OBRIGATÓRIO
+          # TOKEN SECRETO OBRIGATÓRIO (MANTIDO)
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ZEALOUS_BEACH_0A5AABE03 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
           
-          # CONFIGURAÇÕES DE CAMINHO
-          # A aplicação final (index.html) está na pasta 'frontend'
+          # CONFIGURAÇÕES DE CAMINHO (MANTIDAS)
           app_location: "frontend" 
-          # O Tailwind NÃO CRIA uma pasta 'build', ele apenas cria o styles-clean.css. 
-          # O output location deve ser a pasta que contém o index.html, que é 'frontend'.
-          # No entanto, se o Azure Static Web App espera um output_location separado (como 'build') 
-          # e o seu código React/Vue está em 'frontend', você DEVE AJUSTAR SEU BUILD.
-          #
-          # Se este é um projeto HTML/CSS/JS simples (sem framework):
-          output_location: "" # <--- DEIXE VAZIO SE NÃO HOUVER PASTA DE SAÍDA (Tudo está em frontend)
-          
-          # Se o 'output_location' não for reconhecido, use 'frontend' como saída, 
-          # mas vamos tentar "" primeiro.
+          output_location: "" 
           api_location: ""
+          
+
           
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
