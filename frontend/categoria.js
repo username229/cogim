@@ -27,64 +27,72 @@ const pastaPorCategoria = {
     "diverso": "diverso"
 };
 
-// Lista manual de imagens por pasta (SOLUÇÃO TEMPORÁRIA)
-// Esta é a solução mais simples se você não conseguir listar via API
-const imagensPorPasta = {
-    "cozinha": [
-        `${BLOB_BASE_URL}/cozinha/img1.jpg`,
-        `${BLOB_BASE_URL}/cozinha/img2.jpg`,
-        // Adicione todas as suas imagens aqui
-    ],
-    "bancada": [
-        `${BLOB_BASE_URL}/bancada/img1.jpg`,
-        // Continue para todas as pastas...
-    ],
-    // ... continue para todas as pastas
-};
-
 // Variáveis globais
 let imagensAtuais = [];
 let paginaAtual = 1;
 const itensPorPagina = 20;
 
 // =======================================================
-// SOLUÇÃO 1: Listar via API REST (requer CORS configurado)
+// Listar imagens do Blob Storage via API
 // =======================================================
 async function listarImagensBlob(pasta) {
     try {
-        // URL correta da API REST do Azure
         const url = `${BLOB_BASE_URL}?restype=container&comp=list&prefix=${pasta}/`;
-
-        console.log("Tentando listar:", url);
-
+        
+        console.log(`🔍 Listando imagens da pasta: ${pasta}`);
+        console.log(`📡 URL da requisição: ${url}`);
+        
         const resp = await fetch(url);
         
         if (!resp.ok) {
-            console.error("Erro ao listar Blob:", resp.status, resp.statusText);
-            console.error("URL tentada:", url);
-            
-            // Se der erro 403 ou CORS, use a lista manual
-            console.warn("Usando lista manual de imagens para:", pasta);
-            return imagensPorPasta[pasta] || [];
+            console.error(`❌ Erro HTTP ${resp.status}: ${resp.statusText}`);
+            console.error(`💡 Verifique se o CORS está configurado corretamente no Azure`);
+            return [];
         }
 
         const xml = await resp.text();
-        const nomes = [...xml.matchAll(/<Name>(.*?)<\/Name>/g)].map(m => m[1]);
+        
+        // Parse do XML usando DOMParser
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xml, "text/xml");
+        
+        // Busca todos os elementos <Name> no XML
+        const nameElements = xmlDoc.getElementsByTagName("Name");
+        const nomes = Array.from(nameElements).map(el => el.textContent);
+        
+        // Filtra apenas arquivos de imagem
+        const imagensValidas = nomes.filter(nome => {
+            const ext = nome.toLowerCase().split('.').pop();
+            return ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext);
+        });
 
-        return nomes.map(name => `${BLOB_BASE_URL}/${name}`);
+        console.log(`✅ Encontradas ${imagensValidas.length} imagens na pasta ${pasta}`);
+        
+        return imagensValidas.map(name => `${BLOB_BASE_URL}/${name}`);
+        
     } catch (error) {
-        console.error("Erro CORS ou de rede:", error);
-        console.warn("Usando lista manual de imagens para:", pasta);
-        return imagensPorPasta[pasta] || [];
-    }
-}
+        console.error(`❌ Erro ao listar pasta ${pasta}:`, error);
+        
+        if (error.message.includes('CORS')) {
+            console.error(`
+🚫 ERRO DE CORS DETECTADO!
 
-// =======================================================
-// SOLUÇÃO 2: Lista manual de imagens (SEM necessidade de API)
-// =======================================================
-function listarImagensManual(pasta) {
-    // Retorna as imagens da lista manual
-    return imagensPorPasta[pasta] || [];
+Para resolver:
+1. Entre no Portal do Azure (portal.azure.com)
+2. Vá até Storage Account → cogimfotos
+3. No menu lateral: Settings → CORS
+4. Aba "Blob service", adicione:
+   - Allowed origins: *
+   - Allowed methods: GET, HEAD, OPTIONS
+   - Allowed headers: *
+   - Exposed headers: *
+   - Max age: 3600
+5. Salve e aguarde 5-15 minutos
+            `);
+        }
+        
+        return [];
+    }
 }
 
 // =======================================================
@@ -101,15 +109,28 @@ function mostrarLoading(show) {
 // =======================================================
 function renderGaleria() {
     const grid = document.getElementById("galeria-grid");
-    if (!grid) return;
+    if (!grid) {
+        console.error("❌ Elemento 'galeria-grid' não encontrado!");
+        return;
+    }
 
+    // Limpa a galeria mas mantém o spinner
+    const spinner = document.getElementById("loading-spinner");
     grid.innerHTML = "";
+    if (spinner) {
+        grid.appendChild(spinner);
+    }
 
     if (imagensAtuais.length === 0) {
         grid.innerHTML = `
-            <p class="col-span-full text-center text-gray-500 py-10">
-                Nenhuma imagem encontrada.
-            </p>`;
+            <div class="col-span-full text-center py-10">
+                <i class="ri-image-line text-6xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500 text-lg font-semibold">Nenhuma imagem encontrada</p>
+                <p class="text-gray-400 text-sm mt-2">Verifique se o CORS está configurado no Azure</p>
+                <button onclick="aplicarFiltros()" class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                    🔄 Tentar Novamente
+                </button>
+            </div>`;
         return;
     }
 
@@ -117,14 +138,28 @@ function renderGaleria() {
     const end = start + itensPorPagina;
     const slice = imagensAtuais.slice(start, end);
 
-    slice.forEach(url => {
-        grid.innerHTML += `
-            <div class="rounded-lg shadow-md overflow-hidden hover:scale-105 transition border border-gray-200">
-                <img src="${url}" 
-                     class="w-full h-48 object-cover"
-                     onerror="this.parentElement.style.display='none'"
-                     loading="lazy"/>
-            </div>`;
+    console.log(`📸 Mostrando ${slice.length} imagens (${start + 1} a ${Math.min(end, imagensAtuais.length)} de ${imagensAtuais.length})`);
+
+    slice.forEach((url, index) => {
+        const div = document.createElement('div');
+        div.className = 'rounded-lg shadow-md overflow-hidden hover:scale-105 transition-transform duration-300 border border-gray-200 cursor-pointer';
+        
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = `Imagem ${start + index + 1}`;
+        img.className = 'w-full h-48 object-cover';
+        img.loading = 'lazy';
+        
+        img.onerror = function() {
+            console.warn(`⚠️ Erro ao carregar imagem: ${url}`);
+            this.parentElement.innerHTML = `
+                <div class='flex items-center justify-center h-48 bg-gray-100'>
+                    <i class='ri-image-line text-4xl text-gray-300'></i>
+                </div>`;
+        };
+        
+        div.appendChild(img);
+        grid.appendChild(div);
     });
 
     renderPaginacao();
@@ -140,24 +175,58 @@ function renderPaginacao() {
 
     pag.innerHTML = "";
 
+    if (total <= 1) return;
+
+    // Botão Anterior
+    if (paginaAtual > 1) {
+        const btnPrev = document.createElement('button');
+        btnPrev.onclick = () => irParaPagina(paginaAtual - 1);
+        btnPrev.className = "px-4 py-2 rounded-lg border bg-white text-gray-700 shadow hover:bg-gray-100 transition";
+        btnPrev.innerHTML = '<i class="ri-arrow-left-s-line"></i> Anterior';
+        pag.appendChild(btnPrev);
+    }
+
+    // Números das páginas
     for (let i = 1; i <= total; i++) {
-        pag.innerHTML += `
-            <button onclick="irParaPagina(${i})"
-                class="px-4 py-2 rounded-lg border ${i === paginaAtual ? "bg-indigo-600 text-white" : "bg-white text-gray-700"} shadow">
-                ${i}
-            </button>`;
+        if (i === 1 || i === total || (i >= paginaAtual - 1 && i <= paginaAtual + 1)) {
+            const btn = document.createElement('button');
+            btn.onclick = () => irParaPagina(i);
+            btn.className = `px-4 py-2 rounded-lg border shadow transition ${
+                i === paginaAtual 
+                    ? "bg-indigo-600 text-white font-semibold" 
+                    : "bg-white text-gray-700 hover:bg-gray-100"
+            }`;
+            btn.textContent = i;
+            pag.appendChild(btn);
+        } else if (i === paginaAtual - 2 || i === paginaAtual + 2) {
+            const span = document.createElement('span');
+            span.className = "px-2 text-gray-400";
+            span.textContent = "...";
+            pag.appendChild(span);
+        }
+    }
+
+    // Botão Próximo
+    if (paginaAtual < total) {
+        const btnNext = document.createElement('button');
+        btnNext.onclick = () => irParaPagina(paginaAtual + 1);
+        btnNext.className = "px-4 py-2 rounded-lg border bg-white text-gray-700 shadow hover:bg-gray-100 transition";
+        btnNext.innerHTML = 'Próximo <i class="ri-arrow-right-s-line"></i>';
+        pag.appendChild(btnNext);
     }
 }
 
 function irParaPagina(p) {
     paginaAtual = p;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     renderGaleria();
 }
 
 // =======================================================
-// Aplicar Filtros (CORRIGIDO)
+// Aplicar Filtros
 // =======================================================
 async function aplicarFiltros() {
+    console.log("🔄 Aplicando filtros...");
     mostrarLoading(true);
 
     let selecionadas = [];
@@ -167,12 +236,13 @@ async function aplicarFiltros() {
     const tudoMarcado = tudo && tudo.checked;
 
     if (tudoMarcado) {
-        // Se "Tudo" estiver marcado, pega todas as pastas
+        console.log("✅ Filtro 'Tudo' selecionado - carregando todas as categorias");
         selecionadas = Object.values(pastaPorCategoria);
     } else {
         // Categorias gerais
         document.querySelectorAll(".filtro-categoria:checked").forEach(c => {
             if (pastaPorCategoria[c.value]) {
+                console.log(`✅ Categoria: ${c.value} → pasta: ${pastaPorCategoria[c.value]}`);
                 selecionadas.push(pastaPorCategoria[c.value]);
             }
         });
@@ -180,6 +250,7 @@ async function aplicarFiltros() {
         // Subcategorias
         document.querySelectorAll(".filtro-subcategoria:checked").forEach(s => {
             if (pastaPorCategoria[s.value]) {
+                console.log(`✅ Subcategoria: ${s.value} → pasta: ${pastaPorCategoria[s.value]}`);
                 selecionadas.push(pastaPorCategoria[s.value]);
             }
         });
@@ -187,8 +258,13 @@ async function aplicarFiltros() {
 
     // Se nada foi selecionado, mostra todas por padrão
     if (selecionadas.length === 0) {
+        console.log("ℹ️ Nenhum filtro selecionado - mostrando todas as categorias por padrão");
         selecionadas = Object.values(pastaPorCategoria);
     }
+
+    // Remove duplicatas
+    selecionadas = [...new Set(selecionadas)];
+    console.log(`📁 Carregando ${selecionadas.length} pasta(s):`, selecionadas);
 
     imagensAtuais = [];
 
@@ -198,7 +274,7 @@ async function aplicarFiltros() {
         imagensAtuais.push(...imgs);
     }
 
-    console.log("Total de imagens carregadas:", imagensAtuais.length);
+    console.log(`✅ TOTAL: ${imagensAtuais.length} imagens carregadas`);
 
     paginaAtual = 1;
     mostrarLoading(false);
@@ -212,19 +288,35 @@ function toggleMenu() {
     const sidebar = document.getElementById("sidebar-menu");
     const backdrop = document.getElementById("menu-backdrop");
 
+    if (!sidebar || !backdrop) return;
+
     sidebar.classList.toggle("-translate-x-full");
     backdrop.classList.toggle("hidden");
     backdrop.classList.toggle("opacity-0");
+    
+    if (backdrop.classList.contains("hidden")) {
+        backdrop.classList.add("pointer-events-none");
+    } else {
+        backdrop.classList.remove("pointer-events-none");
+    }
+    
     document.body.classList.toggle("overflow-hidden");
 }
 
 function toggleDesktopSidebar() {
     const sidebar = document.getElementById("sidebar-menu");
+    if (!sidebar) return;
+    
     sidebar.classList.toggle("collapsed");
+    
+    const toggleBtn = document.querySelector("#toggle-desktop-btn i");
+    if (toggleBtn) {
+        toggleBtn.classList.toggle("rotate-180");
+    }
 }
 
 // =======================================================
-// Alternar Visibilidade das Subcategorias
+// Alternar Subcategorias
 // =======================================================
 function toggleSubcategories(subContainerId, arrowId) {
     const subContainer = document.getElementById(subContainerId);
@@ -240,19 +332,35 @@ function toggleSubcategories(subContainerId, arrowId) {
 }
 
 // =======================================================
-// Início e Listeners de Filtro
+// Fechar menu ao clicar no backdrop
 // =======================================================
 document.addEventListener("DOMContentLoaded", () => {
+    const backdrop = document.getElementById("menu-backdrop");
+    if (backdrop) {
+        backdrop.addEventListener("click", toggleMenu);
+    }
+});
+
+// =======================================================
+// Inicialização
+// =======================================================
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("🚀 Sistema de galeria Cogim iniciado");
+    console.log("📍 Blob Storage URL:", BLOB_BASE_URL);
+
     // Seleciona todos os checkboxes de filtro
     const filterCheckboxes = document.querySelectorAll(
         ".filtro-categoria, .filtro-subcategoria, #tudo"
     );
 
-    // Anexa a função aplicarFiltros ao evento 'change' de cada checkbox
+    console.log(`📋 ${filterCheckboxes.length} filtros encontrados`);
+
+    // Anexa evento aos checkboxes
     filterCheckboxes.forEach(checkbox => {
         checkbox.addEventListener("change", aplicarFiltros);
     });
     
-    // Aplica os filtros iniciais
+    // Carrega as imagens iniciais
+    console.log("⏳ Carregando galeria inicial...");
     aplicarFiltros();
 });

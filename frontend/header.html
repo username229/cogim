@@ -12,10 +12,10 @@
             >
         </a>
         
-        <div class="flex items-center space-x-4">
+        <div class="flex items-center gap-4">
             
             <!-- Menu Desktop -->
-            <nav id="main-nav" class="hidden lg:flex space-x-6 font-medium text-gray-700">
+            <nav id="main-nav" class="hidden lg:flex items-center space-x-6 font-medium text-gray-700">
                 <a href="index.html#inicio" class="hover:text-indigo-600 transition duration-200" data-translate="nav-home">Início</a>
                 <a href="categoria.html" class="hover:text-indigo-600 transition duration-200" data-translate="nav-gallery">Galeria</a>
                 <a href="index.html#sobre" class="hover:text-indigo-600 transition duration-200" data-translate="nav-about">Sobre</a>
@@ -23,33 +23,30 @@
                 <a href="tel:+258827288888" class="hover:text-indigo-600 transition duration-200" data-translate="footer-contact-link">Contacto</a>
             </nav>
             
-            <div class="flex items-center space-x-3">
-                
-                <!-- Botões de Idioma - AGORA VISÍVEL EM MOBILE -->
-                <div class="flex space-x-2">
-                    <a class="language-btn text-gray-700 hover:text-indigo-600 transition duration-200 cursor-pointer text-sm font-medium" 
-                       data-lang="pt" 
-                       onclick="changeLanguage('pt')">PT</a>
-                    <span class="text-gray-400">|</span>
-                    <a class="language-btn text-gray-700 hover:text-indigo-600 transition duration-200 cursor-pointer text-sm font-medium" 
-                       data-lang="en" 
-                       onclick="changeLanguage('en')">EN</a>
-                </div>
-                
-                <!-- Botão WhatsApp - AGORA VISÍVEL EM MOBILE -->
-                <a href="https://wa.me/258827288888" 
-                   target="_blank" 
-                   rel="noopener" 
-                   class="whatsapp-contact-btn bg-green-500 text-white px-3 py-2 rounded-full flex items-center text-sm space-x-1 hover:bg-green-600 transition duration-200 flex-shrink-0">
-                    <i class="fa-brands fa-whatsapp text-lg"></i> 
-                    <span class="hidden md:inline" data-translate="whatsapp-contact">Entre em contacto</span> 
-                </a>
+            <!-- Botões de Idioma - Alinhados Verticalmente -->
+            <div class="flex items-center gap-2 px-3 py-2 bg-white-50 rounded-lg border border-white-200">
+                <a class="language-btn text-gray-700 hover:text-indigo-600 transition duration-200 cursor-pointer text-sm font-medium" 
+                   data-lang="pt" 
+                   onclick="changeLanguage('pt')">PT</a>
+                <span class="text-gray-300">|</span>
+                <a class="language-btn text-gray-700 hover:text-indigo-600 transition duration-200 cursor-pointer text-sm font-medium" 
+                   data-lang="en" 
+                   onclick="changeLanguage('en')">EN</a>
             </div>
+            
+            <!-- Botão WhatsApp - Alinhado -->
+            <a href="https://wa.me/258827288888" 
+               target="_blank" 
+               rel="noopener" 
+               class="whatsapp-contact-btn bg-green-500 text-white px-3 py-2 rounded-lg flex items-center text-sm gap-2 hover:bg-green-600 transition duration-200 flex-shrink-0 shadow-sm">
+                <i class="fa-brands fa-whatsapp text-lg"></i> 
+                <span class="hidden md:inline" data-translate="whatsapp-contact">Entre em contacto</span> 
+            </a>
             
             <!-- Botão Menu Mobile -->
             <button id="mobile-menu-btn" 
                     onclick="toggleMenu()" 
-                    class="lg:hidden w-10 h-10 flex items-center justify-center text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-lg" 
+                    class="lg:hidden w-10 h-10 flex items-center justify-center text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-lg hover:bg-gray-100 transition" 
                     aria-label="Abrir Menu">
                 <i id="menu-icon" class="ri-menu-line ri-2x"></i>
             </button>
@@ -72,20 +69,29 @@
 <!-- Espaçador para compensar o header fixo -->
 <div class="h-20"></div>
 
+<!-- Conteúdo de exemplo -->
 
 
 <script>
-    // Função de troca de idioma (placeholder)
+    // Função de troca de idioma
     function changeLanguage(lang) {
         console.log('Idioma alterado para:', lang);
-        alert('Idioma alterado para: ' + lang.toUpperCase());
+        
+        // Destaca o idioma selecionado
+        document.querySelectorAll('.language-btn').forEach(btn => {
+            if (btn.dataset.lang === lang) {
+                btn.classList.add('text-indigo-600', 'font-bold');
+            } else {
+                btn.classList.remove('text-indigo-600', 'font-bold');
+            }
+        });
     }
 
-    // Seleciona os elementos do HTML
+    // Seleciona os elementos
     const mobileMenuPanel = document.getElementById('mobile-menu-panel');
     const menuIcon = document.getElementById('menu-icon');
     
-    // Função para abrir/fechar o menu móvel
+    // Toggle menu mobile
     function toggleMenu() {
         mobileMenuPanel.classList.toggle('hidden');
         
@@ -98,7 +104,7 @@
         }
     }
     
-    // Fecha o menu ao redimensionar para desktop
+    // Fecha o menu ao redimensionar
     window.addEventListener('resize', () => {
         if (window.innerWidth >= 1024) { 
             if (!mobileMenuPanel.classList.contains('hidden')) {
@@ -117,4 +123,5 @@
     });
 </script>
 
-<
+</body>
+</html>
