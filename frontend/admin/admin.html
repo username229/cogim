@@ -4,19 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Administrativo - Cogim</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="categoria.css">
-
+    
+    <!-- Font Awesome -->
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'>
-    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#00A3FF',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Google OAuth -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
     <!-- Facebook SDK -->
     <script async defer crossorigin="anonymous" src="https://connect.facebook.net/pt_PT/sdk.js#xfbml=1&version=v18.0&appId=YOUR_APP_ID&autoLogAppEvents=1"></script>
     
     <style>
+        :root {
+            --color-primary: #00A3FF;
+        }
+        
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        
         .admin-card {
             background: white;
             border-radius: 12px;
@@ -63,6 +91,14 @@
             background: transparent;
             color: var(--color-primary);
             border: 2px solid var(--color-primary);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
         
         .btn-secondary:hover {
@@ -72,10 +108,11 @@
         
         .admin-sidebar {
             background: linear-gradient(180deg, var(--color-primary), #0081CC);
-            min-height: calc(100vh - 160px);
-            margin-top: 80px;
-            border-radius: 12px 0 0 12px;
+            min-height: calc(100vh - 80px);
+            border-radius: 0 12px 12px 0;
             color: white;
+            position: sticky;
+            top: 0;
         }
         
         .admin-sidebar nav {
@@ -185,6 +222,7 @@
         }
         
         .divider span {
+            position: relative;
             background: white;
             padding: 0 16px;
             color: #6b7280;
@@ -208,6 +246,7 @@
             cursor: pointer;
             border-bottom: 2px solid transparent;
             transition: all 0.3s ease;
+            font-weight: 500;
         }
         
         .auth-tab.active {
@@ -215,11 +254,29 @@
             color: var(--color-primary);
             font-weight: 600;
         }
+        
+        /* Scrollbar personalizado */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--color-primary);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0081CC;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
     <!-- Header -->
-    <header class="bg-white shadow-lg">
+    <header class="bg-white shadow-lg sticky top-0 z-40">
         <div class="container mx-auto px-4 py-4">
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-4">
@@ -237,7 +294,7 @@
         </div>
     </header>
 
-    <div class="flex min-h-screen pt-4">
+    <div class="flex min-h-screen">
         <!-- Sidebar -->
         <div class="admin-sidebar w-64">
             <div class="p-6">
@@ -272,7 +329,7 @@
         </div>
 
         <!-- Main Content -->
-        <div class="flex-1 p-8">
+        <div class="flex-1 p-8 overflow-y-auto">
             <!-- Dashboard Section -->
             <div id="dashboard" class="content-section active">
                 <div class="mb-8">
@@ -344,14 +401,42 @@
 
                 <!-- Recent Activity -->
                 <div class="admin-card p-6">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4" data-translate="recent-activity">Atividade Recente</h3>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Atividade Recente</h3>
                     <div id="recent-activity-list" class="space-y-4">
-                        <!-- Activity items will be loaded here -->
+                        <p class="text-gray-500 text-center py-4">Nenhuma atividade recente</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Content Management Section -->
+            <!-- Gallery Section -->
+            <div id="gallery" class="content-section">
+                <div class="mb-8 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800 mb-2">Gestão da Galeria</h2>
+                        <p class="text-gray-600">Gerir imagens e categorias da galeria</p>
+                    </div>
+                    <button class="btn-admin" id="add-image-btn">
+                        <i class="fas fa-plus"></i>
+                        Adicionar Imagem
+                    </button>
+                </div>
+
+                <div class="admin-card p-6">
+                    <div class="flex flex-wrap gap-4 mb-6">
+                        <button class="btn-admin category-filter active" data-category="all">Todas</button>
+                        <button class="btn-secondary category-filter" data-category="cozinhas">Cozinhas</button>
+                        <button class="btn-secondary category-filter" data-category="guardafatos">Guarda-fatos</button>
+                        <button class="btn-secondary category-filter" data-category="racks">Racks</button>
+                        <button class="btn-secondary category-filter" data-category="outros">Outros</button>
+                    </div>
+
+                    <div id="gallery-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                        <p class="col-span-full text-gray-500 text-center py-8">Nenhuma imagem na galeria</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Section -->
             <div id="content" class="content-section">
                 <div class="mb-8">
                     <h2 class="text-3xl font-bold text-gray-800 mb-2">Gestão de Conteúdo</h2>
@@ -368,7 +453,7 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Subtítulo</label>
-                                <textarea class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="3">Transformamos os seus sonhos em realidade com móveis personalizados de alta qualidade. Cozinhas, closets, racks e muito mais.</textarea>
+                                <textarea class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="3">Transformamos os seus sonhos em realidade com móveis personalizados de alta qualidade.</textarea>
                             </div>
                             <button class="btn-admin">
                                 <i class="fas fa-save"></i>
@@ -397,34 +482,6 @@
                                 Atualizar Contactos
                             </button>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Gallery Management Section -->
-            <div id="gallery" class="content-section">
-                <div class="mb-8 flex justify-between items-center">
-                    <div>
-                        <h2 class="text-3xl font-bold text-gray-800 mb-2">Gestão da Galeria</h2>
-                        <p class="text-gray-600">Gerir imagens e categorias da galeria</p>
-                    </div>
-                    <button class="btn-admin" id="add-image-btn">
-                        <i class="fas fa-plus"></i>
-                        Adicionar Imagem
-                    </button>
-                </div>
-
-                <div class="admin-card p-6">
-                    <div class="flex flex-wrap gap-4 mb-6">
-                        <button class="btn-admin category-filter active" data-category="all">Todas</button>
-                        <button class="btn-secondary category-filter" data-category="cozinhas">Cozinhas</button>
-                        <button class="btn-secondary category-filter" data-category="guardafatos">Guarda-fatos</button>
-                        <button class="btn-secondary category-filter" data-category="racks">Racks</button>
-                        <button class="btn-secondary category-filter" data-category="outros">Outros</button>
-                    </div>
-
-                    <div id="gallery-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                        <!-- Gallery images will be loaded here -->
                     </div>
                 </div>
             </div>
@@ -458,27 +515,6 @@
                                 </button>
                             </div>
                         </div>
-
-                        <div class="border-b border-gray-200 pb-4">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h4 class="font-semibold text-gray-800">Maria Santos</h4>
-                                    <p class="text-gray-600 text-sm">+258 87 987 6543</p>
-                                    <p class="text-gray-700 mt-2">Preciso de um closet personalizado para o meu quarto.</p>
-                                </div>
-                                <span class="text-gray-500 text-sm">Há 3 horas</span>
-                            </div>
-                            <div class="mt-3 flex gap-2">
-                                <button class="btn-admin text-sm">
-                                    <i class="fas fa-reply"></i>
-                                    Responder
-                                </button>
-                                <button class="btn-secondary text-sm">
-                                    <i class="fas fa-archive"></i>
-                                    Arquivar
-                                </button>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -497,13 +533,9 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Cor Primária</label>
                                 <div class="flex items-center gap-3">
-                                    <input type="color" value="#00A3FF" class="w-12 h-10 border border-gray-300 rounded">
+                                    <input type="color" value="#00A3FF" class="w-12 h-10 border border-gray-300 rounded cursor-pointer">
                                     <input type="text" value="#00A3FF" class="flex-1 p-3 border border-gray-300 rounded-lg">
                                 </div>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Logo</label>
-                                <input type="file" accept="image/*" class="w-full p-3 border border-gray-300 rounded-lg">
                             </div>
                             <button class="btn-admin">
                                 <i class="fas fa-palette"></i>
@@ -519,14 +551,7 @@
                                 <span class="text-gray-700">Modo Manutenção</span>
                                 <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" class="sr-only peer">
-                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                                </label>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-gray-700">Notificações por Email</span>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" checked class="sr-only peer">
-                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                                 </label>
                             </div>
                             <button class="btn-admin">
@@ -542,7 +567,7 @@
             <div id="users" class="content-section">
                 <div class="mb-8">
                     <h2 class="text-3xl font-bold text-gray-800 mb-2">Utilizadores</h2>
-                    <p class="text-gray-600">Gestão de utilizadores do painel administrativo</p>
+                    <p class="text-gray-600">Gestão de utilizadores do painel</p>
                 </div>
 
                 <div class="admin-card p-6">
@@ -558,12 +583,10 @@
                                     <span class="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full mt-1">Ativo</span>
                                 </div>
                             </div>
-                            <div class="flex gap-2">
-                                <button class="btn-admin text-sm">
-                                    <i class="fas fa-edit"></i>
-                                    Editar
-                                </button>
-                            </div>
+                            <button class="btn-admin text-sm">
+                                <i class="fas fa-edit"></i>
+                                Editar
+                            </button>
                         </div>
 
                         <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
@@ -573,16 +596,14 @@
                                 </div>
                                 <div>
                                     <h4 class="font-semibold text-gray-800">Desenvolvedora</h4>
-                                    <p class="text-gray-600 text-sm">Desenvolvedor & Suporte Técnico</p>
+                                    <p class="text-gray-600 text-sm">Desenvolvedor & Suporte</p>
                                     <span class="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full mt-1">Ativo</span>
                                 </div>
                             </div>
-                            <div class="flex gap-2">
-                                <button class="btn-admin text-sm">
-                                    <i class="fas fa-edit"></i>
-                                    Editar
-                                </button>
-                            </div>
+                            <button class="btn-admin text-sm">
+                                <i class="fas fa-edit"></i>
+                                Editar
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -591,136 +612,238 @@
     </div>
 
     <!-- Login Modal -->
-    <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-50 modal-overlay flex items-end justify-center z-50 pb-8">
-        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto">
-            <!-- Language Selector -->
-            <div class="flex justify-center mb-6">
-                <button class="lang-btn active" data-lang="pt" data-translate="lang-pt">PT</button>
-                <button class="lang-btn" data-lang="en" data-translate="lang-en">EN</button>
-            </div>
-            
+    <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-50 modal-overlay flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl">
             <div class="text-center mb-6">
-                <img src="../public/images/logo.png" alt="Cogim Logo" class="h-16 mx-auto mb-4">
-                <h2 class="text-2xl font-bold text-gray-800" data-translate="admin-access">Acesso Administrativo</h2>
-                <p class="text-gray-600" data-translate="admin-subtitle">Entre com as suas credenciais</p>
-            </div>
-
-            <!-- Auth Tabs -->
-            <div class="auth-tabs">
-                <div class="auth-tab active" data-tab="login" data-translate="tab-login">Entrar</div>
-                <div class="auth-tab" data-tab="register" data-translate="tab-register">Criar Conta</div>
-            </div>
-
-            <!-- Social Login -->
-            <div class="space-y-3 mb-6">
-                <button class="social-btn google" id="google-signin">
-                    <i class="fab fa-google text-xl"></i>
-                    <span data-translate="continue-google">Continuar com Google</span>
-                </button>
-                <button class="social-btn facebook" id="facebook-signin">
-                    <i class="fab fa-facebook-f text-xl"></i>
-                    <span data-translate="continue-facebook">Continuar com Facebook</span>
-                </button>
-            </div>
-
-            <div class="divider">
-                <span data-translate="or">ou</span>
-            </div>
-
-            <!-- Login Form -->
-            <div id="login-form-container">
-                <form id="login-form">
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="email-label">Email</label>
-                            <input type="email" id="login-email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="password-label">Palavra-passe</label>
-                            <input type="password" id="login-password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <label class="flex items-center">
-                                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span class="ml-2 text-sm text-gray-600" data-translate="remember-me">Lembrar-me</span>
-                            </label>
-                            <a href="#" class="text-sm text-blue-600 hover:text-blue-800" data-translate="forgot-password">Esqueceu a palavra-passe?</a>
-                        </div>
-                        <button type="submit" class="btn-admin w-full">
-                            <i class="fas fa-sign-in-alt"></i>
-                            <span data-translate="sign-in">Entrar</span>
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Register Form -->
-            <div id="register-form-container" style="display: none;">
-                <form id="register-form">
-                    <div class="space-y-4">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="first-name">Nome</label>
-                                <input type="text" id="register-firstname" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="last-name">Apelido</label>
-                                <input type="text" id="register-lastname" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="email-label">Email</label>
-                            <input type="email" id="register-email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="password-label">Palavra-passe</label>
-                            <input type="password" id="register-password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="confirm-password">Confirmar Palavra-passe</label>
-                            <input type="password" id="register-confirm-password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="role-label">Função</label>
-                            <select id="register-role" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="admin" data-translate="role-admin">Administrador</option>
-                                <option value="editor" data-translate="role-editor">Editor</option>
-                                <option value="viewer" data-translate="role-viewer">Visualizador</option>
-                            </select>
-                        </div>
-                        <div class="flex items-center">
-                            <input type="checkbox" id="accept-terms" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" required>
-                            <label for="accept-terms" class="ml-2 text-sm text-gray-600">
-                                <span data-translate="accept-terms">Aceito os</span> 
-                                <a href="#" class="text-blue-600 hover:text-blue-800" data-translate="terms-conditions">Termos e Condições</a>
-                            </label>
-                        </div>
-                        <button type="submit" class="btn-admin w-full">
-                            <i class="fas fa-user-plus"></i>
-                            <span data-translate="create-account">Criar Conta</span>
-                        </button>
-                    </div>
-                </form>
+                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-lock text-white text-2xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800">Acesso Administrativo</h2>
+                <p class="text-gray-600">Entre com as suas credenciais</p>
             </div>
 
             <!-- Admin Quick Access -->
-            <div class="mt-6 pt-6 border-t border-gray-200">
-                <p class="text-sm text-gray-600 text-center mb-3" data-translate="admin-quick-access">Acesso rápido para administradores</p>
-                <div class="grid grid-cols-2 gap-2">
-                    <button class="btn-secondary text-sm py-2" data-admin="owner">
-                        <i class="fas fa-crown mr-2"></i>
-                        <span data-translate="owner-access">Proprietário</span>
+            <div class="mb-6">
+                <p class="text-sm text-gray-600 text-center mb-4">Acesso Administrativo com 2FA</p>
+                
+                <!-- Admin Type Selection -->
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <button class="btn-admin text-sm py-3 justify-center" data-admin="owner">
+                        <i class="fas fa-crown"></i>
+                        <span>Proprietário</span>
                     </button>
-                    <button class="btn-secondary text-sm py-2" data-admin="developer">
-                        <i class="fas fa-code mr-2"></i>
-                        <span data-translate="dev-access">Desenvolvedora</span>
+                    <button class="btn-admin text-sm py-3 justify-center" data-admin="developer">
+                        <i class="fas fa-code"></i>
+                        <span>Desenvolvedora</span>
                     </button>
                 </div>
+                
+                <!-- Contact Information Form -->
+                <div id="contact-form" class="space-y-4 mb-4" style="display: none;">
+                    <div class="p-4 bg-blue-50 border-2 border-blue-200 rounded-lg">
+                        <p class="text-sm text-blue-800 font-semibold mb-3 text-center">
+                            <i class="fas fa-info-circle mr-2"></i>Digite seus dados para verificação
+                        </p>
+                        
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    <i class="fas fa-envelope text-blue-500 mr-1"></i>Email
+                                </label>
+                                <input 
+                                    type="email" 
+                                    id="admin-email" 
+                                    class="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" 
+                                    placeholder="seu@email.com"
+                                    required>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    <i class="fas fa-mobile-alt text-green-500 mr-1"></i>Número de Telefone
+                                </label>
+                                <input 
+                                    type="tel" 
+                                    id="admin-phone" 
+                                    class="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" 
+                                    placeholder="+258 XX XXX XXXX"
+                                    required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 2FA Method Selection -->
+                    <div class="space-y-3">
+                        <p class="text-xs text-gray-600 text-center font-semibold">Selecione o método de verificação:</p>
+                        <button onclick="selectAuthMethod('sms')" class="w-full flex items-center justify-center gap-3 p-3 border-2 border-blue-500 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition font-semibold shadow-sm">
+                            <i class="fas fa-mobile-alt text-xl"></i>
+                            <span>SMS / Mensagem</span>
+                        </button>
+                        <button onclick="selectAuthMethod('email')" class="w-full flex items-center justify-center gap-3 p-3 border-2 border-gray-300 bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition font-semibold">
+                            <i class="fas fa-envelope text-xl"></i>
+                            <span>Email</span>
+                        </button>
+                        <button onclick="selectAuthMethod('authenticator')" class="w-full flex items-center justify-center gap-3 p-3 border-2 border-gray-300 bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition font-semibold">
+                            <i class="fas fa-shield-alt text-xl"></i>
+                            <span>Autenticador App</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <p class="text-xs text-gray-500 text-center mt-4">
+                    💡 Códigos 2FA aparecem no Console (F12)
+                </p>
             </div>
         </div>
     </div>
 
-    <script src="admin-translations.js"></script>
+    <!-- Scripts -->
+    <script>
+        // Variável global para armazenar o tipo de admin selecionado
+        let selectedAdminType = null;
+        
+        // Capturar cliques nos botões de admin
+        document.querySelectorAll('[data-admin]').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                selectedAdminType = this.getAttribute('data-admin');
+                
+                // Visual feedback - destacar selecionado
+                document.querySelectorAll('[data-admin]').forEach(b => {
+                    b.classList.remove('ring-4', 'ring-blue-300', 'scale-105');
+                    b.classList.add('scale-100');
+                });
+                this.classList.add('ring-4', 'ring-blue-300', 'scale-105');
+                
+                // Mostrar formulário de contato
+                const contactForm = document.getElementById('contact-form');
+                contactForm.style.display = 'block';
+                
+                // Animar entrada
+                contactForm.classList.add('animate-fadeIn');
+                
+                // Focar no email
+                setTimeout(() => {
+                    document.getElementById('admin-email').focus();
+                }, 300);
+            });
+        });
+        
+        // Função para selecionar método de autenticação
+        function selectAuthMethod(method) {
+            if (!selectedAdminType) {
+                alert('⚠️ Por favor, selecione primeiro Proprietário ou Desenvolvedora');
+                return;
+            }
+            
+            // Validar campos
+            const email = document.getElementById('admin-email').value.trim();
+            const phone = document.getElementById('admin-phone').value.trim();
+            
+            if (!email) {
+                alert('⚠️ Por favor, digite seu email');
+                document.getElementById('admin-email').focus();
+                return;
+            }
+            
+            if (!phone) {
+                alert('⚠️ Por favor, digite seu número de telefone');
+                document.getElementById('admin-phone').focus();
+                return;
+            }
+            
+            // Validar formato de email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('⚠️ Por favor, digite um email válido');
+                document.getElementById('admin-email').focus();
+                return;
+            }
+            
+            // Validar formato de telefone (básico)
+            const phoneRegex = /^\+?\d{10,15}$/;
+            const cleanPhone = phone.replace(/\s+/g, '');
+            if (!phoneRegex.test(cleanPhone)) {
+                alert('⚠️ Por favor, digite um número de telefone válido (ex: +258 82 123 4567)');
+                document.getElementById('admin-phone').focus();
+                return;
+            }
+            
+            // Disparar evento para o admin.js processar
+            const event = new CustomEvent('admin2FALogin', {
+                detail: {
+                    adminType: selectedAdminType,
+                    method: method,
+                    email: email,
+                    phone: cleanPhone
+                }
+            });
+            document.dispatchEvent(event);
+        }
+        
+        // Navegação entre seções
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Remover active de todos
+                document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+                document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+                
+                // Adicionar active ao clicado
+                this.classList.add('active');
+                const section = this.getAttribute('data-section');
+                document.getElementById(section).classList.add('active');
+            });
+        });
+        
+        // Formatação automática do telefone
+        document.getElementById('admin-phone')?.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.startsWith('258')) {
+                value = '+' + value;
+            } else if (!value.startsWith('+')) {
+                value = '+258' + value;
+            }
+            
+            // Formatar: +258 XX XXX XXXX
+            if (value.length > 4) {
+                value = value.slice(0, 4) + ' ' + value.slice(4);
+            }
+            if (value.length > 7) {
+                value = value.slice(0, 7) + ' ' + value.slice(7);
+            }
+            if (value.length > 11) {
+                value = value.slice(0, 11) + ' ' + value.slice(11, 15);
+            }
+            
+            e.target.value = value;
+        });
+    </script>
+    
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fadeIn {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .scale-105 {
+            transform: scale(1.05);
+        }
+        
+        .scale-100 {
+            transform: scale(1);
+        }
+    </style>
+    
     <script src="admin.js"></script>
 </body>
 </html>
