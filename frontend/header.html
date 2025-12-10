@@ -61,3 +61,24 @@
         </nav>
     </div>
 </header>
+
+<script>
+    function toggleMenu() {
+        const menuPanel = document.getElementById('mobile-menu-panel');
+        const menuIcon = document.getElementById('menu-icon');
+        
+        if (menuPanel.classList.contains('hidden')) {
+            // Abrir Menu
+            menuPanel.classList.remove('hidden');
+            // Trocar ícone para fechar (ri-close-line)
+            menuIcon.classList.remove('ri-menu-line');
+            menuIcon.classList.add('ri-close-line');
+        } else {
+            // Fechar Menu
+            menuPanel.classList.add('hidden');
+            // Trocar ícone de volta para hambúrguer (ri-menu-line)
+            menuIcon.classList.remove('ri-close-line');
+            menuIcon.classList.add('ri-menu-line');
+        }
+    }
+</script>
