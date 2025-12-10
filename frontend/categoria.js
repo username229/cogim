@@ -255,9 +255,12 @@ function renderGaleria() {
         return;
     }
 
+    console.log(`🎨 Renderizando galeria com ${imagensAtuais.length} imagens...`);
+    
     grid.innerHTML = "";
 
     if (imagensAtuais.length === 0) {
+        console.warn("⚠️ Nenhuma imagem para renderizar");
         grid.innerHTML = `
             <div class="col-span-full text-center py-16">
                 <div class="inline-block p-6 bg-gray-100 rounded-full mb-4">
@@ -280,23 +283,26 @@ function renderGaleria() {
     const slice = imagensAtuais.slice(start, end);
 
     console.log(`📸 Página ${paginaAtual}: mostrando ${slice.length} de ${imagensAtuais.length} imagens`);
+    console.log(`📋 Primeira URL:`, slice[0]);
 
     slice.forEach((url, index) => {
         const div = document.createElement('div');
-        div.className = 'group relative rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-200 cursor-pointer bg-gray-100';
+        div.className = 'gallery-card group relative rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-200 cursor-pointer bg-gray-100';
         div.style.minHeight = '200px';
         
         // Skeleton loader inicial
         const skeleton = document.createElement('div');
-        skeleton.className = 'absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-pulse';
+        skeleton.className = 'skeleton-loader absolute inset-0';
         div.appendChild(skeleton);
         
         // Cria a imagem
         const img = document.createElement('img');
         img.src = url;
         img.alt = `Imagem ${start + index + 1}`;
-        img.className = 'w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110 relative z-10';
+        img.className = 'w-full h-full object-cover transition-transform duration-300 group-hover:scale-110 relative z-10';
         img.loading = 'lazy';
+        
+        console.log(`🖼️ Criando imagem ${start + index + 1}:`, url.substring(0, 80) + '...');
         
         // Overlay com efeito hover
         const overlay = document.createElement('div');
@@ -312,15 +318,15 @@ function renderGaleria() {
         
         // Quando a imagem carregar
         img.onload = function() {
+            console.log(`✅ Imagem ${start + index + 1} carregada com sucesso`);
             skeleton.remove();
             estatisticas.imagensCarregadas++;
             atualizarBarraProgresso();
-            console.log(`✅ Imagem carregada: ${start + index + 1}`);
         };
         
         // Se houver erro no carregamento
         img.onerror = function() {
-            console.warn(`⚠️ Erro ao carregar: ${url}`);
+            console.error(`❌ Erro ao carregar imagem ${start + index + 1}:`, url);
             estatisticas.errosCarregamento++;
             skeleton.remove();
             div.innerHTML = `
@@ -329,6 +335,7 @@ function renderGaleria() {
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                     <p class="text-xs">Erro ao carregar</p>
+                    <p class="text-xs text-gray-300 mt-1">Imagem ${start + index + 1}</p>
                 </div>`;
         };
         
@@ -340,6 +347,8 @@ function renderGaleria() {
         grid.appendChild(div);
     });
 
+    console.log(`✅ Grid renderizado com ${slice.length} cards`);
+    
     renderPaginacao();
     atualizarEstatisticas();
 }
@@ -612,21 +621,78 @@ function limparCache() {
 }
 
 // =======================================================
-// Sidebar
+// Sidebar - CORRIGIDO PARA MOBILE
 // =======================================================
 function toggleMenu() {
     const sidebar = document.getElementById("sidebar-menu");
     const backdrop = document.getElementById("menu-backdrop");
-    if (!sidebar || !backdrop) return;
-
-    sidebar.classList.toggle("-translate-x-full");
-    backdrop.classList.toggle("hidden");
-    backdrop.classList.toggle("opacity-0");
     
-    if (backdrop.classList.contains("hidden")) {
-        backdrop.classList.add("pointer-events-none");
-    } else {
-        backdrop.classList.remove("pointer-events-none");
+    if (!sidebar || !backdrop) {
+        console.error("❌ Sidebar ou backdrop não encontrado!");
+        return;
     }
+
+    // 🔧 CORRIGIDO: Usa classe sidebar-open no mobile
+    const isMobile = window.innerWidth < 1024;
     
-    document.body.classList.
+    if (isMobile) {
+        sidebar.classList.toggle("sidebar-open");
+        backdrop.classList.toggle("hidden");
+        backdrop.classList.toggle("opacity-0");
+        
+        if (backdrop.classList.contains("hidden")) {
+            backdrop.classList.add("pointer-events-none");
+        } else {
+            backdrop.classList.remove("pointer-events-none");
+        }
+        
+        document.body.classList.toggle("overflow-hidden");
+    }
+}
+
+function toggleDesktopSidebar() {
+    const sidebar = document.getElementById("sidebar-menu");
+    if (!sidebar) return;
+    sidebar.classList.toggle("sidebar-closed-desktop");
+    
+    const toggleBtn = document.querySelector("#toggle-desktop-btn i");
+    if (toggleBtn) toggleBtn.classList.toggle("rotate-180");
+}
+
+function toggleSubcategories(subContainerId, arrowId) {
+    const subContainer = document.getElementById(subContainerId);
+    const arrow = document.getElementById(arrowId);
+    if (subContainer) subContainer.classList.toggle("hidden");
+    if (arrow) arrow.classList.toggle("rotate-180");
+}
+
+// =======================================================
+// Inicialização
+// =======================================================
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("🚀 Sistema Cogim Gallery v2.0 iniciado");
+    console.log("📍 Blob Storage:", BLOB_BASE_URL);
+
+    const backdrop = document.getElementById("menu-backdrop");
+    if (backdrop) backdrop.addEventListener("click", toggleMenu);
+
+    const filterCheckboxes = document.querySelectorAll(
+        ".filtro-categoria, .filtro-subcategoria, #tudo"
+    );
+
+    filterCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener("change", aplicarFiltros);
+    });
+    
+    // Adiciona atalhos de teclado
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.key === 'k') {
+            e.preventDefault();
+            const searchInput = document.querySelector('input[type="search"]');
+            if (searchInput) searchInput.focus();
+        }
+    });
+    
+    console.log("⏳ Carregando galeria inicial...");
+    aplicarFiltros();
+});
