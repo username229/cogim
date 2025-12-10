@@ -1,31 +1,381 @@
 // =======================================================
 // CONFIGURAÇÃO
 // =======================================================
-const BLOB_BASE_URL = "https://cogimfotos.blob.core.windows.net/cogim-gallery";
 
-// Configuração de SAS Token (se disponível)
-const SAS_TOKEN = "";
+// !!! NOVO MAPA DE DADOS ESTRUTURADOS COM LINKS DIRETOS DAS IMAGENS !!!
+// Agora o valor é um array de URLs de imagem, e não mais o nome da pasta.
+const dadosPorCategoria = {
+    // Links de exemplo (substitua pelos seus URLs reais)
+    "cozinhas": [
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/554e9be3-b00c-4046-9641-0abec6add357.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/8fed6e6b-9a80-4b05-bd12-043631ba8f08.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/8fed6e6b-9a80-4b05-bd12-043631ba8f08_1.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_4362.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5831.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5837.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5842.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5843.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5844.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5845.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5846.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5847.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5848.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5849.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5852.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5853.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5855.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5856.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5857.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5858.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5862.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5863.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5868.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5871.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5874.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5875.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5884.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5885.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5886.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5887.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5897.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5898.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5900.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5901.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5902.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5903.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5904.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5904_1.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5905.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5905_1.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5906.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5907.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5908.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5911.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5912.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5913.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5914.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5915.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5916.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5925.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5937.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5942.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5944.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5945.JPG",
 
-// Cache de imagens para performance
-const cacheImagens = new Map();
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutos
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5977.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5978.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5979.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5980.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5981.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5982.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_5983.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6013.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6014.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6015.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6016.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6017.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6080.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6081.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6082.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6083.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6101.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6102.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6102.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6103.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6104.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6105.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6106.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6107.JPG",
 
-// Mapa de categorias/subcategorias → pastas REAIS do Blob
-const pastaPorCategoria = {
-    "cozinhas": "cozinha",
-    "cozinha-bancada": "bancada",
-    "cozinha-peninsula": "peninsula",
-    "cozinha-ilha": "ilha",
-    "guardafatos": "closet",
-    "guardafato-portas-correr": "closetdoorcorrer",
-    "guardafato-espelho": "closetdoorespelho",
-    "tetofalso": "teto-falso",
-    "casa-de-banho": "bathroom",
-    "racks": "rack",
-    "camas": "cama",
-    "cadeiras-sofas-e-mesas": "cadeirasofacama",
-    "customizado": "customizado",
-    "diverso": "diverso"
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6108.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6109.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6111.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6112.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6113.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6114.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6115.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6116.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6117.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6120.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6121.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6122.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6123.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6134.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_6137.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_7412.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_7412_1.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_7414.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_7415.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_7416.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_7423.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/IMG_7428.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cozinha/f47736d2-2beb-458c-977d-8867230e485e.JPG",
+
+    ],
+    "cozinha-bancada": [
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/bancada/bancada/33f5c65b-fa80-4894-9124-95abbc60c394.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/bancada/bancada/IMG_4363.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/bancada/bancada/IMG_5823.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/bancada/bancada/IMG_5824.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/bancada/bancada/IMG_5825.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/bancada/bancada/IMG_5825_1.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/bancada/bancada/IMG_5827.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/bancada/bancada/IMG_5835.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/bancada/bancada/IMG_5883.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/bancada/bancada/IMG_5921.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/bancada/bancada/IMG_5930.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/bancada/bancada/IMG_5931.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/bancada/bancada/IMG_5932.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/bancada/bancada/IMG_6105.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/bancada/bancada/IMG_6107.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/bancada/bancada/IMG_6115.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/bancada/bancada/IMG_6136.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/bancada/bancada/IMG_6137.JPG",
+    ],
+    "cozinha-peninsula": [
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/peninsula/12a8f2bf-f99f-4677-a462-393d52f96c03.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/peninsula/3f1125d5-1f3e-412f-ab80-30935b9e1d0b.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/peninsula/7701011f-baa2-4bbe-9d63-33d00f61255d.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/peninsula/IMG_5829.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/peninsula/IMG_5830.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/peninsula/IMG_5831.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/peninsula/IMG_5864.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/peninsula/IMG_5865.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/peninsula/IMG_5866.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/peninsula/IMG_5866_1.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/peninsula/IMG_5869.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/peninsula/IMG_5870.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/peninsula/IMG_6098.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/peninsula/IMG_6099.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/peninsula/IMG_6104.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/peninsula/be5da201-d3a7-43b3-84d2-04d174ce9e5e.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/peninsula/e6dd0c3c-888b-4d91-a251-1e583cb0c365.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/peninsula/f8c3c172-8935-4c7e-92cf-1652a9688608.JPG",
+    ],
+    "cozinha-ilha": [
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/ilha/IMG_5918.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/ilha/IMG_5919.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/ilha/IMG_5920.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/ilha/IMG_5930.JPG", 
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/ilha/IMG_5931.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/ilha/IMG_5932.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/ilha/IMG_5935.JPG",
+    ],
+    "guardafatos": [
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_5819.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_5820.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_5821.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_5876.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_5894.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_5895.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_5896.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_5933.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_5972.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_5973.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_6005.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_6006.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_6009.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_6010.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_6014.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_6028.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_6029.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_6030.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_6032.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_6033.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_6034.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_6035.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_6036.jpg",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_6037.jpg",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_6038.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_6040.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_6042.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_6043.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_6073.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_6074.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_6078.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_6079.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_6124.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_6125.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_7419.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/closet/IMG_7420.JPG",
+    ],
+    // Adicione todas as suas categorias e links aqui:
+    "guardafato-portas-correr": [
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closetdoorcorrer/closetdooorcorrer/IMG_5800.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closetdoorcorrer/closetdooorcorrer/IMG_5801.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closetdoorcorrer/closetdooorcorrer/IMG_5802.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closetdoorcorrer/closetdooorcorrer/IMG_5803.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closetdoorcorrer/closetdooorcorrer/IMG_5879.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closetdoorcorrer/closetdooorcorrer/IMG_5881.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closetdoorcorrer/closetdooorcorrer/IMG_5974.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closetdoorcorrer/closetdooorcorrer/IMG_5975.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closetdoorcorrer/closetdooorcorrer/IMG_5976.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closetdoorcorrer/closetdooorcorrer/IMG_5989.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closetdoorcorrer/closetdooorcorrer/IMG_5990.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closetdoorcorrer/closetdooorcorrer/IMG_5991.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closetdoorcorrer/closetdooorcorrer/IMG_6004.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closetdoorcorrer/closetdooorcorrer/IMG_6126.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closetdoorcorrer/closetdooorcorrer/IMG_6127.JPG",
+
+    ],
+    "guardafato-espelho": [
+        "https://exemplo.com/fotos/closetdoorespelho/img-01.jpg",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closetdoorespelho/closetdoorespelho/IMG_6007.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closetdoorespelho/closetdoorespelho/IMG_6008.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closetdoorespelho/closetdoorespelho/IMG_6044.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closetdoorespelho/closetdoorespelho/IMG_6045.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closetdoorespelho/closetdoorespelho/IMG_6060.JPG",
+    ],
+    "tetofalso": [
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/teto falso/IMG_5888.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/teto falso/IMG_5889.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/teto falso/IMG_5890.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/teto falso/IMG_5891.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/teto falso/IMG_5892.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/teto falso/IMG_5893.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/teto falso/IMG_5959.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/teto falso/IMG_5961.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/teto falso/IMG_5962.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/teto falso/IMG_5963.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/teto falso/IMG_5964.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/teto falso/IMG_5965.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/teto falso/IMG_5966.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/teto falso/IMG_6062.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/teto falso/IMG_6063.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/teto falso/IMG_6064.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/teto falso/IMG_6068.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/teto falso/IMG_6069.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/teto falso/IMG_6084.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/teto falso/IMG_6085.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/teto falso/IMG_6086.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/teto falso/IMG_6088.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/teto falso/IMG_6089.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/teto falso/IMG_6090.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/teto falso/IMG_6093.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/teto falso/IMG_6101.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/closet/teto falso/IMG_7413.JPG",
+       
+    ],
+    "casa-de-banho": [
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/bathroom/IMG_5795.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/bathroom/IMG_5796.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/bathroom/IMG_5797.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/bathroom/IMG_5798.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/bathroom/IMG_5799.JPG",
+          ],
+     "racks": [
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/rack/rack/IMG_5804.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/rack/rack/IMG_5805.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/rack/rack/IMG_5806.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/rack/rack/IMG_5807.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/rack/rack/IMG_5808.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/rack/rack/IMG_5809.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/rack/rack/IMG_5810.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/rack/rack/IMG_5811.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/rack/rack/IMG_5812.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/rack/rack/IMG_5813.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/rack/rack/IMG_5828.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/rack/rack/IMG_5882.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/rack/rack/IMG_5938.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/rack/rack/IMG_5939.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/rack/rack/IMG_5940.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/rack/rack/IMG_5941.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/rack/rack/IMG_5955.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/rack/rack/IMG_6067.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/rack/rack/IMG_6068.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/rack/rack/IMG_6069.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/rack/rack/IMG_6092.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/rack/rack/IMG_6094.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/rack/rack/IMG_6095.JPG",
+    ],
+    "camas": [
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cama/IMG_5860.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cama/IMG_5860_1.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cama/IMG_5992.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cama/IMG_5993.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cama/IMG_6138.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cama/IMG_7427.JPG",
+    ],
+    "cadeiras-sofas-e-mesas": [
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_5951.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_5953.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_5954.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_5956.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_5957.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_5967.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_5968.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_5969.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_5970.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_5970_1.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_5984.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_5985.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_5986.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_5987.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_5995.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_5996.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_5997.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_5998.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_5999.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_6001.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_6003.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_6013.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_6020.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_6021.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_6022.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_6023.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_6046.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_6047.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_6048.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_6049.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_6050.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_6051.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_6052.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_6053.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_6054.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_6055.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_6056.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_6057.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_6058.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_6059.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_6139.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_6140.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_6141.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/cadeirasofacama/cadeirasofacama/IMG_6142.JPG",
+    ],
+    "customizado": [
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/customizado/customizado/IMG_5843.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/customizado/customizado/IMG_5977.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/customizado/customizado/IMG_5978.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/customizado/customizado/IMG_5979.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/customizado/customizado/IMG_5980.JPG",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/customizado/customizado/IMG_5981.JPG",
+    ],
+    "diverso": [
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/diverso/diverso/PHOTO-2025-04-11-22-19-59.jpg",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/diverso/diverso/PHOTO-2025-04-11-22-19-59_1.jpg",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/diverso/diverso/PHOTO-2025-04-11-22-20-00.jpg",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/diverso/diverso/PHOTO-2025-04-11-22-20-00_1.jpg",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/diverso/diverso/PHOTO-2025-04-11-22-20-00_10.jpg",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/diverso/diverso/PHOTO-2025-04-11-22-20-00_11.jpg",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/diverso/diverso/PHOTO-2025-04-11-22-20-00_2.jpg",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/diverso/diverso/PHOTO-2025-04-11-22-20-00_3.jpg",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/diverso/diverso/PHOTO-2025-04-11-22-20-00_4.jpg",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/diverso/diverso/PHOTO-2025-04-11-22-20-00_5.jpg",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/diverso/diverso/PHOTO-2025-04-11-22-20-00_6.jpg",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/diverso/diverso/PHOTO-2025-04-11-22-20-00_7.jpg",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/diverso/diverso/PHOTO-2025-04-11-22-20-00_8.jpg",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/diverso/diverso/PHOTO-2025-04-11-22-20-00_9.jpg",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/diverso/diverso/PHOTO-2025-04-11-22-20-01.jpg",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/diverso/diverso/PHOTO-2025-04-11-22-20-01_1.jpg",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/diverso/diverso/PHOTO-2025-04-11-22-20-01_2.jpg",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/diverso/diverso/PHOTO-2025-04-11-22-20-01_3.jpg",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/diverso/diverso/PHOTO-2025-04-11-22-20-01_4.jpg",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/diverso/diverso/PHOTO-2025-04-11-22-20-01_5.jpg",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/diverso/diverso/PHOTO-2025-04-11-23-43-10.jpg",
+        "https://cogimfotos.blob.core.windows.net/cogim-gallery/diverso/diverso/PHOTO-2025-04-11-23-43-10_1.jpg",
+        
+    ],
+    
 };
 
 // Variáveis globais
@@ -43,186 +393,18 @@ let estatisticas = {
 };
 
 // =======================================================
-// Sistema de Cache Inteligente
+// REMOVIDO: Sistema de Cache Inteligente (Não é mais necessário)
+// REMOVIDO: Listar imagens do Blob Storage (Substituído por dados estáticos)
+// REMOVIDO: Modal de erro CORS (Não há mais chamadas de rede)
 // =======================================================
-function obterDoCache(chave) {
-    const item = cacheImagens.get(chave);
-    if (!item) return null;
-    
-    const agora = Date.now();
-    if (agora - item.timestamp > CACHE_DURATION) {
-        cacheImagens.delete(chave);
-        return null;
-    }
-    
-    return item.dados;
-}
-
-function salvarNoCache(chave, dados) {
-    cacheImagens.set(chave, {
-        dados,
-        timestamp: Date.now()
-    });
-}
 
 // =======================================================
-// 🔧 CORRIGIDO: Listar imagens do Blob Storage
-// =======================================================
-async function listarImagensBlob(pasta, tentativa = 1) {
-    const maxTentativas = 3;
-    
-    // Verifica cache primeiro
-    const chaveCache = `pasta_${pasta}`;
-    const dadosCache = obterDoCache(chaveCache);
-    if (dadosCache) {
-        console.log(`💾 Cache hit para pasta: ${pasta}`);
-        return dadosCache;
-    }
-    
-    try {
-        let url = `${BLOB_BASE_URL}?restype=container&comp=list&prefix=${pasta}/`;
-        if (SAS_TOKEN) {
-            url += `&${SAS_TOKEN}`;
-        }
-        
-        console.log(`🔍 [Tentativa ${tentativa}/${maxTentativas}] Listando: ${pasta}`);
-        
-        const resp = await fetch(url, {
-            method: 'GET',
-            mode: 'cors',
-            cache: 'no-cache',
-            headers: {
-                'Accept': 'application/xml, text/xml, */*'
-            }
-        });
-        
-        if (!resp.ok) {
-            throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
-        }
-
-        const xml = await resp.text();
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(xml, "text/xml");
-        
-        // Verifica se houve erro no XML
-        const erroXml = xmlDoc.querySelector('Error');
-        if (erroXml) {
-            const codigo = erroXml.querySelector('Code')?.textContent;
-            const mensagem = erroXml.querySelector('Message')?.textContent;
-            throw new Error(`Azure Blob Error: ${codigo} - ${mensagem}`);
-        }
-        
-        const nameElements = xmlDoc.getElementsByTagName("Name");
-        const nomes = Array.from(nameElements).map(el => el.textContent);
-        
-        const imagensValidas = nomes.filter(nome => {
-            const ext = nome.toLowerCase().split('.').pop();
-            return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(ext);
-        });
-
-        console.log(`✅ ${imagensValidas.length} imagens em ${pasta}`);
-        
-        const urls = imagensValidas.map(name => {
-            let imageUrl = `${BLOB_BASE_URL}/${name}`;
-            if (SAS_TOKEN) {
-                imageUrl += SAS_TOKEN;
-            }
-            return imageUrl;
-        });
-        
-        // Salva no cache
-        salvarNoCache(chaveCache, urls);
-        
-        return urls;
-        
-    } catch (error) {
-        console.error(`❌ Erro na pasta ${pasta} (tentativa ${tentativa}):`, error);
-        
-        // Retry logic
-        if (tentativa < maxTentativas) {
-            const delay = Math.pow(2, tentativa) * 1000;
-            console.log(`⏳ Aguardando ${delay/1000}s antes de tentar novamente...`);
-            await new Promise(resolve => setTimeout(resolve, delay));
-            return listarImagensBlob(pasta, tentativa + 1);
-        }
-        
-        // Diagnóstico de erro
-        if (error.message.includes('CORS') || error.message.includes('Failed to fetch')) {
-            mostrarErroCORS();
-        }
-        
-        return [];
-    }
-}
-
-// =======================================================
-// Modal de erro CORS
-// =======================================================
-function mostrarErroCORS() {
-    const existe = document.getElementById('modal-erro-cors');
-    if (existe) return;
-    
-    const modal = document.createElement('div');
-    modal.id = 'modal-erro-cors';
-    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
-    modal.innerHTML = `
-        <div class="bg-white rounded-lg max-w-2xl w-full p-6 shadow-2xl">
-            <div class="flex items-start mb-4">
-                <div class="flex-shrink-0 bg-red-100 rounded-full p-3">
-                    <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                    </svg>
-                </div>
-                <div class="ml-4 flex-1">
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">
-                        Erro de CORS Detectado
-                    </h3>
-                    <p class="text-gray-600 mb-4">
-                        As imagens não puderam ser carregadas devido a restrições de CORS no Azure Blob Storage.
-                    </p>
-                </div>
-            </div>
-            
-            <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
-                <p class="font-semibold text-blue-900 mb-2">📋 Solução (Azure Portal):</p>
-                <ol class="list-decimal list-inside space-y-1 text-sm text-blue-800">
-                    <li>Acesse <a href="https://portal.azure.com" target="_blank" class="underline">portal.azure.com</a></li>
-                    <li>Navegue até: Storage Account → cogimfotos</li>
-                    <li>Menu lateral: Settings → Resource sharing (CORS)</li>
-                    <li>Na aba "Blob service", configure:
-                        <ul class="list-disc list-inside ml-6 mt-1 space-y-0.5">
-                            <li>Allowed origins: <code class="bg-blue-100 px-1 rounded">*</code></li>
-                            <li>Allowed methods: <code class="bg-blue-100 px-1 rounded">GET,HEAD,OPTIONS</code></li>
-                            <li>Allowed headers: <code class="bg-blue-100 px-1 rounded">*</code></li>
-                            <li>Exposed headers: <code class="bg-blue-100 px-1 rounded">*</code></li>
-                            <li>Max age: <code class="bg-blue-100 px-1 rounded">3600</code></li>
-                        </ul>
-                    </li>
-                    <li>Clique em "Save" e aguarde 5-15 minutos</li>
-                </ol>
-            </div>
-            
-            <div class="flex justify-end gap-3">
-                <button onclick="document.getElementById('modal-erro-cors').remove()" 
-                        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
-                    Fechar
-                </button>
-                <button onclick="document.getElementById('modal-erro-cors').remove(); aplicarFiltros();" 
-                        class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-                    🔄 Tentar Novamente
-                </button>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-}
-
-// =======================================================
-// Loading Spinner
+// Loading Spinner (Mantido, mas simplificado)
 // =======================================================
 function mostrarLoading(show, progresso = null) {
     let spinner = document.getElementById("loading-spinner");
     
+    // ... (restante da função é igual ao original)
     if (show) {
         if (!spinner) {
             spinner = document.createElement('div');
@@ -246,9 +428,10 @@ function mostrarLoading(show, progresso = null) {
 }
 
 // =======================================================
-// 🔧 CORRIGIDO: Renderizar Galeria (problema resolvido aqui!)
+// Renderizar Galeria (Sem alterações na lógica de renderização)
 // =======================================================
 function renderGaleria() {
+    // ... (Conteúdo da função renderGaleria é o mesmo do original)
     const grid = document.getElementById("galeria-grid");
     if (!grid) {
         console.error("❌ Elemento 'galeria-grid' não encontrado!");
@@ -269,7 +452,7 @@ function renderGaleria() {
                     </svg>
                 </div>
                 <p class="text-gray-700 text-xl font-bold mb-2">Nenhuma imagem encontrada</p>
-                <p class="text-gray-500 mb-6">Selecione uma categoria ou verifique as configurações do Azure</p>
+                <p class="text-gray-500 mb-6">Selecione uma categoria ou adicione os links das fotos no código.</p>
                 <button onclick="aplicarFiltros()" 
                         class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition shadow-lg">
                     🔄 Tentar Novamente
@@ -354,9 +537,10 @@ function renderGaleria() {
 }
 
 // =======================================================
-// Modal de visualização em tela cheia
+// Modal de visualização em tela cheia (Sem alterações)
 // =======================================================
 function abrirModal(indice) {
+    // ... (Conteúdo da função abrirModal é o mesmo do original)
     imagemModalAtual = indice;
     const url = imagensAtuais[indice];
     
@@ -431,9 +615,10 @@ function handleModalKeyboard(e) {
 }
 
 // =======================================================
-// Barra de progresso
+// Barra de progresso (Sem alterações)
 // =======================================================
 function atualizarBarraProgresso() {
+    // ... (Conteúdo da função atualizarBarraProgresso é o mesmo do original)
     let barra = document.getElementById('progress-bar');
     if (!barra) {
         barra = document.createElement('div');
@@ -459,9 +644,10 @@ function atualizarBarraProgresso() {
 }
 
 // =======================================================
-// Painel de estatísticas
+// Painel de estatísticas (Sem alterações)
 // =======================================================
 function atualizarEstatisticas() {
+    // ... (Conteúdo da função atualizarEstatisticas é o mesmo do original)
     let painel = document.getElementById('stats-panel');
     if (!painel) {
         painel = document.createElement('div');
@@ -492,9 +678,10 @@ function atualizarEstatisticas() {
 }
 
 // =======================================================
-// Paginação
+// Paginação (Sem alterações)
 // =======================================================
 function renderPaginacao() {
+    // ... (Conteúdo da função renderPaginacao é o mesmo do original)
     const total = Math.ceil(imagensAtuais.length / itensPorPagina);
     const pag = document.getElementById("paginacao-container");
     if (!pag) return;
@@ -545,7 +732,7 @@ function irParaPagina(p) {
 }
 
 // =======================================================
-// Aplicar Filtros
+// 🟢 NOVO: Aplicar Filtros (Lógica de Carregamento Modificada)
 // =======================================================
 async function aplicarFiltros() {
     console.log("🔄 Aplicando filtros...");
@@ -553,32 +740,27 @@ async function aplicarFiltros() {
     
     mostrarLoading(true, "Carregando categorias...");
 
-    let selecionadas = [];
+    let categoriasSelecionadasKeys = [];
     const tudo = document.getElementById("tudo");
     const tudoMarcado = tudo && tudo.checked;
 
     if (tudoMarcado) {
-        selecionadas = Object.values(pastaPorCategoria);
+        // 🔑 REQUISITO: Se TUDO estiver marcado, obtenha todas as chaves (categorias)
+        categoriasSelecionadasKeys = Object.keys(dadosPorCategoria);
     } else {
-        document.querySelectorAll(".filtro-categoria:checked").forEach(c => {
-            if (pastaPorCategoria[c.value]) {
-                selecionadas.push(pastaPorCategoria[c.value]);
-            }
-        });
-
-        document.querySelectorAll(".filtro-subcategoria:checked").forEach(s => {
-            if (pastaPorCategoria[s.value]) {
-                selecionadas.push(pastaPorCategoria[s.value]);
-            }
+        // Pega as chaves das categorias e subcategorias marcadas
+        document.querySelectorAll(".filtro-categoria:checked, .filtro-subcategoria:checked").forEach(c => {
+            categoriasSelecionadasKeys.push(c.value);
         });
     }
 
-    if (selecionadas.length === 0) {
-        selecionadas = Object.values(pastaPorCategoria);
+    // Se nenhuma estiver marcada E o TUDO não existir/estiver desmarcado, carregamos tudo por padrão
+    if (categoriasSelecionadasKeys.length === 0) {
+         categoriasSelecionadasKeys = Object.keys(dadosPorCategoria);
     }
 
-    selecionadas = [...new Set(selecionadas)];
-    console.log(`📁 Carregando ${selecionadas.length} pasta(s):`, selecionadas);
+    categoriasSelecionadasKeys = [...new Set(categoriasSelecionadasKeys)];
+    console.log(`🔑 Categorias a carregar:`, categoriasSelecionadasKeys);
 
     imagensAtuais = [];
     estatisticas = {
@@ -588,14 +770,15 @@ async function aplicarFiltros() {
         tempoCarregamento: 0
     };
 
-    // Carrega todas as pastas
-    for (let i = 0; i < selecionadas.length; i++) {
-        const pasta = selecionadas[i];
-        mostrarLoading(true, `Carregando ${i + 1}/${selecionadas.length}: ${pasta}`);
-        const imgs = await listarImagensBlob(pasta);
-        imagensAtuais.push(...imgs);
-        console.log(`📦 Pasta ${pasta}: ${imgs.length} imagens adicionadas`);
+    // 💡 NOVO: Carrega as URLs DIRETAMENTE do mapa de dados, sem chamadas de rede.
+    for (const key of categoriasSelecionadasKeys) {
+        const urls = dadosPorCategoria[key] || [];
+        imagensAtuais.push(...urls);
+        console.log(`📦 Categoria ${key}: ${urls.length} imagens adicionadas`);
     }
+
+    // Embaralha as imagens para evitar que a ordem fique sempre por categoria (Opcional)
+    // imagensAtuais.sort(() => Math.random() - 0.5);
 
     estatisticas.totalImagens = imagensAtuais.length;
     estatisticas.tempoCarregamento = ((Date.now() - inicioTempo) / 1000).toFixed(2);
@@ -605,25 +788,25 @@ async function aplicarFiltros() {
     paginaAtual = 1;
     mostrarLoading(false);
     
-    // 🔧 CRÍTICO: Força a renderização imediata
+    // Força a renderização imediata
     setTimeout(() => {
         renderGaleria();
     }, 100);
 }
 
 // =======================================================
-// Limpar cache
+// Limpar cache (Função esvaziada, pois não há cache de rede)
 // =======================================================
 function limparCache() {
-    cacheImagens.clear();
-    console.log("🗑️ Cache limpo");
+    console.log("🗑️ Não há cache de rede para limpar. Reaplicando filtros...");
     aplicarFiltros();
 }
 
 // =======================================================
-// Sidebar - CORRIGIDO PARA MOBILE
+// Sidebar - CORRIGIDO PARA MOBILE (Sem alterações)
 // =======================================================
 function toggleMenu() {
+    // ... (Conteúdo da função toggleMenu é o mesmo do original)
     const sidebar = document.getElementById("sidebar-menu");
     const backdrop = document.getElementById("menu-backdrop");
     
@@ -667,12 +850,11 @@ function toggleSubcategories(subContainerId, arrowId) {
 }
 
 // =======================================================
-// Inicialização
+// Inicialização (Sem alterações)
 // =======================================================
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("🚀 Sistema Cogim Gallery v2.0 iniciado");
-    console.log("📍 Blob Storage:", BLOB_BASE_URL);
-
+    console.log("🚀 Sistema Cogim Gallery v3.0 (Estático) iniciado");
+    
     const backdrop = document.getElementById("menu-backdrop");
     if (backdrop) backdrop.addEventListener("click", toggleMenu);
 
