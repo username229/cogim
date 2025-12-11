@@ -145,13 +145,7 @@
         <!-- 4. Conteúdo Principal - GALERIA -->
         <main id="gallery-content">
             
-            <!-- Botão "Filtros" (Mobile) - Abre o menu lateral -->
-            <div class="lg:hidden flex justify-end mb-4">
-                <button id="toggle-menu-btn" onclick="toggleMenu()" class="p-2 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150 shadow-md font-semibold">
-                    <i class="ri-filter-line mr-2"></i> Filtros
-                </button>
-            </div>
-
+          
             <!-- Card da Galeria (onde o conteúdo é exibido) -->
             <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
                 
@@ -173,12 +167,20 @@
             </div>
         </main>
     </div>
-<div id="footer-placeholder">
 </div>
+
 
     <script src="categoria.js"></script>
     <script src="component_loader.js"></script>
     <script src="script.js"></script>
     <script src="translations.js"></script>
 </body>
+
+   <script>
+    
+        $(document).ready(function() {
+            $('#footer-placeholder').load('footer.html');
+        });
+    </script>
+<div id="footer-placeholder"></div>
 </html>

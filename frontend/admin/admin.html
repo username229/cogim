@@ -683,15 +683,12 @@
                             <i class="fas fa-envelope text-xl"></i>
                             <span>Email</span>
                         </button>
-                        <button onclick="selectAuthMethod('authenticator')" class="w-full flex items-center justify-center gap-3 p-3 border-2 border-gray-300 bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition font-semibold">
-                            <i class="fas fa-shield-alt text-xl"></i>
-                            <span>Autenticador App</span>
-                        </button>
+                      
                     </div>
                 </div>
                 
                 <p class="text-xs text-gray-500 text-center mt-4">
-                    💡 Códigos 2FA aparecem no Console (F12)
+                    💡 Códigos 2FA aparecem no Console 
                 </p>
             </div>
         </div>
@@ -718,6 +715,8 @@
                 // Mostrar formulário de contato
                 const contactForm = document.getElementById('contact-form');
                 contactForm.style.display = 'block';
+
+                let selectedAuthMethod = null;
                 
                 // Animar entrada
                 contactForm.classList.add('animate-fadeIn');
@@ -781,6 +780,192 @@
             document.dispatchEvent(event);
         }
         
+        document.querySelectorAll('.space-y-3 button').forEach(btn => {
+                btn.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-700', 'hover:bg-blue-100');
+                btn.classList.add('border-gray-300', 'bg-white', 'text-gray-700', 'hover:bg-gray-50');
+            });
+            event.currentTarget.classList.remove('border-gray-300', 'bg-white', 'text-gray-700', 'hover:bg-gray-50');
+            event.currentTarget.classList.add('border-blue-500', 'bg-blue-50', 'text-blue-700', 'hover:bg-blue-100');
+
+
+            console.log(`Método 2FA selecionado: ${method} para ${selectedAdminType}`);
+
+            // 2. CHAMA A FUNÇÃO DE BACKEND PARA ENVIAR O CÓDIGO
+  async function verify2FACode() {
+    const enteredCode = document.getElementById('2fa-code').value;
+    const email = document.getElementById('admin-email').value; // Recuperar do input oculto ou variável
+    
+    if (enteredCode.length !== 6) {
+        alert("O código deve ter 6 dígitos.");
+        return;
+    }
+    
+    // A password e o email seriam necessários aqui para o login final,
+    // mas para simplificar, usaremos o 'email' e o código 2FA.
+    
+    try {
+        const response = await fetch('/api/validate-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                email: email, // Email do administrador
+                code2FA: enteredCode, 
+                method: selectedAuthMethod, 
+                adminType: selectedAdminType
+            })
+        });
+
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+            // Se o servidor retornar sucesso e o token, o login foi finalizado.
+            handleSuccessfulLogin(selectedAdminType, data.token);
+        } else {
+            alert(data.message || "Código 2FA Inválido ou credenciais incorretas. Tente novamente.");
+        }
+    } catch (error) {
+        console.error('Erro na validação 2FA:', error);
+        alert('Erro ao verificar o código. Tente novamente.');
+    }
+}
+
+
+
+        
+        /**
+         * Simula o envio da solicitação ao servidor para gerar e enviar o código.
+         * ESTA É A PARTE QUE O SEU SERVIDOR NODE.JS REALMENTE FAZ.
+         */
+        async function send2FACode(method, adminType, email, phone) {
+            // Em um ambiente real, faria uma chamada fetch/axios para o seu servidor Node.js
+            // Exemplo:
+            /*
+            const response = await fetch('/api/send-2fa', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ method, adminType, email, phone })
+            });
+            return response.json();
+            */
+            
+            // DEMONSTRAÇÃO (simulando a resposta do servidor e o código)
+            const demoCode = Math.floor(100000 + Math.random() * 900000);
+            console.log(`🔑 CÓDIGO 2FA GERADO (Aparece no console para fins de desenvolvimento): ${demoCode}`);
+
+            let message = '';
+            switch(method) {
+                case 'sms':
+                    message = `Um código SMS foi 'enviado' para ${phone}.`;
+                    break;
+                case 'email':
+                    message = `Um email com o código foi 'enviado' para ${email}.`;
+                    break;
+                case 'authenticator':
+                    message = `Por favor, insira o código do seu aplicativo Authenticator.`;
+                    break;
+            }
+            console.log(`[${method.toUpperCase()} LOG]: ${message}`);
+            
+            // Simula a resposta do servidor com sucesso
+            return { success: true, message: message, code: demoCode };
+        }
+        
+        /**
+         * Altera o modal para mostrar o campo de verificação do código.
+         */
+        function showCodeVerificationScreen() {
+            const modalContent = document.querySelector('#login-modal > div');
+            modalContent.innerHTML = `
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-key text-white text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">Verificação 2FA</h2>
+                    <p class="text-gray-600">Insira o código de 6 dígitos recebido por ${selectedAuthMethod.toUpperCase()}.</p>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <input 
+                            type="text" 
+                            id="2fa-code" 
+                            class="w-full p-4 text-center text-2xl font-mono tracking-widest border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" 
+                            placeholder="CÓDIGO (6 DÍGITOS)"
+                            maxlength="6"
+                            required>
+                    </div>
+                    <button id="verify-code-btn" onclick="verify2FACode()" class="btn-admin w-full justify-center">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Verificar Código e Entrar
+                    </button>
+                    <button onclick="document.location.reload()" class="btn-secondary w-full justify-center text-sm">
+                        Cancelar/Voltar
+                    </button>
+                </div>
+            `;
+            // Foca automaticamente no campo
+            setTimeout(() => document.getElementById('2fa-code').focus(), 100);
+        }
+        
+        /**
+         * Simula a verificação do código 2FA
+         */
+        function verify2FACode() {
+            const enteredCode = document.getElementById('2fa-code').value;
+            
+            if (enteredCode.length !== 6) {
+                alert("O código deve ter 6 dígitos.");
+                return;
+            }
+
+            // Em um ambiente real, faria uma chamada fetch/axios para o seu servidor Node.js
+            // para verificar o código no backend.
+            
+            // SIMULAÇÃO DE VERIFICAÇÃO DO CÓDIGO
+            console.log(`Tentativa de verificação do código: ${enteredCode}`);
+            
+            // Sucesso simulado
+            if (enteredCode === "000000" || enteredCode === "999999") { // Pode usar um código 'mágico' para teste
+                 handleSuccessfulLogin(selectedAdminType);
+            } else {
+                alert("Código 2FA Inválido ou Expirado. Tente novamente. (Dica: Use '000000' para sucesso simulado)");
+            }
+        }
+        
+        /**
+         * Lida com o login bem-sucedido após o 2FA
+         */
+        function handleSuccessfulLogin(adminType) {
+            let adminName = adminType === 'owner' ? 'Proprietário(a)' : 'Desenvolvedor(a)';
+            
+            document.getElementById('admin-user').textContent = `Bem-vindo, ${adminName}`;
+            document.getElementById('login-modal').classList.add('hidden'); // Esconde o modal
+            document.body.classList.remove('overflow-hidden'); // Restaura a rolagem do body
+
+            alert(`✅ Login bem-sucedido como ${adminName}!`);
+
+            // Inicializar funcionalidades do painel aqui...
+            // Por exemplo: loadGalleryImages();
+        }
+
+        /**
+         * Lógica de Logoff
+         */
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            // Em um ambiente real, limparia o token de sessão/JWT
+            alert("Sessão terminada. A recarregar a página para fazer o login.");
+            document.location.reload(); 
+        });
+
+        // Configurações iniciais ao carregar a página
+        document.addEventListener('DOMContentLoaded', () => {
+             // Força o login modal a aparecer no início e desabilita a rolagem do corpo
+             document.getElementById('login-modal').classList.remove('hidden');
+             document.body.classList.add('overflow-hidden'); 
+        });
+    </script>
+
+
         // Navegação entre seções
         document.querySelectorAll('.sidebar-item').forEach(item => {
             item.addEventListener('click', function() {

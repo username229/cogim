@@ -392,15 +392,59 @@ let estatisticas = {
     tempoCarregamento: 0
 };
 
-// =======================================================
-// REMOVIDO: Sistema de Cache Inteligente (Não é mais necessário)
-// REMOVIDO: Listar imagens do Blob Storage (Substituído por dados estáticos)
-// REMOVIDO: Modal de erro CORS (Não há mais chamadas de rede)
-// =======================================================
+function toggleMenu() {
+    const sidebar = document.getElementById("sidebar-menu");
+    const backdrop = document.getElementById("menu-backdrop");
+    
+    if (!sidebar || !backdrop) {
+        console.error("❌ Sidebar ou backdrop não encontrado!");
+        return;
+    }
 
-// =======================================================
-// Loading Spinner (Mantido, mas simplificado)
-// =======================================================
+    const isOpen = sidebar.classList.contains("sidebar-open");
+    
+    if (isOpen) {
+        // Fechar menu
+        sidebar.classList.remove("sidebar-open");
+        backdrop.classList.remove("active");
+        document.body.classList.remove("overflow-hidden");
+    } else {
+        // Abrir menu
+        sidebar.classList.add("sidebar-open");
+        backdrop.classList.add("active");
+        document.body.classList.add("overflow-hidden");
+    }
+    
+    console.log(`📱 Menu mobile ${isOpen ? 'fechado' : 'aberto'}`);
+}
+
+function toggleDesktopSidebar() {
+    const sidebar = document.getElementById("sidebar-menu");
+    if (!sidebar) return;
+    
+    sidebar.classList.toggle("sidebar-closed-desktop");
+    
+    const toggleBtn = document.querySelector("#toggle-desktop-btn i");
+    if (toggleBtn) {
+        toggleBtn.classList.toggle("rotate-180");
+    }
+    
+    console.log(`💻 Sidebar desktop ${sidebar.classList.contains("sidebar-closed-desktop") ? 'recolhida' : 'expandida'}`);
+}
+
+function toggleSubcategories(subContainerId, arrowId) {
+    const subContainer = document.getElementById(subContainerId);
+    const arrow = document.getElementById(arrowId);
+    
+    if (subContainer) {
+        subContainer.classList.toggle("hidden");
+    }
+    
+    if (arrow) {
+        arrow.classList.toggle("rotate-180");
+    }
+}
+
 function mostrarLoading(show, progresso = null) {
     let spinner = document.getElementById("loading-spinner");
     

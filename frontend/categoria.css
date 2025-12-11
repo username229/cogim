@@ -3,97 +3,81 @@
 @tailwind utilities;
 
 html, body {
-    min-height: 200vh;
+    min-height: 100vh;
     margin: 0;
-<<<<<<< HEAD
     padding-top: var(--navbar-height);
-    padding-left: 0; /* Garante que o padding lateral é controlado apenas no main-container */
+    padding-left: 0;
     padding-right: 0;
-
-=======
-    padding: 0;
->>>>>>> 6333dcf848ae64fd7587074f35a06b22539f9781
     font-family: 'Poppins', sans-serif;
-    /* Permite o scroll vertical */
     overflow-y: auto;
 }
 
 /* Variáveis de largura e altura */
 :root {
-<<<<<<< HEAD
-    --navbar-height: 2rem; 
-=======
     --navbar-height: 5rem; 
->>>>>>> 6333dcf848ae64fd7587074f35a06b22539f9781
     --sidebar-width: 300px; 
-    --sidebar-width-closed: 4rem; /* 64px */
+    --sidebar-width-closed: 4rem;
     --footer-spacing: 64px;
     --layout-gap: 24px; 
     --desktop-gap: 32px; 
-
 }
 
 #main-container {
-    
-<<<<<<< HEAD
-   
-=======
-    margin-top: var(--navbar-height); 
->>>>>>> 6333dcf848ae64fd7587074f35a06b22539f9781
     height: auto; 
-    
     max-width: 1600px; 
     margin-left: auto;
     margin-right: auto;
-    
-    /* Padding lateral padrão no mobile e desktop */
     padding-left: var(--layout-gap);
     padding-right: var(--layout-gap);
 }
 
 /* --- SIDEBAR (FILTROS) --- */
-
 #sidebar-menu {
     position: sticky;
     top: var(--navbar-height);
     width: var(--sidebar-width);
     flex-shrink: 0; 
     height: auto; 
-    overflow-y: visible; 
-    
-<<<<<<< HEAD
-    
-=======
->>>>>>> 6333dcf848ae64fd7587074f35a06b22539f9781
-    /* Transição para suavizar a abertura/fechamento */
+    overflow-y: auto;
     transition: width 0.3s ease-in-out, transform 0.3s ease-in-out;
     transform: translateX(0);
+    background-color: white;
+    border-right: 1px solid #e5e7eb;
+}
+
+/* Scrollbar customizada para a sidebar */
+#sidebar-menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+#sidebar-menu::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+#sidebar-menu::-webkit-scrollbar-thumb {
+    background: #c7d2fe;
+    border-radius: 10px;
+}
+
+#sidebar-menu::-webkit-scrollbar-thumb:hover {
+    background: #a5b4fc;
 }
 
 /* --- LAYOUT DESKTOP (>= 1024px) --- */
 @media (min-width: 1024px) {
-    
-    /* Ativa o Flexbox e o espaçamento entre as colunas */
     #main-container {
         display: flex; 
         gap: var(--desktop-gap); 
-        /* Adiciona padding superior e inferior (fora da área da navbar) */
         padding-top: var(--desktop-gap);
         padding-bottom: var(--desktop-gap);
-        
-<<<<<<< HEAD
-      
-=======
         margin-top: 0; 
->>>>>>> 6333dcf848ae64fd7587074f35a06b22539f9781
     }
     
-    /* * Torna a barra lateral Sticky no desktop.
-     * Ela "gruda" na posição abaixo da navbar ao rolar.
-     */
     #sidebar-menu {
         top: var(--navbar-height); 
         position: sticky; 
+        max-height: calc(100vh - var(--navbar-height) - var(--desktop-gap));
     }
     
     /* ESTADO DE RECOLHIMENTO (DESKTOP) */
@@ -103,35 +87,30 @@ html, body {
         padding-right: 0.5rem;
     }
     
-    /* Ocultar textos no estado recolhido */
     #sidebar-menu.sidebar-closed-desktop .sidebar-text,
     #sidebar-menu.sidebar-closed-desktop .sidebar-title,
     #sidebar-menu.sidebar-closed-desktop .ri-arrow-down-s-line { 
         display: none !important;
     }
 
-    /* Roda a seta do botão de recolher */
     #sidebar-menu.sidebar-closed-desktop #toggle-desktop-btn i {
         transform: rotate(180deg);
     }
     
-    /* Esconde submenus completamente */
     #sidebar-menu.sidebar-closed-desktop .py-1 div.ml-4 {
         display: none !important; 
     }
     
-    /* Centraliza ícones e esconde checkboxes no estado recolhido */
     #sidebar-menu.sidebar-closed-desktop .filter-item-label {
         justify-content: center !important;
         padding-left: 0;
         padding-right: 0;
-        /* Garante que o ícone é o único elemento visível do filtro */
-    }
-    #sidebar-menu.sidebar-closed-desktop .filter-item-label input {
-        display: none; /* Esconde o checkbox/radio */
     }
     
-    /* No desktop, o main-container já fornece o padding esquerdo/direito */
+    #sidebar-menu.sidebar-closed-desktop .filter-item-label input {
+        display: none;
+    }
+    
     #gallery-content {
         padding: 0;
     }
@@ -139,70 +118,130 @@ html, body {
 
 /* --- LAYOUT MOBILE (< 1024px) --- */
 @media (max-width: 1023px) {
-    
-    /* Remove a margin-top do #main-container no mobile e usa padding-top no body/content */
     #main-container {
         margin-top: 0;
         padding-top: var(--layout-gap);
         padding-bottom: var(--layout-gap);
+        display: block;
     }
 
-    /* Reverte para FIXED como OVERLAY */
+    /* ✅ CORRIGIDO: Sidebar como OVERLAY fixo no mobile */
     #sidebar-menu {
         position: fixed; 
         top: 0; 
+        left: 0;
         height: 100vh;
-        z-index: 40; 
-        transform: translateX(-100%); 
+        max-height: 100vh;
+        width: 85vw;
+        max-width: 320px;
+        z-index: 50;
+        transform: translateX(-100%);
         box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
-        /* Volta a ter scroll interno no mobile (necessário para o overlay) */
-        overflow-y: auto; 
+        overflow-y: auto;
+        transition: transform 0.3s ease-in-out;
     }
     
-    /* Classe para abrir o menu no mobile */
-    .sidebar-open {
+    /* ✅ Sidebar aberta no mobile */
+    #sidebar-menu.sidebar-open {
         transform: translateX(0) !important; 
     }
     
-    /* Ocultar a scrollbar no mobile */
+    /* Ocultar scrollbar no mobile */
     #sidebar-menu::-webkit-scrollbar {
         display: none;
     }
+    
     #sidebar-menu {
         -ms-overflow-style: none;
         scrollbar-width: none;
     }
     
-    /* Garante que o backdrop cubra a Navbar no mobile */
+    /* ✅ Backdrop deve cobrir tudo, incluindo navbar */
     #menu-backdrop {
+        position: fixed;
         top: 0 !important;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 40;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+        pointer-events: none;
+    }
+    
+    #menu-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+    
+    /* ✅ CORRIGIDO: Botão de toggle mobile visível */
+    #toggle-menu-btn {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 10;
+    }
+    
+    /* Resetar estilos collapsed no mobile */
+    #sidebar-menu.sidebar-closed-desktop {
+        width: 85vw;
+        max-width: 320px;
+        padding: 1.5rem;
+    }
+
+    #sidebar-menu.sidebar-closed-desktop .sidebar-text,
+    #sidebar-menu.sidebar-closed-desktop .sidebar-title {
+        opacity: 1;
+        visibility: visible;
+        width: auto;
+        display: block !important;
+    }
+
+    #sidebar-menu.sidebar-closed-desktop input[type="checkbox"] {
+        display: block;
+    }
+    
+    #gallery-content {
+        width: 100%;
     }
 }
 
+/* Smartphones pequenos */
+@media (max-width: 640px) {
+    #gallery-content {
+        padding: 0.75rem;
+    }
 
-/* --- CONTEÚDO PRINCIPAL (GALERIA) --- */
-
-#gallery-content {
-    flex-grow: 1; /* Ocupa o espaço restante */
-    overflow-y: visible; 
-    height: auto; 
-    min-width: 0; /* Essencial para layouts flexíveis */
+    #sidebar-menu {
+        width: 85vw;
+        max-width: 280px;
+    }
 }
 
+/* --- CONTEÚDO PRINCIPAL (GALERIA) --- */
+#gallery-content {
+    flex-grow: 1;
+    overflow-y: visible; 
+    height: auto; 
+    min-width: 0;
+}
 
-/* --- OUTROS ESTILOS DA GALERIA --- */
-
-/* Estilo do Card da Galeria */
+/* --- ESTILOS DA GALERIA --- */
 .gallery-card {
     aspect-ratio: 4/3;
     transition: transform 0.3s, box-shadow 0.3s;
 }
+
 .gallery-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
-/* Estilo do Spinner de Loading */
+/* Spinner de Loading */
 .spinner {
     border-top-color: transparent;
     animation: spin 1s linear infinite;
@@ -212,14 +251,114 @@ html, body {
     to { transform: rotate(360deg); }
 }
 
- .chatbot-hidden {
-            transform: scale(0.5);
-            opacity: 0;
-            pointer-events: none;
-            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
-        }
-        .chatbot-visible {
-            transform: scale(1);
-            opacity: 1;
-            pointer-events: auto;
-        }
+/* Skeleton loader */
+.skeleton-loader {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Chatbot */
+.chatbot-hidden {
+    transform: scale(0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+.chatbot-visible {
+    transform: scale(1);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Transições suaves */
+.transition-transform {
+    transition: transform 0.3s ease;
+}
+
+.rotate-180 {
+    transform: rotate(180deg);
+}
+
+/* Estados dos filtros */
+input[type="checkbox"]:checked {
+    background-color: currentColor;
+    border-color: currentColor;
+}
+
+/* Footer */
+#footer-placeholder {
+    margin-top: auto;
+}
+
+/* Subcategorias */
+.label-content {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+/* Utilitários */
+.hidden {
+    display: none !important;
+}
+
+.pointer-events-none {
+    pointer-events: none;
+}
+
+.pointer-events-auto {
+    pointer-events: auto;
+}
+
+/* Prevenir scroll do body quando menu mobile está aberto */
+body.overflow-hidden {
+    overflow: hidden;
+}
+
+/* Ajustes para o modal de imagem */
+#modal-imagem {
+    backdrop-filter: blur(4px);
+}
+
+/* Animação de fade in para cards */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.gallery-card {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Responsividade da grid */
+@media (max-width: 640px) {
+    #galeria-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+    #galeria-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    #galeria-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
