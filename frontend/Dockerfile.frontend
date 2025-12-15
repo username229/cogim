@@ -1,0 +1,15 @@
+# Usa a imagem oficial do Nginx
+FROM nginx:alpine
+
+# Remove a configuração padrão
+RUN rm /etc/nginx/conf.d/default.conf
+
+# Copia a pasta do painel de administração
+COPY admin /usr/share/nginx/html/admin
+
+# Copia ficheiros estáticos soltos (ex: index.html na raiz do seu repositório)
+COPY index.html /usr/share/nginx/html/
+COPY styles.css /usr/share/nginx/html/
+
+# Expõe a porta 80, que o Nginx usa internamente
+EXPOSE 80

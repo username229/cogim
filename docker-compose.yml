@@ -4,35 +4,36 @@ services:
   # 1. Serviço do Backend (Node.js Express)
   backend:
     build:
-      context: .
-      dockerfile: Dockerfile.backend
+      context: ./backend 
+      dockerfile: Dockerfile
     container_name: cogim-backend
-    # Mapeia as variáveis de ambiente do seu .env local se necessário
     env_file:
       - .env.backend
     expose:
-      - "3000" # expõe a porta internamente (para o Nginx)
+      - "3000" # Porta interna
     networks:
       - app-network
 
   # 2. Serviço do Frontend (Nginx Estático)
   frontend:
     build:
-      context: .
-      dockerfile: Dockerfile.frontend
+      context: . # Usa a raiz para aceder a 'admin/' e ficheiros soltos
+      dockerfile: frontend/Dockerfile 
     container_name: cogim-frontend
+    expose:
+      - "80" # Porta interna do Nginx frontend
     networks:
       - app-network
 
-  # 3. Serviço do Proxy Reverso (Nginx)
+  # 3. Serviço do Proxy Reverso (Nginx) - Ponto de Entrada Público
   proxy:
     image: nginx:alpine
     container_name: cogim-proxy
-    # Copia a configuração personalizada do Nginx para dentro do contêiner
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     ports:
-      - "80:80" # Mapeia a porta 80 do contêiner para a porta 80 do seu host (http://localhost)
+      # A porta 80 será a porta que o Render vai expor!
+      - "80:80" 
     depends_on:
       - backend
       - frontend

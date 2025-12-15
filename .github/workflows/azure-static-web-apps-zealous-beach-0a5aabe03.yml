@@ -1,69 +1,49 @@
-name: Azure Static Web Apps CI/CD
+name: CI/CD para Render via Docker
 
 on:
   push:
     branches:
-      - main
-  pull_request:
-    types: [opened, synchronize, reopened, closed]
-    branches:
-      - main
+      - main # Aciona sempre que há um push na branch principal
+  workflow_dispatch: # Permite execução manual
 
 jobs:
-  build_and_deploy_job:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+  deploy:
     runs-on: ubuntu-latest
-    name: Build and Deploy Job
-
     steps:
-      # 1️⃣ Checkout do código
-      - uses: actions/checkout@v3
-        with:
-          submodules: true
-          lfs: false
-          
-      # 2️⃣ Instalar dependências (package.json está na raiz)
-      - name: Install Node Dependencies
-        run: npm install
+      - name: Checkout Código
+        uses: actions/checkout@v4
 
-      # 3️⃣ Gerar gallery_data.json na raiz
-      - name: ⚙️ Gerar gallery_data.json a partir do Blob Storage
-        run: node generate_gallery_data.js
-        env:
-          AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ZEALOUS_BEACH_0A5AABE03 }}
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
-
-      # 4️⃣ Build do frontend (corre scripts do package.json na raiz)
-      - name: Run Frontend Build
-        run: npm run build
+      # ----------------------------------------------------------------------
+      # ETAPA 1: TESTES (Exemplo, muito recomendado antes do deploy)
+      # ----------------------------------------------------------------------
+      # - name: Configurar Node.js e Instalar Dependências
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     node-version: '22'
+      #     cache: 'npm'
+      #     cache-dependency-path: backend/package-lock.json
+      #   
+      # - name: Executar Testes Unitários
+      #   run: npm test
+      #   working-directory: ./backend 
+      #   # O deploy só continua se os testes passarem
+      
+      # ----------------------------------------------------------------------
+      # ETAPA 2: DEPLOY PARA RENDER (Usando a API do Render)
+      # ----------------------------------------------------------------------
+      - name: Acionar Rebuild do Serviço Render
+        # Chama a API do Render para puxar a imagem Docker mais recente
+        run: |
+          echo "Acionando rebuild do serviço Render ID: ${{ secrets.RENDER_SERVICE_ID }}"
+          curl -X POST \
+          -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+          -H "Content-Type: application/json" \
+          "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys"
         
-      # 5️⃣ Deploy para Azure Static Web Apps
-      - name: Deploy to Azure Static Web Apps
-        id: builddeploy
-        uses: Azure/static-web-apps-deploy@v1
-        with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ZEALOUS_BEACH_0A5AABE03 }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          action: "upload"
+        env:
+          # Injeta os segredos
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
 
-          # Diretório onde está o frontend
-          app_location: "frontend"
-          output_location: ""
-          api_location: ""
-
-          
-  close_pull_request_job:
-    if: github.event_name == 'pull_request' && github.event.action == 'closed'
-    runs-on: ubuntu-latest
-    name: Close Pull Request Job
-
-    steps:
-      - name: Close Pull Request
-        id: closepullrequest
-        uses: Azure/static-web-apps-deploy@v1
-        with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ZEALOUS_BEACH_0A5AABE03 }}
-          action: "close"
+      - name: Confirmação de Deploy
+        run: echo "Rebuild do Render acionado com sucesso. O Render está a construir a nova imagem Docker."
