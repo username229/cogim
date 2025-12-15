@@ -46,6 +46,11 @@ __pycache__/
 __blobstorage__
 __queuestorage__
 __azurite_db*__.json
+staticwebapp.config.json
+generate_gallery_data.js
+
+azure-pipelines.yml
+cogigmblobtrigger
 
 *.local
 .env

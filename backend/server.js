@@ -5,7 +5,6 @@ const path = require('path');
 const cors = require('cors');
 const { BlobServiceClient } = require('@azure/storage-blob');
 const PORT = process.env.PORT || 3000;
-
 // ------------------------------------------
 // 1. CONFIGURAÇÃO AZURE BLOB CLIENT
 // ------------------------------------------
