@@ -1,10 +1,13 @@
-// server.js (Versão Integrada ao Azure)
-require('dotenv').config(); // Carrega o .env localmente
+require('dotenv').config(); 
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const { BlobServiceClient } = require('@azure/storage-blob');
+
+const app = express();
+// O Render injeta a porta automaticamente, mas usamos 3000 como padrão interno do Docker
 const PORT = process.env.PORT || 3000;
+
 // ------------------------------------------
 // 1. CONFIGURAÇÃO AZURE BLOB CLIENT
 // ------------------------------------------
@@ -12,135 +15,99 @@ const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
 const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
 const containerName = process.env.AZURE_STORAGE_CONTAINER_NAME;
 
-// O URL base para as imagens (usado no frontend)
 const AZURE_BLOB_BASE_URL = `https://${accountName}.blob.core.windows.net/${containerName}/`; 
 
 let containerClient;
 
 if (accountName && accountKey && containerName) {
     try {
-        const sharedKeyCredential = new (require('@azure/storage-blob').StorageSharedKeyCredential)(
-            accountName, 
-            accountKey
-        );
+        const { StorageSharedKeyCredential } = require('@azure/storage-blob');
+        const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey);
         const blobServiceClient = new BlobServiceClient(
             `https://${accountName}.blob.core.windows.net`,
             sharedKeyCredential
         );
         containerClient = blobServiceClient.getContainerClient(containerName);
-        console.log('☁️ Conexão com Azure Blob Storage estabelecida.');
+        console.log('☁️ Conexão com Azure Blob Storage estabelecida com sucesso.');
     } catch (error) {
         console.error("❌ ERRO: Falha ao inicializar o Azure Blob Client:", error.message);
-        // Não encerra o servidor, mas a API do Azure falhará
     }
 } else {
-    console.warn("⚠️ Variáveis do Azure não configuradas. A API de Galeria (Azure) não funcionará.");
+    console.warn("⚠️ Variáveis do Azure (ACCOUNT_NAME/KEY/CONTAINER) não encontradas no ambiente.");
 }
 
 // ------------------------------------------
-// 2. CONFIGURAÇÃO EXPRESS
+// 2. MIDDLEWARES
 // ------------------------------------------
-const app = express();
-app.use(cors()); // Permite acesso do frontend
+app.use(cors());
+app.use(express.json());
+
+// Servir arquivos estáticos (Backup caso o NGINX falhe ou para testes locais)
 app.use(express.static(path.join(__dirname, 'frontend')));
-app.use('/public', express.static(path.join(__dirname, 'public'))); // Mantido para ativos locais não-Azure
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // ------------------------------------------
-// 3. ROTAS DE NAVEGAÇÃO
+// 3. FUNÇÕES AUXILIARES
 // ------------------------------------------
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'frontend', 'index.html')));
-app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'frontend', 'admin.html')));
-
-// ------------------------------------------
-// 4. API PARA OBTER DADOS DA GALERIA (AZURE)
-// ------------------------------------------
-
-/**
- * Mapeia o caminho do blob (categoria/subpasta/imagem.jpg) para o formato de resposta do frontend.
- * @param {string} filePath - Caminho do blob (ex: cozinhas/modernas/cozinha_ilha_1.jpg)
- * @returns {object|null} Objeto de dados da foto ou null se for um diretório.
- */
 function mapBlobToPhoto(filePath) {
     if (filePath.endsWith('/') || !/\.(jpg|jpeg|png|gif|webp)$/i.test(filePath)) {
-        return null; // Ignorar diretórios e arquivos não-imagem
+        return null; 
     }
 
     const parts = filePath.split('/');
     let categorySlug = parts[0]; 
     let photoUrl = AZURE_BLOB_BASE_URL + filePath;
-
-    // Você precisará de uma lógica mais complexa para inferir 'subcategorias' 
-    // ou passá-las diretamente do Azure, mas por enquanto, vamos simplificar:
     let subcategorySlug = parts.length > 2 ? parts[1] : categorySlug;
     
-    // ATENÇÃO: Se as fotos estiverem DENTRO de uma subpasta, o categorySlug será o nome da primeira pasta.
-    
     return {
-        id: filePath, // Usar o path como ID único
+        id: filePath,
         file: filePath,
         categoria: categorySlug,
-        subcategorias: [subcategorySlug], // Use o nome da subpasta como subcategoria
+        subcategorias: [subcategorySlug],
         photoUrl: photoUrl
     };
 }
 
+// ------------------------------------------
+// 4. ROTAS DA API
+// ------------------------------------------
 
+// Endpoint principal da galeria
 app.get('/api/gallery-data', async (req, res) => {
     if (!containerClient) {
-        return res.status(500).json({ error: 'Servidor Azure Blob não inicializado.' });
+        return res.status(503).json({ error: 'Servidor Azure Blob não configurado.' });
     }
     
     try {
         let photos = [];
-        // listBlobsFlat lista todos os blobs, incluindo subpastas.
         const iter = containerClient.listBlobsFlat();
 
         for await (const blob of iter) {
             const photoData = mapBlobToPhoto(blob.name);
-            if (photoData) {
-                photos.push(photoData);
-            }
+            if (photoData) photos.push(photoData);
         }
         
-        // Formato final: Agrupa fotos por categoria para corresponder ao seu frontend
         const galleryData = {};
-        
         photos.forEach(photo => {
             const slug = photo.categoria;
             if (!galleryData[slug]) {
-                // Aqui você pode adicionar as informações de exibição da categoria
                 galleryData[slug] = {
-                    nome: slug.charAt(0).toUpperCase() + slug.slice(1).replace('-', ' '), // Capitaliza a primeira letra para exibição
+                    nome: slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, ' '),
                     slug: slug,
                     fotos: []
                 };
             }
-            // Adiciona a URL completa da foto
             galleryData[slug].fotos.push(photo); 
         });
 
-
-        // Transforma o objeto em um array de categorias
-        const result = Object.values(galleryData);
-
-        console.log(`🖼️ Sucesso: Carregadas ${photos.length} imagens do Azure.`);
-        res.json(result);
-
+        res.json(Object.values(galleryData));
     } catch (error) {
         console.error('❌ Erro ao listar blobs do Azure:', error);
-        res.status(500).json({ error: 'Não foi possível carregar os dados da galeria do Azure.' });
+        res.status(500).json({ error: 'Erro ao carregar galeria do Azure.' });
     }
 });
 
-
-// ------------------------------------------
-// 5. ROTAS DE INFORMAÇÃO E ESTATÍSTICAS (MANTIDAS)
-// * Nota: Você deve reescrever /api/gallery-count para usar o Azure
-// ------------------------------------------
-
-// ... (Mantenha as rotas /api/system-info, /api/detect-accounts, /api/stats, /api/gallery-count)
-
-// ATENÇÃO: Você precisa REESCREVER /api/gallery-count para usar a lógica do Azure
+// Endpoint de contagem para o Dashboard
 app.get('/api/gallery-count', async (req, res) => {
     if (!containerClient) return res.json({ count: 0 });
     
@@ -148,21 +115,40 @@ app.get('/api/gallery-count', async (req, res) => {
         const iter = containerClient.listBlobsFlat();
         let totalImages = 0;
         for await (const blob of iter) {
-             if (mapBlobToPhoto(blob.name)) {
-                totalImages++;
-             }
+             if (mapBlobToPhoto(blob.name)) totalImages++;
         }
         res.json({ count: totalImages });
     } catch (error) {
-        res.status(500).json({ error: 'Erro ao contar imagens do Azure' });
+        res.status(500).json({ error: 'Erro ao contar imagens' });
     }
 });
-// ... (outras rotas)
+
+// Endpoint de status do sistema (Útil para o Render Health Check)
+app.get('/api/system-info', (req, res) => {
+    res.json({
+        status: 'online',
+        uptime: process.uptime(),
+        azureConnected: !!containerClient,
+        timestamp: new Date()
+    });
+});
 
 // ------------------------------------------
-// 6. INICIALIZAÇÃO DO SERVIDOR
+// 5. ROTAS DE NAVEGAÇÃO (Fallback)
 // ------------------------------------------
-app.listen(PORT, () => {
-    // É CRÍTICO imprimir este log para saber que o servidor iniciou
-    console.log(`🚀 Servidor Express rodando em http://localhost:${PORT}`);
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'frontend', 'admin.html'));
+});
+
+// ------------------------------------------
+// 6. INICIALIZAÇÃO
+// ------------------------------------------
+// Importante: '0.0.0.0' permite que o container receba conexões externas ao seu próprio IP
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`
+     Servidor Express Online!
+     Porta: ${PORT}
+    URL Interna: http://backend:${PORT}
+    __________________________________________
+    `);
 });
