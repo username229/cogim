@@ -6,7 +6,7 @@ const { BlobServiceClient } = require('@azure/storage-blob');
 
 const app = express();
 // O Render injeta a porta automaticamente, mas usamos 3000 como padrão interno do Docker
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
 // ------------------------------------------
 // 1. CONFIGURAÇÃO AZURE BLOB CLIENT
@@ -148,7 +148,7 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log(`
      Servidor Express Online!
      Porta: ${PORT}
-    URL Interna: http://backend:${PORT}
+    🔗URL Interna: http://backend:${PORT}
     __________________________________________
     `);
 });
