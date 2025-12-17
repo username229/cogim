@@ -2,153 +2,47 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
-const { BlobServiceClient } = require('@azure/storage-blob');
 
 const app = express();
-// O Render injeta a porta automaticamente, mas usamos 3000 como padrão interno do Docker
 const PORT = process.env.PORT || 3000;
 
-// ------------------------------------------
-// 1. CONFIGURAÇÃO AZURE BLOB CLIENT
-// ------------------------------------------
-const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
-const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
-const containerName = process.env.AZURE_STORAGE_CONTAINER_NAME;
-
-const AZURE_BLOB_BASE_URL = `https://${accountName}.blob.core.windows.net/${containerName}/`; 
-
-let containerClient;
-
-if (accountName && accountKey && containerName) {
-    try {
-        const { StorageSharedKeyCredential } = require('@azure/storage-blob');
-        const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey);
-        const blobServiceClient = new BlobServiceClient(
-            `https://${accountName}.blob.core.windows.net`,
-            sharedKeyCredential
-        );
-        containerClient = blobServiceClient.getContainerClient(containerName);
-        console.log('☁️ Conexão com Azure Blob Storage estabelecida com sucesso.');
-    } catch (error) {
-        console.error("❌ ERRO: Falha ao inicializar o Azure Blob Client:", error.message);
-    }
-} else {
-    console.warn("⚠️ Variáveis do Azure (ACCOUNT_NAME/KEY/CONTAINER) não encontradas no ambiente.");
-}
-
-// ------------------------------------------
-// 2. MIDDLEWARES
-// ------------------------------------------
 app.use(cors());
 app.use(express.json());
 
-// Servir arquivos estáticos (Backup caso o NGINX falhe ou para testes locais)
-app.use(express.static(path.join(__dirname, 'frontend')));
-app.use('/public', express.static(path.join(__dirname, 'public')));
+// --- A MUDANÇA ESTÁ AQUI ---
+// Definimos o caminho para a pasta 'frontend' que está um nível acima da pasta 'backend'
+const frontendPath = path.join(__dirname, '..', 'frontend');
 
-// ------------------------------------------
-// 3. FUNÇÕES AUXILIARES
-// ------------------------------------------
-function mapBlobToPhoto(filePath) {
-    if (filePath.endsWith('/') || !/\.(jpg|jpeg|png|gif|webp)$/i.test(filePath)) {
-        return null; 
-    }
+// 1. Servir os ficheiros estáticos (CSS, JS, Imagens)
+// Importante: Isso permite que o index.html encontre seus estilos e scripts
+app.use(express.static(frontendPath));
 
-    const parts = filePath.split('/');
-    let categorySlug = parts[0]; 
-    let photoUrl = AZURE_BLOB_BASE_URL + filePath;
-    let subcategorySlug = parts.length > 2 ? parts[1] : categorySlug;
-    
-    return {
-        id: filePath,
-        file: filePath,
-        categoria: categorySlug,
-        subcategorias: [subcategorySlug],
-        photoUrl: photoUrl
-    };
-}
-
-// ------------------------------------------
-// 4. ROTAS DA API
-// ------------------------------------------
-
-// Endpoint principal da galeria
-app.get('/api/gallery-data', async (req, res) => {
-    if (!containerClient) {
-        return res.status(503).json({ error: 'Servidor Azure Blob não configurado.' });
-    }
-    
-    try {
-        let photos = [];
-        const iter = containerClient.listBlobsFlat();
-
-        for await (const blob of iter) {
-            const photoData = mapBlobToPhoto(blob.name);
-            if (photoData) photos.push(photoData);
-        }
-        
-        const galleryData = {};
-        photos.forEach(photo => {
-            const slug = photo.categoria;
-            if (!galleryData[slug]) {
-                galleryData[slug] = {
-                    nome: slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, ' '),
-                    slug: slug,
-                    fotos: []
-                };
-            }
-            galleryData[slug].fotos.push(photo); 
-        });
-
-        res.json(Object.values(galleryData));
-    } catch (error) {
-        console.error('❌ Erro ao listar blobs do Azure:', error);
-        res.status(500).json({ error: 'Erro ao carregar galeria do Azure.' });
-    }
+// 2. Rota para carregar o index.html na raiz
+app.get('/', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
-// Endpoint de contagem para o Dashboard
-app.get('/api/gallery-count', async (req, res) => {
-    if (!containerClient) return res.json({ count: 0 });
-    
-    try {
-        const iter = containerClient.listBlobsFlat();
-        let totalImages = 0;
-        for await (const blob of iter) {
-             if (mapBlobToPhoto(blob.name)) totalImages++;
-        }
-        res.json({ count: totalImages });
-    } catch (error) {
-        res.status(500).json({ error: 'Erro ao contar imagens' });
-    }
+// 3. Rota para o futuro Admin (atualmente servindo o mesmo index ou erro)
+app.get('/admin', (req, res) => {
+    // Quando você criar o painel, basta apontar para a nova pasta aqui
+    res.send('O Painel de Admin será configurado aqui em breve.');
 });
 
-// Endpoint de status do sistema (Útil para o Render Health Check)
+// 4. API de Status
 app.get('/api/system-info', (req, res) => {
     res.json({
         status: 'online',
         uptime: process.uptime(),
-        azureConnected: !!containerClient,
-        timestamp: new Date()
+        directory: frontendPath
     });
 });
 
-// ------------------------------------------
-// 5. ROTAS DE NAVEGAÇÃO (Fallback)
-// ------------------------------------------
-app.get('/admin', (req, res) => {
-    res.sendFile(path.join(__dirname, 'frontend', 'admin.html'));
+// 5. Fallback: Se não encontrar nada, volta para o index (útil para SPAs)
+app.get('*', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
-// ------------------------------------------
-// 6. INICIALIZAÇÃO
-// ------------------------------------------
-// Importante: '0.0.0.0' permite que o container receba conexões externas ao seu próprio IP
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`
-     Servidor Express Online!
-     Porta: ${PORT}
-    🔗URL Interna: http://backend:${PORT}
-    __________________________________________
-    `);
+    console.log(`🚀 Servidor rodando na porta ${PORT}`);
+    console.log(`📂 Servindo arquivos de: ${frontendPath}`);
 });
