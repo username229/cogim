@@ -2,66 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
+/* --- BASES E VARIÁVEIS --- */
+:root {
+    --navbar-height: 5rem; 
+    --filtros-sidebar-width: 280px; 
+    --filtros-sidebar-width-closed: 4rem;
+    --layout-gap: 16px; 
+    --desktop-gap: 32px; 
+}
+
 html, body {
     min-height: 100vh;
     margin: 0;
     padding-top: var(--navbar-height);
-    padding-left: 0;
-    padding-right: 0;
     font-family: 'Poppins', sans-serif;
-    overflow-y: auto;
-}
-
-/* Variáveis de largura e altura */
-:root {
-    --navbar-height: 5rem; 
-    --sidebar-width: 300px; 
-    --sidebar-width-closed: 4rem;
-    --footer-spacing: 64px;
-    --layout-gap: 24px; 
-    --desktop-gap: 32px; 
+    overflow-x: hidden;
 }
 
 #main-container {
-    height: auto; 
-    max-width: 1600px; 
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: var(--layout-gap);
-    padding-right: var(--layout-gap);
+    max-width: 1920px;
+    margin: 0 auto;
+    padding: 0 var(--layout-gap);
+    width: 100%;
 }
 
-/* --- SIDEBAR (FILTROS) --- */
-#sidebar-menu {
-    position: sticky;
-    top: var(--navbar-height);
-    width: var(--sidebar-width);
-    flex-shrink: 0; 
-    height: auto; 
-    overflow-y: auto;
-    transition: width 0.3s ease-in-out, transform 0.3s ease-in-out;
-    transform: translateX(0);
+/* --- FILTROS SIDEBAR (GERAL) --- */
+#filtros-sidebar-menu {
     background-color: white;
-    border-right: 1px solid #e5e7eb;
-}
-
-/* Scrollbar customizada para a sidebar */
-#sidebar-menu::-webkit-scrollbar {
-    width: 6px;
-}
-
-#sidebar-menu::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-}
-
-#sidebar-menu::-webkit-scrollbar-thumb {
-    background: #c7d2fe;
-    border-radius: 10px;
-}
-
-#sidebar-menu::-webkit-scrollbar-thumb:hover {
-    background: #a5b4fc;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* --- LAYOUT DESKTOP (>= 1024px) --- */
@@ -70,295 +38,89 @@ html, body {
         display: flex; 
         gap: var(--desktop-gap); 
         padding-top: var(--desktop-gap);
-        padding-bottom: var(--desktop-gap);
-        margin-top: 0; 
     }
     
-    #sidebar-menu {
-        top: var(--navbar-height); 
-        position: sticky; 
-        max-height: calc(100vh - var(--navbar-height) - var(--desktop-gap));
+    #filtros-sidebar-menu {
+        position: sticky;
+        top: calc(var(--navbar-height) + 20px);
+        width: var(--filtros-sidebar-width);
+        height: calc(100vh - var(--navbar-height) - 60px);
+        flex-shrink: 0; 
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        overflow-y: auto;
     }
     
-    /* ESTADO DE RECOLHIMENTO (DESKTOP) */
-    #sidebar-menu.sidebar-closed-desktop {
-        width: var(--sidebar-width-closed);
-        padding-left: 0.5rem; 
-        padding-right: 0.5rem;
+    /* Estado Recolhido Desktop */
+    #filtros-sidebar-menu.filtros-sidebar-closed-desktop {
+        width: var(--filtros-sidebar-width-closed);
     }
     
-    #sidebar-menu.sidebar-closed-desktop .sidebar-text,
-    #sidebar-menu.sidebar-closed-desktop .sidebar-title,
-    #sidebar-menu.sidebar-closed-desktop .ri-arrow-down-s-line { 
+    .filtros-sidebar-closed-desktop .filtros-sidebar-text,
+    .filtros-sidebar-closed-desktop .filtros-sidebar-title,
+    .filtros-sidebar-closed-desktop .ri-arrow-down-s-line,
+    .filtros-sidebar-closed-desktop h4 { 
         display: none !important;
-    }
-
-    #sidebar-menu.sidebar-closed-desktop #toggle-desktop-btn i {
-        transform: rotate(180deg);
-    }
-    
-    #sidebar-menu.sidebar-closed-desktop .py-1 div.ml-4 {
-        display: none !important; 
-    }
-    
-    #sidebar-menu.sidebar-closed-desktop .filter-item-label {
-        justify-content: center !important;
-        padding-left: 0;
-        padding-right: 0;
-    }
-    
-    #sidebar-menu.sidebar-closed-desktop .filter-item-label input {
-        display: none;
-    }
-    
-    #gallery-content {
-        padding: 0;
     }
 }
 
 /* --- LAYOUT MOBILE (< 1024px) --- */
 @media (max-width: 1023px) {
     #main-container {
-        margin-top: 0;
-        padding-top: var(--layout-gap);
-        padding-bottom: var(--layout-gap);
-        display: block;
+        display: block; /* Remove o flex lateral para a galeria subir */
     }
 
-    /* ✅ CORRIGIDO: Sidebar como OVERLAY fixo no mobile */
-    #sidebar-menu {
+    #filtros-sidebar-menu {
+        /* 1. Removemos do fluxo para não aparecer antes da galeria */
+        display: none; 
         position: fixed; 
-        top: 0; 
-        left: 0;
-        height: 100vh;
-        max-height: 100vh;
-        width: 85vw;
-        max-width: 320px;
-        z-index: 50;
-        transform: translateX(-100%);
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+        
+        /* 2. Posicionamento suspenso */
+        top: 9.5rem; /* Ajustado para ficar abaixo do botão de filtros */
+        left: 5%;
+        right: 5%;
+        width: 90%;
+        z-index: 100;
+        
+        /* 3. Estética de Dropdown */
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        max-height: 70vh;
         overflow-y: auto;
-        transition: transform 0.3s ease-in-out;
-    }
-    
-    /* ✅ Sidebar aberta no mobile */
-    #sidebar-menu.sidebar-open {
-        transform: translateX(0) !important; 
-    }
-    
-    /* Ocultar scrollbar no mobile */
-    #sidebar-menu::-webkit-scrollbar {
-        display: none;
-    }
-    
-    #sidebar-menu {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-    }
-    
-    /* ✅ Backdrop deve cobrir tudo, incluindo navbar */
-    #menu-backdrop {
-        position: fixed;
-        top: 0 !important;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 40;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.3s ease, visibility 0.3s ease;
-        pointer-events: none;
-    }
-    
-    #menu-backdrop.active {
-        opacity: 1;
-        visibility: visible;
-        pointer-events: auto;
-    }
-    
-    /* ✅ CORRIGIDO: Botão de toggle mobile visível */
-    #toggle-menu-btn {
-        display: inline-flex !important;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        z-index: 10;
-    }
-    
-    /* Resetar estilos collapsed no mobile */
-    #sidebar-menu.sidebar-closed-desktop {
-        width: 85vw;
-        max-width: 320px;
-        padding: 1.5rem;
     }
 
-    #sidebar-menu.sidebar-closed-desktop .sidebar-text,
-    #sidebar-menu.sidebar-closed-desktop .sidebar-title {
-        opacity: 1;
-        visibility: visible;
-        width: auto;
+    /* 4. Mostra apenas quando a classe for ativada pelo JS */
+    #filtros-sidebar-menu.filtros-sidebar-open {
         display: block !important;
+        opacity: 1;
+        visibility: visible;
+        animation: fadeInDown 0.3s ease-out;
     }
 
-    #sidebar-menu.sidebar-closed-desktop input[type="checkbox"] {
-        display: block;
-    }
-    
     #gallery-content {
-        width: 100%;
+        margin-top: 1rem;
     }
-}
-
-/* Smartphones pequenos */
-@media (max-width: 640px) {
-    #gallery-content {
-        padding: 0.75rem;
-    }
-
-    #sidebar-menu {
-        width: 85vw;
-        max-width: 280px;
-    }
-}
-
-/* --- CONTEÚDO PRINCIPAL (GALERIA) --- */
-#gallery-content {
-    flex-grow: 1;
-    overflow-y: visible; 
-    height: auto; 
-    min-width: 0;
 }
 
 /* --- ESTILOS DA GALERIA --- */
-.gallery-card {
-    aspect-ratio: 4/3;
-    transition: transform 0.3s, box-shadow 0.3s;
+#galeria-grid {
+    display: grid;
+    gap: 1.5rem;
 }
 
-.gallery-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+/* Responsividade Dinâmica da Grid */
+@media (min-width: 640px) { #galeria-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { #galeria-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1280px) { #galeria-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 1536px) { #galeria-grid { grid-template-columns: repeat(5, 1fr); } }
+
+/* Animações */
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-/* Spinner de Loading */
-.spinner {
-    border-top-color: transparent;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-/* Skeleton loader */
-.skeleton-loader {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
-    animation: loading 1.5s infinite;
-}
-
-@keyframes loading {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-}
-
-/* Chatbot */
-.chatbot-hidden {
-    transform: scale(0.5);
-    opacity: 0;
-    pointer-events: none;
-    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
-}
-
-.chatbot-visible {
-    transform: scale(1);
-    opacity: 1;
-    pointer-events: auto;
-}
-
-/* Transições suaves */
-.transition-transform {
-    transition: transform 0.3s ease;
-}
-
-.rotate-180 {
-    transform: rotate(180deg);
-}
-
-/* Estados dos filtros */
-input[type="checkbox"]:checked {
-    background-color: currentColor;
-    border-color: currentColor;
-}
-
-/* Footer */
-#footer-placeholder {
-    margin-top: auto;
-}
-
-/* Subcategorias */
-.label-content {
-    display: flex;
-    align-items: center;
-    flex: 1;
-}
-
-/* Utilitários */
-.hidden {
-    display: none !important;
-}
-
-.pointer-events-none {
-    pointer-events: none;
-}
-
-.pointer-events-auto {
-    pointer-events: auto;
-}
-
-/* Prevenir scroll do body quando menu mobile está aberto */
-body.overflow-hidden {
-    overflow: hidden;
-}
-
-/* Ajustes para o modal de imagem */
-#modal-imagem {
-    backdrop-filter: blur(4px);
-}
-
-/* Animação de fade in para cards */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.gallery-card {
-    animation: fadeIn 0.3s ease-out;
-}
-
-/* Responsividade da grid */
-@media (max-width: 640px) {
-    #galeria-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-}
-
-@media (min-width: 641px) and (max-width: 768px) {
-    #galeria-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (min-width: 769px) and (max-width: 1024px) {
-    #galeria-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
+/* Scrollbar Sidebar */
+#filtros-sidebar-menu::-webkit-scrollbar { width: 5px; }
+#filtros-sidebar-menu::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }

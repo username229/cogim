@@ -128,7 +128,27 @@ const translations = {
         'working-hours-sat': 'Sábado: 9h às 13h',
         'footer-copyright': '© 2025 Cogim Cozinhas. Todos os direitos reservados.',
         'footer-terms': 'Termos de Serviço',
-        'footer-privacy': 'Política de Privacidade'
+        'footer-privacy': 'Política de Privacidade',
+
+        // CHATBOT
+        'chat-welcome': 'Olá! 👋 Sou o assistente virtual da Cogim. Como posso ajudá-lo hoje?',
+        'chat-tip': '💡 Dica: Clique em qualquer uma das opções abaixo para obter informações rápidas!',
+        'chat-wa-btn': 'Abrir WhatsApp',
+        'chat-input-placeholder': 'Escolha uma opção...',
+        
+        // FAQ Keys
+        'faq-horarios-q': 'Qual é o horário de funcionamento?',
+        'faq-horarios-a': '⏰ Nosso horário de funcionamento:\n\n📅 Segunda a Sexta: 8h às 17h\n📅 Sábado: 9h às 13h\n📅 Domingo: Fechado',
+        
+        'faq-localizacao-q': 'Onde vocês estão localizados?',
+        'faq-localizacao-a': '📍 Estamos localizados na:\n\n🏢 Av. 25 de Setembro\nMaputo, Moçambique',
+        
+        'faq-produtos-q': 'Quais produtos vocês oferecem?',
+        'faq-produtos-a': '🛋️ Nossos produtos incluem:\n\n🍳 Cozinhas planejadas\n🚿 Móveis para casa de banho\n👔 Guarda-roupas sob medida',
+        
+        'faq-whatsapp-q': 'Falar com atendente',
+        'faq-whatsapp-a': '📱 Para falar diretamente conosco:\n\n🟢 Clique no botão abaixo para ir ao WhatsApp'
+    
     },
     en: {
         // Navigation
@@ -254,7 +274,26 @@ const translations = {
         'working-hours-sat': 'Saturday: 9am to 1pm',
         'footer-copyright': '© 2025 Cogim Kitchens. All rights reserved.',
         'footer-terms': 'Terms of Service',
-        'footer-privacy': 'Privacy Policy'
+        'footer-privacy': 'Privacy Policy',
+
+        'chat-welcome': 'Hello! 👋 I am Cogim\'s virtual assistant. How can I help you today?',
+        'chat-tip': '💡 Tip: Click on any of the options below for quick information!',
+        'chat-wa-btn': 'Open WhatsApp',
+        'chat-input-placeholder': 'Choose an option...',
+        
+        // FAQ Keys
+        'faq-horarios-q': 'What are the opening hours?',
+        'faq-horarios-a': '⏰ Our opening hours:\n\n📅 Mon to Fri: 8am to 5pm\n📅 Saturday: 9am to 1pm\n📅 Sunday: Closed',
+        
+        'faq-localizacao-q': 'Where are you located?',
+        'faq-localizacao-a': '📍 We are located at:\n\n🏢 Av. 25 de Setembro\nMaputo, Mozambique',
+        
+        'faq-produtos-q': 'What products do you offer?',
+        'faq-produtos-a': '🛋️ Our products include:\n\n🍳 Custom Kitchens\n🚿 Bathroom Furniture\n👔 Custom Wardrobes',
+        
+        'faq-whatsapp-q': 'Talk to an agent',
+        'faq-whatsapp-a': '📱 To speak directly with us:\n\n🟢 Click the button below to go to WhatsApp'
+    
     }
 };
 

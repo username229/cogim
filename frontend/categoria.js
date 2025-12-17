@@ -393,30 +393,50 @@ let estatisticas = {
 };
 
 function toggleMenu() {
-    const sidebar = document.getElementById("sidebar-menu");
+    const menuFiltros = document.getElementById("filtros-sidebar-menu");
     const backdrop = document.getElementById("menu-backdrop");
-    
-    if (!sidebar || !backdrop) {
-        console.error("❌ Sidebar ou backdrop não encontrado!");
+    const iconeSeta = document.getElementById("arrow-icon");
+
+    if (!menuFiltros) {
+        console.error("❌ Menu de filtros não encontrado!");
         return;
     }
 
-    const isOpen = sidebar.classList.contains("sidebar-open");
-    
+    const isOpen = menuFiltros.classList.contains("filtros-sidebar-open");
+
     if (isOpen) {
-        // Fechar menu
-        sidebar.classList.remove("sidebar-open");
-        backdrop.classList.remove("active");
+        /* ===== FECHAR ===== */
+        menuFiltros.classList.remove("filtros-sidebar-open");
+
+        if (backdrop) {
+            backdrop.classList.add("hidden");
+        }
+
+        if (iconeSeta) {
+            iconeSeta.style.transform = "rotate(0deg)";
+        }
+
         document.body.classList.remove("overflow-hidden");
+
     } else {
-        // Abrir menu
-        sidebar.classList.add("sidebar-open");
-        backdrop.classList.add("active");
-        document.body.classList.add("overflow-hidden");
+        /* ===== ABRIR ===== */
+        menuFiltros.classList.add("filtros-sidebar-open");
+
+        if (backdrop) {
+            backdrop.classList.remove("hidden");
+        }
+
+        if (iconeSeta) {
+            iconeSeta.style.transform = "rotate(180deg)";
+        }
+
+        /* Bloqueia scroll apenas no mobile */
+        if (window.innerWidth < 1024) {
+            document.body.classList.add("overflow-hidden");
+        }
     }
-    
-    console.log(`📱 Menu mobile ${isOpen ? 'fechado' : 'aberto'}`);
 }
+
 
 function toggleDesktopSidebar() {
     const sidebar = document.getElementById("sidebar-menu");
@@ -846,36 +866,7 @@ function limparCache() {
     aplicarFiltros();
 }
 
-// =======================================================
-// Sidebar - CORRIGIDO PARA MOBILE (Sem alterações)
-// =======================================================
-function toggleMenu() {
-    // ... (Conteúdo da função toggleMenu é o mesmo do original)
-    const sidebar = document.getElementById("sidebar-menu");
-    const backdrop = document.getElementById("menu-backdrop");
-    
-    if (!sidebar || !backdrop) {
-        console.error("❌ Sidebar ou backdrop não encontrado!");
-        return;
-    }
 
-    // 🔧 CORRIGIDO: Usa classe sidebar-open no mobile
-    const isMobile = window.innerWidth < 1024;
-    
-    if (isMobile) {
-        sidebar.classList.toggle("sidebar-open");
-        backdrop.classList.toggle("hidden");
-        backdrop.classList.toggle("opacity-0");
-        
-        if (backdrop.classList.contains("hidden")) {
-            backdrop.classList.add("pointer-events-none");
-        } else {
-            backdrop.classList.remove("pointer-events-none");
-        }
-        
-        document.body.classList.toggle("overflow-hidden");
-    }
-}
 
 function toggleDesktopSidebar() {
     const sidebar = document.getElementById("sidebar-menu");
@@ -886,16 +877,9 @@ function toggleDesktopSidebar() {
     if (toggleBtn) toggleBtn.classList.toggle("rotate-180");
 }
 
-function toggleSubcategories(subContainerId, arrowId) {
-    const subContainer = document.getElementById(subContainerId);
-    const arrow = document.getElementById(arrowId);
-    if (subContainer) subContainer.classList.toggle("hidden");
-    if (arrow) arrow.classList.toggle("rotate-180");
-}
 
-// =======================================================
-// Inicialização (Sem alterações)
-// =======================================================
+
+
 document.addEventListener("DOMContentLoaded", () => {
     console.log("🚀 Sistema Cogim Gallery v3.0 (Estático) iniciado");
     
