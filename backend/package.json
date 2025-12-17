@@ -22,13 +22,15 @@
     "@azure/storage-blob": "^12.29.1",
     "@tailwindcss/cli": "^4.1.17",
     "@tailwindcss/postcss": "^4.1.17",
+    "bcryptjs": "^3.0.3",
     "caniuse-lite": "^1.0.30001757",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^4.22.1",
     "nodemailer": "^7.0.11",
     "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.17"
+    "tailwindcss": "^4.1.17",
+    "twilio": "^5.10.7"
   },
   "devDependencies": {
     "concurrently": "^8.2.0",
