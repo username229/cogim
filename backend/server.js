@@ -2,47 +2,95 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
+const twilio = require('twilio');
+const nodemailer = require('nodemailer');
+const bcrypt = require('bcryptjs');
+const fs = require('fs').promises;
+const crypto = require('crypto');
+const { BlobServiceClient } = require('@azure/storage-blob');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// --- MIDDLEWARES ---
 app.use(cors());
 app.use(express.json());
 
-// --- A MUDANÇA ESTÁ AQUI ---
-// Definimos o caminho para a pasta 'frontend' que está um nível acima da pasta 'backend'
+// --- CONFIGURAÇÃO DE CAMINHOS ---
+// Caminho para a pasta frontend (que contém a subpasta admin)
 const frontendPath = path.join(__dirname, '..', 'frontend');
+const adminPath = path.join(frontendPath, 'admin');
 
-// 1. Servir os ficheiros estáticos (CSS, JS, Imagens)
-// Importante: Isso permite que o index.html encontre seus estilos e scripts
+// 1. Servir arquivos estáticos (CSS, JS, Imagens)
+// Importante: Isso permite que os arquivos dentro de /frontend e /frontend/admin sejam achados
 app.use(express.static(frontendPath));
+app.use('/admin', express.static(adminPath));
 
-// 2. Rota para carregar o index.html na raiz
+// --- CONFIGURAÇÕES DE SERVIÇOS (Azure, Twilio, Email) ---
+const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+const transporter = nodemailer.createTransport({
+    service: process.env.NODEMAILER_SERVICE || 'gmail',
+    auth: {
+        user: process.env.NODEMAILER_USER,
+        pass: process.env.NODEMAILER_PASS
+    }
+});
+
+// ------------------------------------------
+// ROTAS DE NAVEGAÇÃO (HTML)
+// ------------------------------------------
+
+// 1. Página Principal (Site)
 app.get('/', (req, res) => {
     res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
-// 3. Rota para o futuro Admin (atualmente servindo o mesmo index ou erro)
+// 2. Página do Painel Admin
 app.get('/admin', (req, res) => {
-    // Quando você criar o painel, basta apontar para a nova pasta aqui
-    res.send('O Painel de Admin será configurado aqui em breve.');
+    res.sendFile(path.join(adminPath, 'admin.html'));
 });
 
-// 4. API de Status
+// ------------------------------------------
+// ENDPOINTS DA API (Lógica do seu servidor.js)
+// ------------------------------------------
+
+// Exemplo de uma das rotas que você enviou:
+app.post('/api/send-sms', async (req, res) => {
+    const { phone, code, userName } = req.body;
+    try {
+        await twilioClient.messages.create({
+            body: `Cogim Admin - Código: ${code}`,
+            from: process.env.TWILIO_PHONE_NUMBER,
+            to: phone
+        });
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Adicione aqui as outras rotas /api/validate-password, /api/activities, etc.
+
+// ------------------------------------------
+// FALLBACK & INICIALIZAÇÃO
+// ------------------------------------------
+
+// Health check para o Render
 app.get('/api/system-info', (req, res) => {
-    res.json({
-        status: 'online',
-        uptime: process.uptime(),
-        directory: frontendPath
-    });
+    res.json({ status: 'online', mode: 'unified' });
 });
 
-// 5. Fallback: Se não encontrar nada, volta para o index (útil para SPAs)
+// Se nada acima coincidir, volta para o index.html (SPA fallback)
 app.get('*', (req, res) => {
     res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Servidor rodando na porta ${PORT}`);
-    console.log(`📂 Servindo arquivos de: ${frontendPath}`);
-});
+    console.log(`
+    🚀 Servidor Unificado Online
+    ---------------------------
+    🌍 Site: http://localhost:${PORT}
+    🔐 Admin: http://localhost:${PORT}/admin
+    📂 Root: ${frontendPath}
+    `);
+});s
