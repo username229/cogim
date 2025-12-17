@@ -93,4 +93,4 @@ app.listen(PORT, '0.0.0.0', () => {
     🔐 Admin: http://localhost:${PORT}/admin
     📂 Root: ${frontendPath}
     `);
-});s
+});
