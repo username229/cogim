@@ -36,6 +36,38 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+// --- ROTA DE ENVIO DE E-MAIL 2FA ---
+app.post('/api/send-email', async (req, res) => {
+    const { email, code, userName } = req.body;
+
+    const mailOptions = {
+        from: `"Cogim Admin" <${process.env.NODEMAILER_USER}>`,
+        to: email,
+        subject: `🔐 Seu Código de Acesso: ${code}`,
+        html: `
+            <div style="font-family: sans-serif; max-width: 400px; margin: 20px auto; padding: 20px; border: 2px solid #3b82f6; border-radius: 12px;">
+                <h2 style="color: #1e40af; text-align: center;">Verificação Cogim</h2>
+                <p>Olá <strong>${userName}</strong>,</p>
+                <p>Use o código abaixo para autenticar seu acesso ao painel administrativo:</p>
+                <div style="background: #eff6ff; padding: 20px; font-size: 32px; font-weight: bold; text-align: center; letter-spacing: 5px; color: #1e40af; border-radius: 8px;">
+                    ${code}
+                </div>
+                <p style="font-size: 12px; color: #64748b; margin-top: 20px;">
+                    Este código expira em 5 minutos. Se não foi você quem solicitou, ignore este e-mail.
+                </p>
+            </div>
+        `
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log(`✅ E-mail de verificação enviado para: ${email}`);
+        res.json({ success: true });
+    } catch (error) {
+        console.error("❌ Erro ao enviar e-mail:", error);
+        res.status(500).json({ success: false, error: 'Erro ao processar e-mail de segurança' });
+    }
+});
 // ------------------------------------------
 // ROTAS DE NAVEGAÇÃO (HTML)
 // ------------------------------------------
