@@ -847,7 +847,6 @@ async function aplicarFiltros() {
     estatisticas.totalImagens = imagensAtuais.length;
     estatisticas.tempoCarregamento = ((Date.now() - inicioTempo) / 1000).toFixed(2);
 
-    console.log(`✅ Total: ${imagensAtuais.length} imagens em ${estatisticas.tempoCarregamento}s`);
 
     paginaAtual = 1;
     mostrarLoading(false);

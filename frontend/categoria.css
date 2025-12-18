@@ -8,7 +8,7 @@
     --filtros-sidebar-width: 280px; 
     --filtros-sidebar-width-closed: 4rem;
     --layout-gap: 16px; 
-    --desktop-gap: 32px; 
+    --desktop-gap: 11px; 
 }
 
 html, body {
@@ -37,7 +37,8 @@ html, body {
     #main-container {
         display: flex; 
         gap: var(--desktop-gap); 
-        padding-top: var(--desktop-gap);
+        padding-top: 0;
+        margin-top: 0;
     }
     
     #filtros-sidebar-menu {
