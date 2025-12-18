@@ -591,12 +591,11 @@ async function logActivity(activity) {
     try {
         activity.timestamp = new Date().toISOString();
         
-        await fetch('http://localhost:3000/api/log-activity', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(activity)
-        });
-        
+      await fetch(`${API_URL}/api/log-activity`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(activity)
+});
         // Atualizar lista de atividades
         loadActivities();
     } catch (error) {
@@ -606,7 +605,7 @@ async function logActivity(activity) {
 
 async function loadActivities() {
     try {
-        const response = await fetch('http://localhost:3000/api/activities?limit=50');
+        const response = await fetch(`${API_URL}/api/activities?limit=50`);
         const data = await response.json();
         
         displayActivities(data.activities || []);
@@ -708,6 +707,34 @@ function maskPhone(phone) {
     if (cleaned.length < 8) return phone;
     return phone.replace(/(\d{3})\d{5}(\d{4})/, '$1*****$2');
 }
+
+// Adicione esta função ao final do seu admin.js
+async function loginComQualquerEmail() {
+    const emailDigitado = prompt("Digite o e-mail para receber o código de acesso:");
+
+    if (!emailDigitado || !emailDigitado.includes('@')) {
+        showNotification('❌ Digite um e-mail válido', 'error');
+        return;
+    }
+
+    // Criamos um objeto de usuário na hora (dinâmico)
+    pendingUser = {
+        type: 'dynamic_admin',
+        name: emailDigitado.split('@')[0], // Usa a primeira parte do email como nome
+        email: emailDigitado,
+        role: 'Acesso Temporário',
+        permissions: ['all'],
+        twoFactorEnabled: true,
+        preferred2FAMethod: 'email'
+    };
+
+    // Chamamos a sua função que já existe no seu código!
+    hideLoginModal();
+    initiate2FA(pendingUser, 'email');
+}
+
+// Torne a função global para usar no HTML
+window.loginComQualquerEmail = loginComQualquerEmail;
 
 // Expor funções globais necessárias
 window.quickAdminLogin = quickAdminLogin;
