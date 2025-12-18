@@ -1,22 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <!-- META -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Filtros e Projetos Customizados | Móveis por Medida</title>
-
-    <!-- CSS -->
     <link rel="stylesheet" href="categoria.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.css">
-
-    <!-- FONTS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-
-    <!-- LIBS -->
     <script src="https://cdn.tailwindcss.com/3.4.16"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
@@ -24,7 +16,7 @@
 <body class="bg-gray-50 h-full">
 
     <!-- ================= NAVBAR ================= -->
-    <div id="navbar-placeholder"></div>
+    <div id="header-placeholder"></div>
 
     <!-- ================= BOTÃO FILTROS (MOBILE) ================= -->
     <div class="lg:hidden w-full px-4 pt-4 sticky top-[5rem] z-30 bg-gray-50">
@@ -32,67 +24,20 @@
             class="w-full flex items-center justify-between bg-white border border-gray-200 p-4 rounded-xl shadow-sm">
             <div class="flex items-center gap-2">
                 <i class="ri-list-settings-line text-indigo-600 text-xl"></i>
-                <span class="font-bold text-gray-700">
-                    <span class="only-desktop">Filtros e Categorias</span>
-                    <span class="only-mobile">Filtros</span>
-                </span>
+                <span class="font-bold text-gray-700">Filtros</span>
             </div>
             <i class="ri-arrow-down-s-line text-gray-400 transition-transform duration-300"
                id="arrow-icon"></i>
         </button>
     </div>
 
-    <!-- CHATBOT -->
-    <div id="chatbot-container" class="fixed bottom-6 right-6 z-50">
-        <button id="chatbot-button" class="w-14 h-14 bg-blue-500 rounded-full flex items-center justify-center shadow-lg hover:bg-blue-600 transition" title="Chat de Ajuda">
-            <i class="ri-message-3-line ri-xl text-white"></i>
-        </button>
-        
-        <div id="chatbot-widget" class="chatbot-hidden absolute bottom-20 right-0 w-80 md:w-96 bg-white rounded-lg shadow-2xl border border-gray-200 flex flex-col">
-            <div class="flex items-center justify-between p-3 bg-blue-500 text-white rounded-t-lg">
-                <div class="flex items-center">
-                    <i class="ri-customer-service-line mr-2"></i>
-                    <span class="font-semibold">Assistente Cogim</span>
-                </div>
-                <button id="close-chatbot" class="text-white hover:text-gray-200" title="Fechar chatbot">
-                    <i class="ri-close-line ri-lg"></i>
-                </button>
-            </div>
-            
-            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto bg-gray-50" style="max-height: 400px;">
-                <div class="mb-4">
-                    <div class="bg-blue-100 p-3 rounded-lg max-w-xs">
-                        <p class="text-sm text-gray-800" data-translate="chat-welcome">Olá! 👋 Sou o assistente virtual da Cogim. Como posso ajudá-lo hoje?</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="faq-options" class="p-3 border-t border-gray-200">
-                <p class="text-xs text-gray-600 mb-2">Perguntas frequentes:</p>
-                <div class="grid grid-cols-2 gap-2">
-                    <button class="faq-btn text-xs bg-gray-100 hover:bg-gray-200 p-2 rounded text-left" data-question="horarios">
-                        🕒 Horários
-                    </button>
-                    <button class="faq-btn text-xs bg-gray-100 hover:bg-gray-200 p-2 rounded text-left" data-question="localizacao">
-                        📍 Localização
-                    </button>
-                    <button class="faq-btn text-xs bg-gray-100 hover:bg-gray-200 p-2 rounded text-left" data-question="produtos">
-                        🛋️ Produtos
-                    </button>
-                    <button class="faq-btn text-xs bg-gray-100 hover:bg-gray-200 p-2 rounded text-left" data-question="whatsapp">
-                        📱 WhatsApp
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- ================= CONTAINER PRINCIPAL ================= -->
     <div id="main-container">
 
         <!-- ================= SIDEBAR FILTROS ================= -->
-        <aside id="filtros-sidebar" class="bg-white border-r border-gray-200 p-6 hidden lg:block">
-
+        <aside id="filtros-sidebar-menu" 
+               class="bg-white border-r border-gray-200 p-6 hidden lg:block lg:static z-[9999] transition-all duration-300">
+            
             <!-- HEADER SIDEBAR -->
             <div class="flex justify-between items-center mb-6 border-b pb-4">
                 <h3 class="text-xl font-bold text-indigo-600 sidebar-title">Filtros</h3>
@@ -115,7 +60,7 @@
                 <!-- TUDO -->
                 <label class="flex justify-between items-center px-3 py-2 bg-indigo-50 rounded-lg font-bold cursor-pointer hover:bg-indigo-100 transition">
                     <span>Tudo</span>
-                    <input type="checkbox" id="tudo-checkbox">
+                    <input type="checkbox" id="tudo-checkbox" class="cursor-pointer">
                 </label>
 
                 <!-- COZINHAS -->
@@ -123,21 +68,21 @@
                     <label onclick="toggleSubcategories('cozinhas-sub')"
                         class="flex justify-between items-center px-3 py-2 cursor-pointer hover:bg-gray-100 rounded transition">
                         <span>Cozinhas</span>
-                        <i class="ri-arrow-down-s-line"></i>
+                        <i class="ri-arrow-down-s-line transition-transform duration-300" id="cozinhas-arrow"></i>
                     </label>
 
                     <div id="cozinhas-sub" class="ml-4 hidden space-y-1">
-                        <label class="flex justify-between px-3 py-1">
+                        <label class="flex justify-between px-3 py-1 cursor-pointer hover:bg-gray-50 rounded">
                             <span>Com Bancada</span>
-                            <input type="checkbox">
+                            <input type="checkbox" class="cursor-pointer">
                         </label>
-                        <label class="flex justify-between px-3 py-1">
+                        <label class="flex justify-between px-3 py-1 cursor-pointer hover:bg-gray-50 rounded">
                             <span>Península</span>
-                            <input type="checkbox">
+                            <input type="checkbox" class="cursor-pointer">
                         </label>
-                        <label class="flex justify-between px-3 py-1">
+                        <label class="flex justify-between px-3 py-1 cursor-pointer hover:bg-gray-50 rounded">
                             <span>Ilha</span>
-                            <input type="checkbox">
+                            <input type="checkbox" class="cursor-pointer">
                         </label>
                     </div>
                 </div>
@@ -147,53 +92,60 @@
                     <label onclick="toggleSubcategories('guardafatos-sub')"
                         class="flex justify-between items-center px-3 py-2 cursor-pointer hover:bg-gray-100 rounded transition">
                         <span>Guarda-fatos</span>
-                        <i class="ri-arrow-down-s-line"></i>
+                        <i class="ri-arrow-down-s-line transition-transform duration-300" id="guardafatos-arrow"></i>
                     </label>
 
                     <div id="guardafatos-sub" class="ml-4 hidden space-y-1">
-                        <label class="flex justify-between px-3 py-1">
+                        <label class="flex justify-between px-3 py-1 cursor-pointer hover:bg-gray-50 rounded">
                             <span>Com Espelho</span>
-                            <input type="checkbox">
+                            <input type="checkbox" class="cursor-pointer">
                         </label>
-                        <label class="flex justify-between px-3 py-1">
+                        <label class="flex justify-between px-3 py-1 cursor-pointer hover:bg-gray-50 rounded">
                             <span>Porta de Correr</span>
-                            <input type="checkbox">
+                            <input type="checkbox" class="cursor-pointer">
                         </label>
                     </div>
                 </div>
 
                 <!-- SIMPLES -->
-                <label class="flex justify-between px-3 py-2 hover:bg-gray-100 rounded transition cursor-pointer"><span>Teto Falso</span><input type="checkbox"></label>
-                <label class="flex justify-between px-3 py-2 hover:bg-gray-100 rounded transition cursor-pointer"><span>Casa de Banho</span><input type="checkbox"></label>
-                <label class="flex justify-between px-3 py-2 hover:bg-gray-100 rounded transition cursor-pointer"><span>Racks</span><input type="checkbox"></label>
-                <label class="flex justify-between px-3 py-2 hover:bg-gray-100 rounded transition cursor-pointer"><span>Camas</span><input type="checkbox"></label>
-                <label class="flex justify-between px-3 py-2 hover:bg-gray-100 rounded transition cursor-pointer"><span>Sofás e Mesas</span><input type="checkbox"></label>
+                <label class="flex justify-between px-3 py-2 hover:bg-gray-100 rounded transition cursor-pointer">
+                    <span>Teto Falso</span>
+                    <input type="checkbox" class="cursor-pointer">
+                </label>
+                <label class="flex justify-between px-3 py-2 hover:bg-gray-100 rounded transition cursor-pointer">
+                    <span>Casa de Banho</span>
+                    <input type="checkbox" class="cursor-pointer">
+                </label>
+                <label class="flex justify-between px-3 py-2 hover:bg-gray-100 rounded transition cursor-pointer">
+                    <span>Racks</span>
+                    <input type="checkbox" class="cursor-pointer">
+                </label>
+                <label class="flex justify-between px-3 py-2 hover:bg-gray-100 rounded transition cursor-pointer">
+                    <span>Camas</span>
+                    <input type="checkbox" class="cursor-pointer">
+                </label>
+                <label class="flex justify-between px-3 py-2 hover:bg-gray-100 rounded transition cursor-pointer">
+                    <span>Sofás e Mesas</span>
+                    <input type="checkbox" class="cursor-pointer">
+                </label>
 
             </nav>
         </aside>
 
         <!-- BACKDROP MOBILE -->
-  <div id="menu-backdrop"
-     class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden"
-     onclick="toggleMenu()">
-</div>
-
-
+        <div id="menu-backdrop"
+             class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden"
+             onclick="toggleMenu()">
+        </div>
 
         <!-- ================= GALERIA ================= -->
         <main id="gallery-content">
             <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
-
-                <h2 class="text-2xl font-bold mb-6 border-b pb-3">
-                    Galeria
-                </h2>
-
+                <h2 class="text-2xl font-bold mb-6 border-b pb-3">Galeria</h2>
                 <div id="galeria-grid"
                      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                 </div>
-
                 <div id="paginacao-container" class="mt-8 flex justify-center"></div>
-
             </div>
         </main>
 
@@ -206,21 +158,47 @@
     <script src="categoria.js"></script>
     <script src="script.js"></script>
     <script src="translations.js"></script>
-    <script src="chatbot.js"></script>
+    <script src="component_loader.js"></script>
 
     <script>
-        $(function () {
-            $('#navbar-placeholder').load('header.html');
-            $('#footer-placeholder').load('footer.html');
-        });
-
         function toggleMenu() {
-            $('#filtros-sidebar').toggle();
-            $('#menu-backdrop').toggle();
+            const menuFiltros = document.getElementById("filtros-sidebar-menu");
+            const backdrop = document.getElementById("menu-backdrop");
+            const arrowIcon = document.getElementById("arrow-icon");
+
+            const isOpen = menuFiltros.classList.contains("filtros-sidebar-open");
+
+            if (isOpen) {
+                // Fechar menu
+                menuFiltros.classList.remove("filtros-sidebar-open");
+                if (backdrop) backdrop.classList.add("hidden");
+                if (arrowIcon) arrowIcon.style.transform = "rotate(0deg)";
+                document.body.classList.remove("overflow-hidden");
+            } else {
+                // Abrir menu
+                menuFiltros.classList.add("filtros-sidebar-open");
+                if (backdrop) backdrop.classList.remove("hidden");
+                if (arrowIcon) arrowIcon.style.transform = "rotate(180deg)";
+                document.body.classList.add("overflow-hidden");
+            }
         }
 
         function toggleSubcategories(id) {
-            $('#' + id).toggle();
+            const submenu = document.getElementById(id);
+            const arrowId = id.replace('-sub', '-arrow');
+            const arrow = document.getElementById(arrowId);
+            
+            if (submenu) {
+                const isHidden = submenu.classList.contains('hidden');
+                
+                if (isHidden) {
+                    submenu.classList.remove('hidden');
+                    if (arrow) arrow.style.transform = "rotate(180deg)";
+                } else {
+                    submenu.classList.add('hidden');
+                    if (arrow) arrow.style.transform = "rotate(0deg)";
+                }
+            }
         }
 
         // Handle "Tudo" checkbox - select all categories
@@ -238,10 +216,36 @@
                     }
                 });
             }
+
+            // Adicionar evento de change em todos os checkboxes para aplicar filtros
+            const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+            allCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (typeof aplicarFiltros === 'function') {
+                        aplicarFiltros();
+                    }
+                });
+            });
         });
     </script>
 
+    <style>
+        /* Animação suave das setas */
+        .ri-arrow-down-s-line {
+            transition: transform 0.3s ease;
+        }
+
+        /* Ajustes adicionais para garantir visibilidade mobile */
+        @media (max-width: 1023px) {
+            #filtros-sidebar-menu {
+                z-index: 100 !important;
+            }
+            
+            #menu-backdrop {
+                z-index: 99;
+            }
+        }
+    </style>
+
 </body>
-
-
 </html>
