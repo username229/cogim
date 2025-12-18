@@ -1,5 +1,5 @@
 // =======================================================
-// SISTEMA DE AUTENTICAÇÃO COM 2FA E GERENCIAMENTO DE SENHAS
+// SISTEMA ADMINISTRATIVO - COGIM
 // =======================================================
 
 const adminUsers = {
@@ -19,168 +19,6 @@ let currentUser = null;
 let pendingUser = null;
 
 // =======================================================
-// 🆕 CLASSE DE AUTENTICAÇÃO 2FA
-// =======================================================
-class TwoFactorAuth {
-    constructor() {
-        this.codeLength = 6;
-        this.expirationTime = 5 * 60 * 1000;
-        this.maxAttempts = 3;
-        this.apiUrl = 'http://localhost:3000/api';
-    }
-
-    generateCode() {
-        return Math.floor(100000 + Math.random() * 900000).toString();
-    }
-
-    createSession(user, method = 'email') {
-        const code = this.generateCode();
-        const session = {
-            code: code,
-            user: user,
-            method: method,
-            timestamp: Date.now(),
-            attempts: 0,
-            maxAttempts: this.maxAttempts
-        };
-
-        localStorage.setItem('cogim_2fa_session', JSON.stringify(session));
-        console.log(`🔐 Código 2FA: ${code}`);
-        
-        return session;
-    }
-
-    getSession() {
-        const sessionData = localStorage.getItem('cogim_2fa_session');
-        if (!sessionData) return null;
-
-        const session = JSON.parse(sessionData);
-        
-        if (Date.now() - session.timestamp > this.expirationTime) {
-            this.clearSession();
-            return null;
-        }
-
-        return session;
-    }
-
-    verifyCode(inputCode) {
-        const session = this.getSession();
-        
-        if (!session) {
-            return { success: false, error: 'Sessão expirada. Por favor, faça login novamente.' };
-        }
-
-        session.attempts++;
-        localStorage.setItem('cogim_2fa_session', JSON.stringify(session));
-
-        if (session.attempts > session.maxAttempts) {
-            this.clearSession();
-            return { 
-                success: false, 
-                error: 'Número máximo de tentativas excedido.',
-                maxAttemptsReached: true 
-            };
-        }
-
-        if (inputCode === session.code) {
-            return { 
-                success: true, 
-                user: session.user 
-            };
-        }
-
-        const remainingAttempts = session.maxAttempts - session.attempts;
-        return { 
-            success: false, 
-            error: `Código incorreto. ${remainingAttempts} tentativa(s) restante(s).`,
-            remainingAttempts: remainingAttempts
-        };
-    }
-
-    clearSession() {
-        localStorage.removeItem('cogim_2fa_session');
-    }
-
-    async sendCodeByEmail(email, code, userName) {
-        try {
-            const response = await fetch(`${this.apiUrl}/send-email`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, code, userName })
-            });
-
-            const result = await response.json();
-            return result;
-        } catch (error) {
-            console.error('❌ Erro ao enviar email:', error);
-            return { success: false, error: error.message };
-        }
-    }
-
-    async sendCodeBySMS(phone, code, userName) {
-        try {
-            const response = await fetch(`${this.apiUrl}/send-sms`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phone, code, userName })
-            });
-
-            const result = await response.json();
-            return result;
-        } catch (error) {
-            console.error('❌ Erro ao enviar SMS:', error);
-            return { success: false, error: error.message };
-        }
-    }
-
-    async checkUserHasPassword(userId) {
-        try {
-            const response = await fetch(`${this.apiUrl}/check-password/${userId}`);
-            const result = await response.json();
-            return result.hasPassword;
-        } catch (error) {
-            console.error('❌ Erro ao verificar senha:', error);
-            return false;
-        }
-    }
-
-    async validatePassword(userId, password) {
-        try {
-            const response = await fetch(`${this.apiUrl}/validate-password`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId, password })
-            });
-
-            const result = await response.json();
-            return result.success;
-        } catch (error) {
-            console.error('❌ Erro ao validar senha:', error);
-            return false;
-        }
-    }
-
-    async setPassword(userId, password, savePassword) {
-        try {
-            const response = await fetch(`${this.apiUrl}/set-password`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId, password, savePassword })
-            });
-
-            const result = await response.json();
-            return result.success;
-        } catch (error) {
-            console.error('❌ Erro ao criar senha:', error);
-            return false;
-        }
-    }
-}
-
-const twoFactorAuth = new TwoFactorAuth();
-
-// =======================================================
 // INICIALIZAÇÃO
 // =======================================================
 document.addEventListener('DOMContentLoaded', function() {
@@ -188,12 +26,16 @@ document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
     loadActivities();
     
+    // Escutar evento de login 2FA do HTML
     document.addEventListener('admin2FALogin', function(e) {
         const { adminType, method, email, phone } = e.detail;
         quickAdminLogin(adminType, method, email, phone);
     });
 });
 
+// =======================================================
+// VERIFICAÇÃO DE AUTENTICAÇÃO
+// =======================================================
 function checkAuthentication() {
     const savedUser = localStorage.getItem('cogim_admin_user');
     const savedAuth = localStorage.getItem('cogim_admin_auth');
@@ -203,6 +45,7 @@ function checkAuthentication() {
         const authTime = parseInt(savedAuth);
         const currentTime = new Date().getTime();
         
+        // Sessão válida por 8 horas
         if ((currentTime - authTime) < (8 * 60 * 60 * 1000)) {
             currentUser = user;
             showAdminPanel();
@@ -214,7 +57,230 @@ function checkAuthentication() {
 }
 
 // =======================================================
-// 🆕 MODAL DE CRIAÇÃO DE SENHA
+// LOGIN COM SELEÇÃO DE ADMIN
+// =======================================================
+async function quickAdminLogin(adminType, method = 'sms', userEmail = '', userPhone = '') {
+    if (!adminUsers[adminType]) {
+        showNotification('❌ Tipo de administrador inválido', 'error');
+        return;
+    }
+    
+    pendingUser = {
+        type: adminType,
+        name: adminUsers[adminType].name,
+        email: userEmail,
+        phone: userPhone,
+        role: adminUsers[adminType].role,
+        permissions: adminUsers[adminType].permissions,
+        twoFactorEnabled: true,
+        preferred2FAMethod: method
+    };
+    
+    // Salvar dados do usuário
+    localStorage.setItem(`cogim_admin_${adminType}_email`, userEmail);
+    localStorage.setItem(`cogim_admin_${adminType}_phone`, userPhone);
+    
+    // Verificar se tem senha salva
+    const hasPassword = await window.twoFactorAuth.checkUserHasPassword(adminType);
+    
+    if (hasPassword) {
+        showPasswordLoginModal();
+    } else {
+        hideLoginModal();
+        initiate2FA(pendingUser, method);
+    }
+}
+
+// =======================================================
+// MODAL DE LOGIN COM SENHA
+// =======================================================
+function showPasswordLoginModal() {
+    const modal = document.getElementById('login-modal');
+    const content = modal.querySelector('.bg-white');
+    
+    content.innerHTML = `
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-key text-white text-2xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Digite sua Senha</h2>
+            <p class="text-gray-600 text-sm">${pendingUser.name}</p>
+        </div>
+        
+        <div class="space-y-4 mb-6">
+            <div class="relative">
+                <input 
+                    type="password" 
+                    id="login-password" 
+                    class="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
+                    placeholder="Digite sua senha">
+                <button type="button" onclick="togglePasswordVisibility('login-password')" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+            
+            <div id="login-password-error" class="hidden p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"></div>
+        </div>
+        
+        <div class="space-y-3">
+            <button onclick="loginWithPassword()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition shadow-lg">
+                <i class="fas fa-sign-in-alt mr-2"></i>Entrar
+            </button>
+            
+            <button onclick="useCodeInstead()" class="w-full bg-gray-100 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-200 transition">
+                <i class="fas fa-mobile-alt mr-2"></i>Usar Código 2FA
+            </button>
+            
+            <button onclick="backToAdminSelection()" class="w-full text-gray-500 py-2 hover:text-gray-700 transition">
+                Voltar
+            </button>
+        </div>
+    `;
+    
+    setTimeout(() => {
+        document.getElementById('login-password').focus();
+        
+        // Permitir Enter para login
+        document.getElementById('login-password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                loginWithPassword();
+            }
+        });
+    }, 100);
+}
+
+async function loginWithPassword() {
+    const password = document.getElementById('login-password').value;
+    
+    if (!password) {
+        showLoginPasswordError('Digite sua senha');
+        return;
+    }
+    
+    const isValid = await window.twoFactorAuth.validatePassword(pendingUser.type, password);
+    
+    if (isValid) {
+        hideLoginModal();
+        completeLogin();
+        showNotification('✅ Login realizado com sucesso!', 'success');
+    } else {
+        showLoginPasswordError('Senha incorreta');
+        document.getElementById('login-password').value = '';
+        document.getElementById('login-password').focus();
+        
+        // Registrar tentativa falha
+        await logActivity({
+            type: 'failed_login',
+            user: pendingUser.name,
+            method: 'password'
+        });
+    }
+}
+
+function showLoginPasswordError(message) {
+    const errorDiv = document.getElementById('login-password-error');
+    errorDiv.textContent = message;
+    errorDiv.classList.remove('hidden');
+    
+    setTimeout(() => {
+        errorDiv.classList.add('hidden');
+    }, 5000);
+}
+
+function useCodeInstead() {
+    const method = pendingUser.preferred2FAMethod || 'sms';
+    initiate2FA(pendingUser, method);
+    hideLoginModal();
+}
+
+function backToAdminSelection() {
+    location.reload();
+}
+
+function togglePasswordVisibility(inputId) {
+    const input = document.getElementById(inputId);
+    const button = event.currentTarget;
+    const icon = button.querySelector('i');
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+
+// =======================================================
+// INICIAR PROCESSO 2FA
+// =======================================================
+async function initiate2FA(user, method = 'email') {
+    const session = window.twoFactorAuth.createSession(user, method);
+    
+    if (method === 'email') {
+        await window.twoFactorAuth.sendCodeByEmail(user.email, session.code, user.name);
+        showNotification(`📧 Código enviado para ${maskEmail(user.email)}`, 'info');
+    } else if (method === 'sms') {
+        await window.twoFactorAuth.sendCodeBySMS(user.phone, session.code, user.name);
+        showNotification(`📱 Código enviado via SMS para ${maskPhone(user.phone)}`, 'info');
+    }
+    
+    window.show2FAModal(method);
+    
+    // Registrar atividade
+    await logActivity({
+        type: method === 'email' ? 'email_sent' : 'sms_sent',
+        user: user.name,
+        contact: method === 'email' ? user.email : user.phone
+    });
+}
+
+// =======================================================
+// VERIFICAÇÃO DO CÓDIGO 2FA
+// =======================================================
+async function verify2FACode() {
+    const inputs = document.querySelectorAll('.code-input');
+    const code = Array.from(inputs).map(input => input.value).join('');
+    
+    if (code.length !== 6) {
+        window.show2FAError('Por favor, digite o código completo de 6 dígitos');
+        return;
+    }
+    
+    const result = window.twoFactorAuth.verifyCode(code);
+    
+    if (result.success) {
+        window.hide2FAModal();
+        
+        // Verificar se usuário já tem senha
+        const hasPassword = await window.twoFactorAuth.checkUserHasPassword(result.user.type);
+        
+        if (hasPassword) {
+            completeLogin();
+            showNotification('✅ Login realizado com sucesso!', 'success');
+        } else {
+            // Mostrar modal para criar senha
+            showPasswordCreationModal();
+        }
+    } else {
+        window.show2FAError(result.error);
+        
+        if (result.maxAttemptsReached) {
+            setTimeout(() => {
+                window.hide2FAModal();
+                showLoginModal();
+            }, 3000);
+        } else {
+            inputs.forEach(input => input.value = '');
+            inputs[0].focus();
+        }
+    }
+}
+
+// =======================================================
+// MODAL DE CRIAÇÃO DE SENHA
 // =======================================================
 function showPasswordCreationModal() {
     let modal = document.getElementById('password-creation-modal');
@@ -310,9 +376,18 @@ function createPasswordCreationModal() {
         </div>
     `;
     
-    // Event listeners para validação em tempo real
+    // Event listener para validação em tempo real
     const newPasswordInput = modal.querySelector('#new-password');
     newPasswordInput.addEventListener('input', updatePasswordStrength);
+    
+    // Permitir Enter
+    modal.querySelectorAll('input').forEach(input => {
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                createUserPassword();
+            }
+        });
+    });
     
     return modal;
 }
@@ -327,7 +402,6 @@ function updatePasswordStrength() {
     }
     
     let strength = 0;
-    let feedback = [];
     
     if (password.length >= 8) strength++;
     if (password.length >= 12) strength++;
@@ -343,24 +417,9 @@ function updatePasswordStrength() {
             <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
                 <div class="h-full bg-${colors[strength - 1]}-500 transition-all" style="width: ${strength * 20}%"></div>
             </div>
-            <span class="text-${colors[strength - 1]}-600 font-semibold">${texts[strength - 1]}</span>
+            <span class="text-${colors[strength - 1]}-600 font-semibold text-xs">${texts[strength - 1]}</span>
         </div>
     `;
-}
-
-function togglePasswordVisibility(inputId) {
-    const input = document.getElementById(inputId);
-    const icon = event.currentTarget.querySelector('i');
-    
-    if (input.type === 'password') {
-        input.type = 'text';
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
-    } else {
-        input.type = 'password';
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
-    }
 }
 
 async function createUserPassword() {
@@ -380,7 +439,7 @@ async function createUserPassword() {
     }
     
     try {
-        const success = await twoFactorAuth.setPassword(
+        const success = await window.twoFactorAuth.setPassword(
             pendingUser.type,
             password,
             savePassword
@@ -421,11 +480,14 @@ function showPasswordError(message) {
     }, 5000);
 }
 
+// =======================================================
+// COMPLETAR LOGIN
+// =======================================================
 function completeLogin() {
     currentUser = pendingUser;
     localStorage.setItem('cogim_admin_user', JSON.stringify(currentUser));
     localStorage.setItem('cogim_admin_auth', new Date().getTime().toString());
-    twoFactorAuth.clearSession();
+    window.twoFactorAuth.clearSession();
     showAdminPanel();
     
     // Registrar atividade de login
@@ -437,176 +499,89 @@ function completeLogin() {
 }
 
 // =======================================================
-// VERIFICAÇÃO 2FA
+// INTERFACE DO PAINEL
 // =======================================================
-async function verify2FACode() {
-    const inputs = document.querySelectorAll('.code-input');
-    const code = Array.from(inputs).map(input => input.value).join('');
-    
-    if (code.length !== 6) {
-        show2FAError('Por favor, digite o código completo de 6 dígitos');
-        return;
-    }
-    
-    const result = twoFactorAuth.verifyCode(code);
-    
-    if (result.success) {
-        hide2FAModal();
-        
-        // Verificar se usuário já tem senha
-        const hasPassword = await twoFactorAuth.checkUserHasPassword(result.user.type);
-        
-        if (hasPassword) {
-            completeLogin();
-            showNotification('✅ Login realizado com sucesso!', 'success');
-        } else {
-            // Mostrar modal para criar senha
-            showPasswordCreationModal();
-        }
-    } else {
-        show2FAError(result.error);
-        
-        if (result.maxAttemptsReached) {
-            setTimeout(() => {
-                hide2FAModal();
-                showLoginModal();
-            }, 3000);
-        } else {
-            inputs.forEach(input => input.value = '');
-            inputs[0].focus();
-        }
-    }
-}
-
-// =======================================================
-// LOGIN COM SENHA (SE DISPONÍVEL)
-// =======================================================
-async function quickAdminLogin(adminType, method = 'sms', userEmail = '', userPhone = '') {
-    if (!adminUsers[adminType]) {
-        showNotification('❌ Tipo de administrador inválido', 'error');
-        return;
-    }
-    
-    pendingUser = {
-        type: adminType,
-        name: adminUsers[adminType].name,
-        email: userEmail,
-        phone: userPhone,
-        role: adminUsers[adminType].role,
-        permissions: adminUsers[adminType].permissions,
-        twoFactorEnabled: true,
-        preferred2FAMethod: method
-    };
-    
-    // Salvar dados
-    localStorage.setItem(`cogim_admin_${adminType}_email`, userEmail);
-    localStorage.setItem(`cogim_admin_${adminType}_phone`, userPhone);
-    
-    // Verificar se tem senha salva
-    const hasPassword = await twoFactorAuth.checkUserHasPassword(adminType);
-    
-    if (hasPassword) {
-        showPasswordLoginModal();
-    } else {
-        hideLoginModal();
-        initiate2FA(pendingUser, method);
-    }
-}
-
-function showPasswordLoginModal() {
+function showLoginModal() {
     const modal = document.getElementById('login-modal');
-    const content = modal.querySelector('.bg-white');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function hideLoginModal() {
+    document.getElementById('login-modal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+function showAdminPanel() {
+    hideLoginModal();
+    window.hide2FAModal();
+    hidePasswordCreationModal();
+    document.getElementById('admin-user').textContent = currentUser.name;
+    document.body.style.overflow = 'auto';
+}
+
+// =======================================================
+// EVENT LISTENERS
+// =======================================================
+function setupEventListeners() {
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', handleLogout);
+    }
+}
+
+function handleLogout() {
+    logActivity({
+        type: 'logout',
+        user: currentUser.name
+    });
     
-    content.innerHTML = `
-        <div class="text-center mb-6">
-            <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-key text-white text-2xl"></i>
-            </div>
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">Digite sua Senha</h2>
-            <p class="text-gray-600 text-sm">${pendingUser.name}</p>
-        </div>
-        
-        <div class="space-y-4 mb-6">
-            <div class="relative">
-                <input 
-                    type="password" 
-                    id="login-password" 
-                    class="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
-                    placeholder="Digite sua senha">
-                <button type="button" onclick="togglePasswordVisibility('login-password')" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-eye"></i>
-                </button>
-            </div>
-            
-            <div id="login-password-error" class="hidden p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"></div>
-        </div>
-        
-        <div class="space-y-3">
-            <button onclick="loginWithPassword()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition shadow-lg">
-                <i class="fas fa-sign-in-alt mr-2"></i>Entrar
-            </button>
-            
-            <button onclick="useCodeInstead()" class="w-full bg-gray-100 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-200 transition">
-                <i class="fas fa-mobile-alt mr-2"></i>Usar Código 2FA
-            </button>
-            
-            <button onclick="backToAdminSelection()" class="w-full text-gray-500 py-2 hover:text-gray-700 transition">
-                Voltar
+    localStorage.removeItem('cogim_admin_user');
+    localStorage.removeItem('cogim_admin_auth');
+    window.twoFactorAuth.clearSession();
+    currentUser = null;
+    pendingUser = null;
+    showLoginModal();
+    showNotification('✅ Sessão terminada com sucesso!', 'info');
+}
+
+// =======================================================
+// SISTEMA DE NOTIFICAÇÕES
+// =======================================================
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 p-4 rounded-lg text-white z-50 transition-all duration-300 shadow-lg`;
+    
+    switch(type) {
+        case 'success':
+            notification.classList.add('bg-green-500');
+            break;
+        case 'error':
+            notification.classList.add('bg-red-500');
+            break;
+        case 'warning':
+            notification.classList.add('bg-yellow-500');
+            break;
+        default:
+            notification.classList.add('bg-blue-500');
+    }
+    
+    notification.innerHTML = `
+        <div class="flex items-center gap-3">
+            <span>${message}</span>
+            <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200">
+                <i class="fas fa-times"></i>
             </button>
         </div>
     `;
     
+    document.body.appendChild(notification);
+    
+    // Auto-remover após 5 segundos
     setTimeout(() => {
-        document.getElementById('login-password').focus();
-    }, 100);
-}
-
-async function loginWithPassword() {
-    const password = document.getElementById('login-password').value;
-    
-    if (!password) {
-        showLoginPasswordError('Digite sua senha');
-        return;
-    }
-    
-    const isValid = await twoFactorAuth.validatePassword(pendingUser.type, password);
-    
-    if (isValid) {
-        hideLoginModal();
-        completeLogin();
-        showNotification('✅ Login realizado com sucesso!', 'success');
-    } else {
-        showLoginPasswordError('Senha incorreta');
-        document.getElementById('login-password').value = '';
-        document.getElementById('login-password').focus();
-        
-        // Registrar tentativa falha
-        await logActivity({
-            type: 'failed_login',
-            user: pendingUser.name,
-            method: 'password'
-        });
-    }
-}
-
-function showLoginPasswordError(message) {
-    const errorDiv = document.getElementById('login-password-error');
-    errorDiv.textContent = message;
-    errorDiv.classList.remove('hidden');
-    
-    setTimeout(() => {
-        errorDiv.classList.add('hidden');
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
     }, 5000);
-}
-
-function useCodeInstead() {
-    const method = pendingUser.preferred2FAMethod || 'sms';
-    initiate2FA(pendingUser, method);
-    hideLoginModal();
-}
-
-function backToAdminSelection() {
-    location.reload();
 }
 
 // =======================================================
@@ -614,11 +589,16 @@ function backToAdminSelection() {
 // =======================================================
 async function logActivity(activity) {
     try {
+        activity.timestamp = new Date().toISOString();
+        
         await fetch('http://localhost:3000/api/log-activity', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(activity)
         });
+        
+        // Atualizar lista de atividades
+        loadActivities();
     } catch (error) {
         console.error('Erro ao registrar atividade:', error);
     }
@@ -629,9 +609,10 @@ async function loadActivities() {
         const response = await fetch('http://localhost:3000/api/activities?limit=50');
         const data = await response.json();
         
-        displayActivities(data.activities);
+        displayActivities(data.activities || []);
     } catch (error) {
         console.error('Erro ao carregar atividades:', error);
+        displayActivities([]);
     }
 }
 
@@ -669,10 +650,7 @@ function getActivityIcon(type) {
         'password_created': 'key',
         'sms_sent': 'mobile-alt',
         'email_sent': 'envelope',
-        'logout': 'sign-out-alt',
-        'page_view': 'eye',
-        'contact_form': 'envelope-open',
-        'gallery_view': 'images'
+        'logout': 'sign-out-alt'
     };
     return icons[type] || 'circle';
 }
@@ -684,10 +662,7 @@ function getActivityColor(type) {
         'password_created': 'blue',
         'sms_sent': 'purple',
         'email_sent': 'blue',
-        'logout': 'gray',
-        'page_view': 'indigo',
-        'contact_form': 'yellow',
-        'gallery_view': 'pink'
+        'logout': 'gray'
     };
     return colors[type] || 'gray';
 }
@@ -699,10 +674,7 @@ function getActivityDescription(activity) {
         'password_created': `${activity.user} criou uma senha`,
         'sms_sent': `Código SMS enviado para ${activity.user}`,
         'email_sent': `Código email enviado para ${activity.user}`,
-        'logout': `${activity.user} fez logout`,
-        'page_view': `Página visualizada: ${activity.page}`,
-        'contact_form': `Novo contato recebido de ${activity.name}`,
-        'gallery_view': `Galeria visualizada: ${activity.category}`
+        'logout': `${activity.user} fez logout`
     };
     return descriptions[activity.type] || 'Atividade registrada';
 }
@@ -721,64 +693,7 @@ function formatTimeAgo(timestamp) {
 // Atualizar atividades a cada minuto
 setInterval(loadActivities, 60000);
 
-// =======================================================
-// OUTRAS FUNÇÕES (mantidas do código original)
-// =======================================================
-// [... resto do código mantém-se igual ...]
-
-function setupEventListeners() {
-    const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', handleLogout);
-    }
-}
-
-function handleLogout() {
-    logActivity({
-        type: 'logout',
-        user: currentUser.name
-    });
-    
-    localStorage.removeItem('cogim_admin_user');
-    localStorage.removeItem('cogim_admin_auth');
-    twoFactorAuth.clearSession();
-    currentUser = null;
-    pendingUser = null;
-    showLoginModal();
-    showNotification('✅ Sessão terminada com sucesso!', 'info');
-}
-
-function showLoginModal() {
-    const modal = document.getElementById('login-modal');
-    modal.style.display = 'flex';
-}
-
-function hideLoginModal() {
-    document.getElementById('login-modal').style.display = 'none';
-}
-
-function showAdminPanel() {
-    hideLoginModal();
-    hide2FAModal();
-    hidePasswordCreationModal();
-    document.getElementById('admin-user').textContent = currentUser.name;
-    document.body.style.overflow = 'auto';
-}
-
-async function initiate2FA(user, method = 'email') {
-    const session = twoFactorAuth.createSession(user, method);
-    
-    if (method === 'email') {
-        await twoFactorAuth.sendCodeByEmail(user.email, session.code, user.name);
-        showNotification(`📧 Código enviado para ${maskEmail(user.email)}`, 'info');
-    } else if (method === 'sms') {
-        await twoFactorAuth.sendCodeBySMS(user.phone, session.code, user.name);
-        showNotification(`📱 Código enviado via SMS`, 'info');
-    }
-    
-    show2FAModal(method);
-}
-
+// Funções auxiliares
 function maskEmail(email) {
     if (!email) return '';
     const [username, domain] = email.split('@');
@@ -794,25 +709,14 @@ function maskPhone(phone) {
     return phone.replace(/(\d{3})\d{5}(\d{4})/, '$1*****$2');
 }
 
-function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `fixed top-4 right-4 p-4 rounded-lg text-white z-50 transition-all duration-300 transform translate-x-full shadow-lg`;
-    
-    switch(type) {
-        case 'success':
-            notification.classList.add('bg-green-500');
-            break;
-        case 'error':
-            notification.classList.add('bg-red-500');
-            break;
-        case 'warning':
-            notification.classList.add('bg-yellow-500');
-            break;
-        default:
-            notification.classList.add('bg-blue-500');
-    }
-    
-    notification.innerHTML = `
-        <div class="flex items-center gap-3">
-            <span>${message}</span>
-            <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200">
+// Expor funções globais necessárias
+window.quickAdminLogin = quickAdminLogin;
+window.verify2FACode = verify2FACode;
+window.loginWithPassword = loginWithPassword;
+window.useCodeInstead = useCodeInstead;
+window.backToAdminSelection = backToAdminSelection;
+window.togglePasswordVisibility = togglePasswordVisibility;
+window.createUserPassword = createUserPassword;
+window.skipPasswordCreation = skipPasswordCreation;
+
+console.log('✅ Sistema Administrativo carregado com sucesso!');

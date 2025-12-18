@@ -25,12 +25,6 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Google OAuth -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    
-    <!-- Facebook SDK -->
-    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/pt_PT/sdk.js#xfbml=1&version=v18.0&appId=YOUR_APP_ID&autoLogAppEvents=1"></script>
-    
     <style>
         :root {
             --color-primary: #00A3FF;
@@ -115,13 +109,6 @@
             top: 0;
         }
         
-        .admin-sidebar nav {
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: stretch !important;
-            gap: 0 !important;
-        }
-        
         .sidebar-item {
             padding: 12px 20px;
             cursor: pointer;
@@ -145,117 +132,30 @@
         .content-section.active {
             display: block;
         }
-        
-        .lang-btn {
-            padding: 8px 16px;
-            border: 2px solid var(--color-primary);
-            background: transparent;
-            color: var(--color-primary);
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 0 4px;
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
-        .lang-btn.active,
-        .lang-btn:hover {
-            background: var(--color-primary);
-            color: white;
+        .animate-fadeIn {
+            animation: fadeIn 0.3s ease-out;
         }
         
-        .social-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            padding: 12px 24px;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
-            background: white;
-            color: #374151;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
+        .scale-105 {
+            transform: scale(1.05);
         }
         
-        .social-btn:hover {
-            border-color: var(--color-primary);
-            box-shadow: 0 4px 12px rgba(0, 163, 255, 0.2);
+        .scale-100 {
+            transform: scale(1);
         }
         
-        .social-btn.google {
-            border-color: #db4437;
-            color: #db4437;
-        }
-        
-        .social-btn.google:hover {
-            background: #db4437;
-            color: white;
-        }
-        
-        .social-btn.facebook {
-            border-color: #1877f2;
-            color: #1877f2;
-        }
-        
-        .social-btn.facebook:hover {
-            background: #1877f2;
-            color: white;
-        }
-        
-        .divider {
-            position: relative;
-            text-align: center;
-            margin: 24px 0;
-        }
-        
-        .divider::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: #e5e7eb;
-        }
-        
-        .divider span {
-            position: relative;
-            background: white;
-            padding: 0 16px;
-            color: #6b7280;
-            font-size: 14px;
-        }
-        
-        .modal-overlay {
-            backdrop-filter: blur(4px);
-        }
-        
-        .auth-tabs {
-            display: flex;
-            border-bottom: 1px solid #e5e7eb;
-            margin-bottom: 24px;
-        }
-        
-        .auth-tab {
-            flex: 1;
-            padding: 12px;
-            text-align: center;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-        
-        .auth-tab.active {
-            border-bottom-color: var(--color-primary);
-            color: var(--color-primary);
-            font-weight: 600;
-        }
-        
-        /* Scrollbar personalizado */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -298,31 +198,31 @@
         <!-- Sidebar -->
         <div class="admin-sidebar w-64">
             <div class="p-6">
-                <h2 class="text-xl font-bold mb-6" data-translate="main-menu">Menu Principal</h2>
+                <h2 class="text-xl font-bold mb-6">Menu Principal</h2>
                 <nav>
                     <div class="sidebar-item active" data-section="dashboard">
                         <i class="fas fa-chart-bar mr-3"></i>
-                        <span data-translate="dashboard">Dashboard</span>
+                        <span>Dashboard</span>
                     </div>
                     <div class="sidebar-item" data-section="gallery">
                         <i class="fas fa-images mr-3"></i>
-                        <span data-translate="gallery">Galeria</span>
+                        <span>Galeria</span>
                     </div>
                     <div class="sidebar-item" data-section="content">
                         <i class="fas fa-edit mr-3"></i>
-                        <span data-translate="content-management">Gestão de Conteúdo</span>
+                        <span>Gestão de Conteúdo</span>
                     </div>
                     <div class="sidebar-item" data-section="messages">
                         <i class="fas fa-envelope mr-3"></i>
-                        <span data-translate="messages">Mensagens</span>
+                        <span>Mensagens</span>
                     </div>
                     <div class="sidebar-item" data-section="settings">
                         <i class="fas fa-cog mr-3"></i>
-                        <span data-translate="settings">Configurações</span>
+                        <span>Configurações</span>
                     </div>
                     <div class="sidebar-item" data-section="users">
                         <i class="fas fa-users mr-3"></i>
-                        <span data-translate="users">Utilizadores</span>
+                        <span>Utilizadores</span>
                     </div>
                 </nav>
             </div>
@@ -380,25 +280,6 @@
                     </div>
                 </div>
 
-                <!-- Quick Actions -->
-                <div class="admin-card p-6 mb-8">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4">Ações Rápidas</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <button class="btn-admin">
-                            <i class="fas fa-plus"></i>
-                            Adicionar Imagem
-                        </button>
-                        <button class="btn-admin">
-                            <i class="fas fa-edit"></i>
-                            Editar Conteúdo
-                        </button>
-                        <button class="btn-admin">
-                            <i class="fas fa-chart-line"></i>
-                            Ver Relatórios
-                        </button>
-                    </div>
-                </div>
-
                 <!-- Recent Activity -->
                 <div class="admin-card p-6">
                     <h3 class="text-xl font-bold text-gray-800 mb-4">Atividade Recente</h3>
@@ -408,211 +289,36 @@
                 </div>
             </div>
 
-            <!-- Gallery Section -->
+            <!-- Outras seções... -->
             <div id="gallery" class="content-section">
-                <div class="mb-8 flex justify-between items-center">
-                    <div>
-                        <h2 class="text-3xl font-bold text-gray-800 mb-2">Gestão da Galeria</h2>
-                        <p class="text-gray-600">Gerir imagens e categorias da galeria</p>
-                    </div>
-                    <button class="btn-admin" id="add-image-btn">
-                        <i class="fas fa-plus"></i>
-                        Adicionar Imagem
-                    </button>
-                </div>
-
-                <div class="admin-card p-6">
-                    <div class="flex flex-wrap gap-4 mb-6">
-                        <button class="btn-admin category-filter active" data-category="all">Todas</button>
-                        <button class="btn-secondary category-filter" data-category="cozinhas">Cozinhas</button>
-                        <button class="btn-secondary category-filter" data-category="guardafatos">Guarda-fatos</button>
-                        <button class="btn-secondary category-filter" data-category="racks">Racks</button>
-                        <button class="btn-secondary category-filter" data-category="outros">Outros</button>
-                    </div>
-
-                    <div id="gallery-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                        <p class="col-span-full text-gray-500 text-center py-8">Nenhuma imagem na galeria</p>
-                    </div>
-                </div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Gestão da Galeria</h2>
+                <p class="text-gray-600">Em construção...</p>
             </div>
 
-            <!-- Content Section -->
             <div id="content" class="content-section">
-                <div class="mb-8">
-                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Gestão de Conteúdo</h2>
-                    <p class="text-gray-600">Edite o conteúdo das páginas do website</p>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div class="admin-card p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-4">Página Principal</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Título Principal</label>
-                                <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="Móveis por Medida de Qualidade Superior">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Subtítulo</label>
-                                <textarea class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="3">Transformamos os seus sonhos em realidade com móveis personalizados de alta qualidade.</textarea>
-                            </div>
-                            <button class="btn-admin">
-                                <i class="fas fa-save"></i>
-                                Guardar Alterações
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="admin-card p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-4">Informações de Contacto</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">WhatsApp</label>
-                                <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="+258 82 728 8888">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                                <input type="email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="info@cogim.co.mz">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Endereço</label>
-                                <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="Maputo, Moçambique">
-                            </div>
-                            <button class="btn-admin">
-                                <i class="fas fa-save"></i>
-                                Atualizar Contactos
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Gestão de Conteúdo</h2>
+                <p class="text-gray-600">Em construção...</p>
             </div>
 
-            <!-- Messages Section -->
             <div id="messages" class="content-section">
-                <div class="mb-8">
-                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Mensagens</h2>
-                    <p class="text-gray-600">Contactos e mensagens recebidas</p>
-                </div>
-
-                <div class="admin-card p-6">
-                    <div class="space-y-4">
-                        <div class="border-b border-gray-200 pb-4">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h4 class="font-semibold text-gray-800">João Silva</h4>
-                                    <p class="text-gray-600 text-sm">+258 84 123 4567</p>
-                                    <p class="text-gray-700 mt-2">Gostaria de orçamento para uma cozinha moderna.</p>
-                                </div>
-                                <span class="text-gray-500 text-sm">Há 1 hora</span>
-                            </div>
-                            <div class="mt-3 flex gap-2">
-                                <button class="btn-admin text-sm">
-                                    <i class="fas fa-reply"></i>
-                                    Responder
-                                </button>
-                                <button class="btn-secondary text-sm">
-                                    <i class="fas fa-archive"></i>
-                                    Arquivar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Mensagens</h2>
+                <p class="text-gray-600">Em construção...</p>
             </div>
 
-            <!-- Settings Section -->
             <div id="settings" class="content-section">
-                <div class="mb-8">
-                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Configurações</h2>
-                    <p class="text-gray-600">Configurações gerais do sistema</p>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div class="admin-card p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-4">Configurações Visuais</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Cor Primária</label>
-                                <div class="flex items-center gap-3">
-                                    <input type="color" value="#00A3FF" class="w-12 h-10 border border-gray-300 rounded cursor-pointer">
-                                    <input type="text" value="#00A3FF" class="flex-1 p-3 border border-gray-300 rounded-lg">
-                                </div>
-                            </div>
-                            <button class="btn-admin">
-                                <i class="fas fa-palette"></i>
-                                Aplicar Alterações
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="admin-card p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-4">Configurações de Sistema</h3>
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between">
-                                <span class="text-gray-700">Modo Manutenção</span>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" class="sr-only peer">
-                                    <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                                </label>
-                            </div>
-                            <button class="btn-admin">
-                                <i class="fas fa-save"></i>
-                                Guardar Configurações
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Configurações</h2>
+                <p class="text-gray-600">Em construção...</p>
             </div>
 
-            <!-- Users Section -->
             <div id="users" class="content-section">
-                <div class="mb-8">
-                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Utilizadores</h2>
-                    <p class="text-gray-600">Gestão de utilizadores do painel</p>
-                </div>
-
-                <div class="admin-card p-6">
-                    <div class="space-y-6">
-                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                            <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                                    D
-                                </div>
-                                <div>
-                                    <h4 class="font-semibold text-gray-800">Dono do Website</h4>
-                                    <p class="text-gray-600 text-sm">Administrador Principal</p>
-                                    <span class="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full mt-1">Ativo</span>
-                                </div>
-                            </div>
-                            <button class="btn-admin text-sm">
-                                <i class="fas fa-edit"></i>
-                                Editar
-                            </button>
-                        </div>
-
-                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                            <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                                    D
-                                </div>
-                                <div>
-                                    <h4 class="font-semibold text-gray-800">Desenvolvedora</h4>
-                                    <p class="text-gray-600 text-sm">Desenvolvedor & Suporte</p>
-                                    <span class="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full mt-1">Ativo</span>
-                                </div>
-                            </div>
-                            <button class="btn-admin text-sm">
-                                <i class="fas fa-edit"></i>
-                                Editar
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Utilizadores</h2>
+                <p class="text-gray-600">Em construção...</p>
             </div>
         </div>
     </div>
 
     <!-- Login Modal -->
-    <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-50 modal-overlay flex items-center justify-center z-50 p-4">
+    <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-2xl p-8 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl">
             <div class="text-center mb-6">
                 <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -683,12 +389,11 @@
                             <i class="fas fa-envelope text-xl"></i>
                             <span>Email</span>
                         </button>
-                      
                     </div>
                 </div>
                 
                 <p class="text-xs text-gray-500 text-center mt-4">
-                    💡 Códigos 2FA aparecem no Console 
+                    💡 Códigos 2FA aparecem no Console (F12)
                 </p>
             </div>
         </div>
@@ -698,6 +403,7 @@
     <script>
         // Variável global para armazenar o tipo de admin selecionado
         let selectedAdminType = null;
+        let selectedAuthMethod = null;
         
         // Capturar cliques nos botões de admin
         document.querySelectorAll('[data-admin]').forEach(btn => {
@@ -705,23 +411,18 @@
                 e.preventDefault();
                 selectedAdminType = this.getAttribute('data-admin');
                 
-                // Visual feedback - destacar selecionado
+                // Visual feedback
                 document.querySelectorAll('[data-admin]').forEach(b => {
                     b.classList.remove('ring-4', 'ring-blue-300', 'scale-105');
                     b.classList.add('scale-100');
                 });
                 this.classList.add('ring-4', 'ring-blue-300', 'scale-105');
                 
-                // Mostrar formulário de contato
+                // Mostrar formulário
                 const contactForm = document.getElementById('contact-form');
                 contactForm.style.display = 'block';
-
-                let selectedAuthMethod = null;
-                
-                // Animar entrada
                 contactForm.classList.add('animate-fadeIn');
                 
-                // Focar no email
                 setTimeout(() => {
                     document.getElementById('admin-email').focus();
                 }, 300);
@@ -735,7 +436,6 @@
                 return;
             }
             
-            // Validar campos
             const email = document.getElementById('admin-email').value.trim();
             const phone = document.getElementById('admin-phone').value.trim();
             
@@ -751,7 +451,6 @@
                 return;
             }
             
-            // Validar formato de email
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 alert('⚠️ Por favor, digite um email válido');
@@ -759,221 +458,26 @@
                 return;
             }
             
-            // Validar formato de telefone (básico)
-            const phoneRegex = /^\+?\d{10,15}$/;
-            const cleanPhone = phone.replace(/\s+/g, '');
-            if (!phoneRegex.test(cleanPhone)) {
-                alert('⚠️ Por favor, digite um número de telefone válido (ex: +258 82 123 4567)');
-                document.getElementById('admin-phone').focus();
-                return;
-            }
+            selectedAuthMethod = method;
             
-            // Disparar evento para o admin.js processar
+            // Disparar evento
             const event = new CustomEvent('admin2FALogin', {
                 detail: {
                     adminType: selectedAdminType,
                     method: method,
                     email: email,
-                    phone: cleanPhone
+                    phone: phone.replace(/\s+/g, '')
                 }
             });
             document.dispatchEvent(event);
         }
         
-        document.querySelectorAll('.space-y-3 button').forEach(btn => {
-                btn.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-700', 'hover:bg-blue-100');
-                btn.classList.add('border-gray-300', 'bg-white', 'text-gray-700', 'hover:bg-gray-50');
-            });
-            event.currentTarget.classList.remove('border-gray-300', 'bg-white', 'text-gray-700', 'hover:bg-gray-50');
-            event.currentTarget.classList.add('border-blue-500', 'bg-blue-50', 'text-blue-700', 'hover:bg-blue-100');
-
-
-            console.log(`Método 2FA selecionado: ${method} para ${selectedAdminType}`);
-
-            // 2. CHAMA A FUNÇÃO DE BACKEND PARA ENVIAR O CÓDIGO
-  async function verify2FACode() {
-    const enteredCode = document.getElementById('2fa-code').value;
-    const email = document.getElementById('admin-email').value; // Recuperar do input oculto ou variável
-    
-    if (enteredCode.length !== 6) {
-        alert("O código deve ter 6 dígitos.");
-        return;
-    }
-    
-    // A password e o email seriam necessários aqui para o login final,
-    // mas para simplificar, usaremos o 'email' e o código 2FA.
-    
-    try {
-        const response = await fetch('/api/validate-password', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                email: email, // Email do administrador
-                code2FA: enteredCode, 
-                method: selectedAuthMethod, 
-                adminType: selectedAdminType
-            })
-        });
-
-        const data = await response.json();
-        
-        if (response.ok && data.success) {
-            // Se o servidor retornar sucesso e o token, o login foi finalizado.
-            handleSuccessfulLogin(selectedAdminType, data.token);
-        } else {
-            alert(data.message || "Código 2FA Inválido ou credenciais incorretas. Tente novamente.");
-        }
-    } catch (error) {
-        console.error('Erro na validação 2FA:', error);
-        alert('Erro ao verificar o código. Tente novamente.');
-    }
-}
-
-
-
-        
-        /**
-         * Simula o envio da solicitação ao servidor para gerar e enviar o código.
-         * ESTA É A PARTE QUE O SEU SERVIDOR NODE.JS REALMENTE FAZ.
-         */
-        async function send2FACode(method, adminType, email, phone) {
-            // Em um ambiente real, faria uma chamada fetch/axios para o seu servidor Node.js
-            // Exemplo:
-            /*
-            const response = await fetch('/api/send-2fa', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ method, adminType, email, phone })
-            });
-            return response.json();
-            */
-            
-            // DEMONSTRAÇÃO (simulando a resposta do servidor e o código)
-            const demoCode = Math.floor(100000 + Math.random() * 900000);
-            console.log(`🔑 CÓDIGO 2FA GERADO (Aparece no console para fins de desenvolvimento): ${demoCode}`);
-
-            let message = '';
-            switch(method) {
-                case 'sms':
-                    message = `Um código SMS foi 'enviado' para ${phone}.`;
-                    break;
-                case 'email':
-                    message = `Um email com o código foi 'enviado' para ${email}.`;
-                    break;
-                case 'authenticator':
-                    message = `Por favor, insira o código do seu aplicativo Authenticator.`;
-                    break;
-            }
-            console.log(`[${method.toUpperCase()} LOG]: ${message}`);
-            
-            // Simula a resposta do servidor com sucesso
-            return { success: true, message: message, code: demoCode };
-        }
-        
-        /**
-         * Altera o modal para mostrar o campo de verificação do código.
-         */
-        function showCodeVerificationScreen() {
-            const modalContent = document.querySelector('#login-modal > div');
-            modalContent.innerHTML = `
-                <div class="text-center mb-6">
-                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-key text-white text-2xl"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-gray-800">Verificação 2FA</h2>
-                    <p class="text-gray-600">Insira o código de 6 dígitos recebido por ${selectedAuthMethod.toUpperCase()}.</p>
-                </div>
-                
-                <div class="space-y-4">
-                    <div>
-                        <input 
-                            type="text" 
-                            id="2fa-code" 
-                            class="w-full p-4 text-center text-2xl font-mono tracking-widest border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" 
-                            placeholder="CÓDIGO (6 DÍGITOS)"
-                            maxlength="6"
-                            required>
-                    </div>
-                    <button id="verify-code-btn" onclick="verify2FACode()" class="btn-admin w-full justify-center">
-                        <i class="fas fa-sign-in-alt"></i>
-                        Verificar Código e Entrar
-                    </button>
-                    <button onclick="document.location.reload()" class="btn-secondary w-full justify-center text-sm">
-                        Cancelar/Voltar
-                    </button>
-                </div>
-            `;
-            // Foca automaticamente no campo
-            setTimeout(() => document.getElementById('2fa-code').focus(), 100);
-        }
-        
-        /**
-         * Simula a verificação do código 2FA
-         */
-        function verify2FACode() {
-            const enteredCode = document.getElementById('2fa-code').value;
-            
-            if (enteredCode.length !== 6) {
-                alert("O código deve ter 6 dígitos.");
-                return;
-            }
-
-            // Em um ambiente real, faria uma chamada fetch/axios para o seu servidor Node.js
-            // para verificar o código no backend.
-            
-            // SIMULAÇÃO DE VERIFICAÇÃO DO CÓDIGO
-            console.log(`Tentativa de verificação do código: ${enteredCode}`);
-            
-            // Sucesso simulado
-            if (enteredCode === "000000" || enteredCode === "999999") { // Pode usar um código 'mágico' para teste
-                 handleSuccessfulLogin(selectedAdminType);
-            } else {
-                alert("Código 2FA Inválido ou Expirado. Tente novamente. (Dica: Use '000000' para sucesso simulado)");
-            }
-        }
-        
-        /**
-         * Lida com o login bem-sucedido após o 2FA
-         */
-        function handleSuccessfulLogin(adminType) {
-            let adminName = adminType === 'owner' ? 'Proprietário(a)' : 'Desenvolvedor(a)';
-            
-            document.getElementById('admin-user').textContent = `Bem-vindo, ${adminName}`;
-            document.getElementById('login-modal').classList.add('hidden'); // Esconde o modal
-            document.body.classList.remove('overflow-hidden'); // Restaura a rolagem do body
-
-            alert(`✅ Login bem-sucedido como ${adminName}!`);
-
-            // Inicializar funcionalidades do painel aqui...
-            // Por exemplo: loadGalleryImages();
-        }
-
-        /**
-         * Lógica de Logoff
-         */
-        document.getElementById('logout-btn').addEventListener('click', function() {
-            // Em um ambiente real, limparia o token de sessão/JWT
-            alert("Sessão terminada. A recarregar a página para fazer o login.");
-            document.location.reload(); 
-        });
-
-        // Configurações iniciais ao carregar a página
-        document.addEventListener('DOMContentLoaded', () => {
-             // Força o login modal a aparecer no início e desabilita a rolagem do corpo
-             document.getElementById('login-modal').classList.remove('hidden');
-             document.body.classList.add('overflow-hidden'); 
-        });
-    </script>
-
-
         // Navegação entre seções
         document.querySelectorAll('.sidebar-item').forEach(item => {
             item.addEventListener('click', function() {
-                // Remover active de todos
                 document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
                 document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
                 
-                // Adicionar active ao clicado
                 this.classList.add('active');
                 const section = this.getAttribute('data-section');
                 document.getElementById(section).classList.add('active');
@@ -989,7 +493,6 @@
                 value = '+258' + value;
             }
             
-            // Formatar: +258 XX XXX XXXX
             if (value.length > 4) {
                 value = value.slice(0, 4) + ' ' + value.slice(4);
             }
@@ -1004,31 +507,8 @@
         });
     </script>
     
-    <style>
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .animate-fadeIn {
-            animation: fadeIn 0.3s ease-out;
-        }
-        
-        .scale-105 {
-            transform: scale(1.05);
-        }
-        
-        .scale-100 {
-            transform: scale(1);
-        }
-    </style>
-    
+    <!-- Carregar 2FA primeiro, depois admin.js -->
+    <script src="2fa.js"></script>
     <script src="admin.js"></script>
 </body>
 </html>

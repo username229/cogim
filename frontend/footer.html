@@ -4,30 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
     
     <style>
         .content-body h2 {
-            font-size: 1.75rem; /* text-2xl */
-            font-weight: 700; /* font-bold */
-            margin-top: 2.5rem; /* mt-10 */
-            margin-bottom: 1rem; /* mb-4 */
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
             padding-bottom: 0.5rem;
-            border-bottom: 2px solid #e0e7ff; /* Cor clara do Indigo */
+            border-bottom: 2px solid #e0e7ff;
         }
         .content-body h3 {
-            font-size: 1.25rem; /* text-xl */
-            font-weight: 600; /* font-semibold */
-            margin-top: 1.5rem; /* mt-6 */
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
             margin-bottom: 0.5rem;
-            color: #4f46e5; /* Cor primária do site (Indigo-600) */
+            color: #4f46e5;
         }
         .content-body p, .content-body ul {
-            margin-bottom: 1rem; /* mb-4 */
+            margin-bottom: 1rem;
             line-height: 1.75;
-            color: #4b5563; /* text-gray-600 */
+            color: #4b5563;
         }
         .content-body ul {
             list-style-type: disc;
@@ -48,7 +47,6 @@
 </head>
 <body class="font-sans">
 
-   
     <footer class="bg-gray-900 text-white pt-16 pb-8">
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
@@ -128,7 +126,7 @@
             </div>
             <div class="border-t border-gray-800 pt-8">
                 <div class="flex flex-col md:flex-row md:justify-between md:items-center">
-                    <p class="text-gray-400 mb-4 md:mb-0" data-translate="footer-copyright">&copy; <span id="current-year">2024</span> Cogim Lda. Todos os direitos reservados.</p>
+                    <p class="text-gray-400 mb-4 md:mb-0" data-translate="footer-copyright">&copy; <span id="current-year">2025</span> Cogim Lda. Todos os direitos reservados.</p>
                     <div class="flex flex-wrap gap-4">
                         <a href="#" id="open-terms" class="text-gray-400 hover:text-white transition" data-translate="footer-terms">Termos de Serviço</a>
                         <a href="#" id="open-privacy" class="text-gray-400 hover:text-white transition" data-translate="footer-privacy">Política de Privacidade</a>
@@ -154,10 +152,10 @@
                 </button>
             </div>
             
-            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto bg-gray-50">
+            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto bg-gray-50" style="max-height: 400px;">
                 <div class="mb-4">
                     <div class="bg-blue-100 p-3 rounded-lg max-w-xs">
-                        <p class="text-sm text-gray-800">Olá! 👋 Sou o assistente virtual da Cogim. Como posso ajudá-lo hoje?</p>
+                        <p class="text-sm text-gray-800" data-translate="chat-welcome">Olá! 👋 Sou o assistente virtual da Cogim. Como posso ajudá-lo hoje?</p>
                     </div>
                 </div>
             </div>
@@ -174,12 +172,6 @@
                     <button class="faq-btn text-xs bg-gray-100 hover:bg-gray-200 p-2 rounded text-left" data-question="produtos">
                         🛋️ Produtos
                     </button>
-                    <button class="faq-btn text-xs bg-gray-100 hover:bg-gray-200 p-2 rounded text-left" data-question="orcamento">
-                        💰 Orçamento
-                    </button>
-                    <button class="faq-btn text-xs bg-gray-100 hover:bg-gray-200 p-2 rounded text-left" data-question="prazo">
-                        ⏱️ Prazos
-                    </button>
                     <button class="faq-btn text-xs bg-gray-100 hover:bg-gray-200 p-2 rounded text-left" data-question="whatsapp">
                         📱 WhatsApp
                     </button>
@@ -188,151 +180,71 @@
         </div>
     </div>
 
+    <!-- MODAL TERMOS -->
     <div id="modal-termos" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-[100] hidden overflow-y-auto" aria-modal="true" role="dialog">
         <div class="flex items-center justify-center min-h-screen p-4">
-            
             <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl transform transition-all my-8">
-                
                 <div class="flex items-center justify-between p-4 border-b bg-indigo-700 text-white rounded-t-lg">
-                    <h3 class="text-xl font-bold">Termos de Serviço da Cogim Galeria</h3>
+                    <h3 class="text-xl font-bold" data-translate="terms-title">Termos de Serviço da Cogim Galeria</h3>
                     <button id="close-modal-termos" class="text-white hover:text-indigo-200" title="Fechar">
                         <i class="ri-close-line ri-lg"></i>
                     </button>
                 </div>
                 
                 <div class="p-6 sm:p-10 content-body max-h-[80vh] overflow-y-auto">
-                    <p class="text-sm text-gray-500 mb-8">
+                    <p class="text-sm text-gray-500 mb-8" data-translate="last-updated">
                         **Última atualização: 3 de Dezembro de 2025**
                     </p>
 
-                    <p>
+                    <p data-translate="terms-intro">
                         Bem-vindo à Cogim Galeria. Ao aceder ou utilizar o nosso serviço, o utilizador concorda em ficar vinculado a estes Termos de Serviço e à nossa Política de Privacidade.
                     </p>
 
-                    <h2>1. Aceitação dos Termos</h2>
-                    <p>
-                        O acesso e utilização do Serviço estão condicionados à aceitação e cumprimento destes Termos. Estes Termos aplicam-se a todos os visitantes, utilizadores e outros que acedam ou utilizem o Serviço. Se discordar de qualquer parte dos termos, não deverá aceder ao Serviço.
+                    <h2 data-translate="terms-section-1-title">1. Aceitação dos Termos</h2>
+                    <p data-translate="terms-section-1-content">
+                        O acesso e utilização do Serviço estão condicionados à aceitação e cumprimento destes Termos...
                     </p>
 
-                    <h2>2. O Serviço</h2>
-                    <p>
-                        A Cogim Galeria é um serviço de exibição de portfólio de projetos (Cozinhas, Guarda-fatos, etc.), com o objetivo de demonstrar o trabalho e a qualidade dos serviços da Cogim. As imagens exibidas no Serviço são protegidas por direitos de autor e são propriedade exclusiva da Cogim ou de terceiros com as devidas licenças.
-                    </p>
-
-                    <h2>3. Direitos de Autor e Propriedade Intelectual</h2>
-                    <p>
-                        Todo o conteúdo presente no Serviço, incluindo, mas não se limitando a imagens, textos, gráficos, logótipos e o design da galeria, é propriedade da Cogim e está protegido por leis de direitos de autor e propriedade intelectual.
-                    </p>
-                    <ul>
-                        <li>**Uso Pessoal:** É permitido visualizar o conteúdo da galeria para fins estritamente pessoais e não comerciais.</li>
-                        <li>**Uso Proibido:** É estritamente proibida a cópia, reprodução, distribuição, modificação, exibição pública ou criação de trabalhos derivados de qualquer conteúdo da galeria sem o consentimento prévio por escrito da Cogim.</li>
-                    </ul>
-
-                    <h2>4. Limitação de Responsabilidade</h2>
-                    <p>
-                        A Cogim não garante que o Serviço será ininterrupto, oportuno, seguro ou livre de erros. Em nenhuma circunstância a Cogim será responsável por quaisquer danos indiretos, incidentais, especiais, consequenciais ou punitivos, incluindo, sem limitação, perda de lucros, dados, uso, boa vontade ou outras perdas intangíveis.
-                    </p>
-
-                    <h2>5. Alterações aos Termos</h2>
-                    <p>
-                        Reservamo-nos o direito de, a nosso exclusivo critério, modificar ou substituir estes Termos a qualquer momento. Se uma revisão for material, envidaremos esforços razoáveis para fornecer um aviso com pelo menos 30 dias de antecedência antes de quaisquer novos termos entrarem em vigor.
-                    </p>
-                    <p>
-                        Ao continuar a aceder ou utilizar o nosso Serviço após a entrada em vigor de quaisquer revisões, o utilizador concorda em ficar vinculado aos termos revistos.
-                    </p>
-
-                    <h2 class="!border-none">Contacto</h2>
-                    <p>
+                    <h2 class="!border-none" data-translate="contact-title">Contacto</h2>
+                    <p data-translate="contact-text">
                         Para qualquer questão sobre estes Termos, por favor contacte-nos através dos canais habituais da Cogim.
                     </p>
                 </div>
-                
             </div>
-            
         </div>
     </div>
 
+    <!-- MODAL PRIVACIDADE -->
     <div id="modal-privacidade" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-[100] hidden overflow-y-auto" aria-modal="true" role="dialog">
         <div class="flex items-center justify-center min-h-screen p-4">
-            
             <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl transform transition-all my-8">
-                
                 <div class="flex items-center justify-between p-4 border-b bg-indigo-700 text-white rounded-t-lg">
-                    <h3 class="text-xl font-bold">Política de Privacidade da Cogim</h3>
+                    <h3 class="text-xl font-bold" data-translate="privacy-title">Política de Privacidade da Cogim</h3>
                     <button id="close-modal-privacy" class="text-white hover:text-indigo-200" title="Fechar">
                         <i class="ri-close-line ri-lg"></i>
                     </button>
                 </div>
                 
                 <div class="p-6 sm:p-10 content-body max-h-[80vh] overflow-y-auto">
-                    <p class="text-sm text-gray-500 mb-8">
+                    <p class="text-sm text-gray-500 mb-8" data-translate="last-updated">
                         **Última atualização: 3 de Dezembro de 2025**
                     </p>
 
-                    <p>
-                        A sua privacidade é importante para nós. Esta Política de Privacidade descreve como a Cogim recolhe, utiliza e protege as informações do utilizador ao aceder e utilizar a nossa Galeria.
+                    <p data-translate="privacy-intro">
+                        A sua privacidade é importante para nós. Esta Política de Privacidade descreve como a Cogim recolhe, utiliza e protege as informações do utilizador...
                     </p>
 
-                    <h2>1. Informação que Recolhemos</h2>
-                    <p>
-                        Uma vez que a Cogim Galeria é um portfólio estático, **não recolhemos ativamente informações pessoais** que identifiquem diretamente o utilizador, como nome, endereço de e-mail ou número de telefone.
-                    </p>
-                    <p>
-                        No entanto, podemos recolher dados não pessoais através de ferramentas de análise:
-                    </p>
-                    <ul>
-                        <li>**Dados de Uso:** Informações sobre como o Serviço é acedido e utilizado (ex: endereço IP anónimo, tipo de navegador, páginas visitadas, tempo gasto nessas páginas).</li>
-                        <li>**Dados de Dispositivo:** Informações sobre o dispositivo usado para aceder ao Serviço (ex: modelo do dispositivo, sistema operativo).</li>
-                    </ul>
-
-                    <h2>2. Uso dos Dados</h2>
-                    <p>
-                        Os dados recolhidos (anónimos) são utilizados exclusivamente para os seguintes fins:
-                    </p>
-                    <ul>
-                        <li>Para fornecer e manter o Serviço.</li>
-                        <li>Para monitorizar o uso do Serviço (ex: quais categorias de fotos são mais populares).</li>
-                        <li>Para detetar, prevenir e resolver problemas técnicos.</li>
-                        <li>Para melhorar a experiência do utilizador e a funcionalidade da galeria.</li>
-                    </ul>
-
-                    <h2>3. Cookies e Tecnologias de Rastreio</h2>
-                    <p>
-                        Utilizamos Cookies e tecnologias de rastreio semelhantes para rastrear a atividade no nosso Serviço. Cookies são ficheiros com uma pequena quantidade de dados que podem incluir um identificador único anónimo.
-                    </p>
-                    <p>
-                        A maioria dos navegadores permite que recuse a utilização de cookies. No entanto, se não aceitar cookies, poderá não conseguir utilizar algumas partes do nosso Serviço.
-                    </p>
-
-                    <h2>4. Segurança dos Dados</h2>
-                    <p>
-                        A segurança dos seus dados é importante para nós. Embora nenhum método de transmissão ou armazenamento eletrónico seja 100% seguro, esforçamo-nos para usar meios comercialmente aceitáveis para proteger os seus Dados de Uso.
-                    </p>
-
-                    <h2>5. Links para Outros Sites</h2>
-                    <p>
-                        A nossa galeria pode conter links para outros sites que não são operados por nós. Se clicar num link de terceiros, será direcionado para o site desse terceiro. Aconselhamos vivamente que reveja a Política de Privacidade de todos os sites que visitar.
-                    </p>
-
-                    <h2>6. Alterações a Esta Política de Privacidade</h2>
-                    <p>
-                        Podemos atualizar a nossa Política de Privacidade periodicamente. Iremos notificá-lo sobre quaisquer alterações publicando a nova Política de Privacidade nesta página.
-                    </p>
-
-                    <h2 class="!border-none">Contacto</h2>
-                    <p>
+                    <h2 class="!border-none" data-translate="contact-title">Contacto</h2>
+                    <p data-translate="contact-text">
                         Se tiver dúvidas sobre esta Política de Privacidade, por favor contacte-nos.
                     </p>
                 </div>
-                
             </div>
-            
         </div>
     </div>
 
-
     <script>
-        // --- FUNÇÃO DE CONTROLE DE MODAL REUTILIZÁVEL (Termos e Privacidade) ---
+        // Configuração de modais
         function setupModal(openBtnId, closeModalBtnId, modalId) {
             const openButton = document.getElementById(openBtnId);
             const closeModalButton = document.getElementById(closeModalBtnId);
@@ -343,30 +255,25 @@
             const openModal = (e) => {
                 e.preventDefault(); 
                 modal.classList.remove('hidden'); 
-                document.body.classList.add('overflow-hidden'); // Bloqueia o scroll do corpo
+                document.body.classList.add('overflow-hidden');
             };
 
             const closeModal = () => {
                 modal.classList.add('hidden');
-                document.body.classList.remove('overflow-hidden'); // Reativa o scroll
+                document.body.classList.remove('overflow-hidden');
             };
 
-            // Abrir o Modal
             openButton.addEventListener('click', openModal);
-
-            // Fechar o Modal (botão X)
             if (closeModalButton) {
                 closeModalButton.addEventListener('click', closeModal);
             }
 
-            // Fechar o Modal (clicar fora da área escura)
             modal.addEventListener('click', function(e) {
                 if (e.target === modal) {
                     closeModal();
                 }
             });
 
-            // Fechar o Modal (tecla ESC)
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
                     closeModal();
@@ -374,50 +281,8 @@
             });
         }
 
-        // --- CONFIGURAÇÃO E ATIVAÇÃO DOS MODALS ---
         setupModal('open-terms', 'close-modal-termos', 'modal-termos');
         setupModal('open-privacy', 'close-modal-privacy', 'modal-privacidade');
-
-        // --- FUNCIONALIDADE BÁSICA DO CHATBOT (Para abrir/fechar o widget) ---
-        const chatbotButton = document.getElementById('chatbot-button');
-        const chatbotWidget = document.getElementById('chatbot-widget');
-        const closeChatbotButton = document.getElementById('close-chatbot');
-
-        if (chatbotButton && chatbotWidget) {
-            chatbotButton.addEventListener('click', () => {
-                const isHidden = chatbotWidget.classList.contains('chatbot-hidden');
-                
-                if (isHidden) {
-                    chatbotWidget.classList.remove('chatbot-hidden');
-                    chatbotWidget.classList.add('chatbot-visible');
-                    // Opcional: muda o ícone para 'fechar'
-                    chatbotButton.innerHTML = '<i class="ri-close-line ri-xl text-white"></i>';
-                } else {
-                    chatbotWidget.classList.remove('chatbot-visible');
-                    chatbotWidget.classList.add('chatbot-hidden');
-                    // Opcional: muda o ícone de volta para 'mensagem'
-                    chatbotButton.innerHTML = '<i class="ri-message-3-line ri-xl text-white"></i>';
-                }
-            });
-        }
-        
-        if (closeChatbotButton && chatbotWidget) {
-            closeChatbotButton.addEventListener('click', () => {
-                chatbotWidget.classList.remove('chatbot-visible');
-                chatbotWidget.classList.add('chatbot-hidden');
-                chatbotButton.innerHTML = '<i class="ri-message-3-line ri-xl text-white"></i>';
-            });
-        }
-
-        // --- FUNCIONALIDADE BÁSICA DAS FAQs do Chatbot (Opcional, apenas exibe no console) ---
-        const faqButtons = document.querySelectorAll('.faq-btn');
-        faqButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const question = button.getAttribute('data-question');
-                console.log(`Usuário clicou na FAQ: ${question}`);
-                // Aqui você adicionaria a lógica para enviar a pergunta ao chat e receber a resposta
-            });
-        });
     </script>
 </body>
 </html>
