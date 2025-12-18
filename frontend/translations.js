@@ -138,6 +138,20 @@ const translations = {
         'faq-whatsapp-q': '📱 WhatsApp',
         'faq-whatsapp-a': '📱 Para falar diretamente conosco:\n\n🟢 Clique no botão abaixo para ir ao WhatsApp',
 
+        // Modal de Cookies
+        'cookie-title': 'Utilizamos Cookies',
+        'cookie-message': 'Utilizamos cookies para melhorar a sua experiência no nosso site, personalizar conteúdo e analisar o tráfego. Ao continuar a navegar, você concorda com o uso de cookies.',
+        'cookie-types-title': 'Tipos de cookies que utilizamos:',
+        'cookie-essential': 'Essenciais',
+        'cookie-essential-desc': 'Funcionamento do site',
+        'cookie-functionality': 'Funcionalidade',
+        'cookie-functionality-desc': 'Idioma e preferências',
+        'cookie-analytics': 'Analytics',
+        'cookie-analytics-desc': 'Análise de uso (opcional)',
+        'cookie-privacy-link': 'Política de Privacidade',
+        'cookie-reject': 'Apenas Essenciais',
+        'cookie-accept': 'Aceitar Todos',
+
         // Termos e Privacidade
         'terms-title': 'Termos de Serviço da Cogim Galeria',
         'privacy-title': 'Política de Privacidade da Cogim',
@@ -286,6 +300,20 @@ const translations = {
         
         'faq-whatsapp-q': '📱 WhatsApp',
         'faq-whatsapp-a': '📱 To speak directly with us:\n\n🟢 Click the button below to go to WhatsApp',
+
+        // Cookie Modal
+        'cookie-title': 'We Use Cookies',
+        'cookie-message': 'We use cookies to improve your experience on our website, personalize content and analyze traffic. By continuing to browse, you agree to the use of cookies.',
+        'cookie-types-title': 'Types of cookies we use:',
+        'cookie-essential': 'Essential',
+        'cookie-essential-desc': 'Site functionality',
+        'cookie-functionality': 'Functionality',
+        'cookie-functionality-desc': 'Language and preferences',
+        'cookie-analytics': 'Analytics',
+        'cookie-analytics-desc': 'Usage analysis (optional)',
+        'cookie-privacy-link': 'Privacy Policy',
+        'cookie-reject': 'Essential Only',
+        'cookie-accept': 'Accept All',
 
         // Terms and Privacy
         'terms-title': 'Cogim Gallery Terms of Service',

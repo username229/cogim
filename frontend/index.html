@@ -35,7 +35,7 @@
             </p>
             
             <div class="flex flex-col sm:flex-row gap-4">
-                <a href="categoria.html" class="bg-primary text-black px-8 py-3 rounded-button shadow-lg hover:bg-opacity-90 transition duration-300 text-center !rounded-button whitespace-nowrap font-semibold" data-translate="hero-btn-gallery">
+                <a href="categoria.html" class="bg-primary text-black px-8 py-3 rounded-button shadow-lg hover:bg-opacity-90 transition duration-300 text-center !rounded-button whitespace-nowrap font-semibold !text-black" data-translate="hero-btn-gallery">
                     Ver Galeria
                 </a>
                 
@@ -47,7 +47,7 @@
     </div>
 </section>
 
-<!-- ✅ Modal de Cookies em Português -->
+<!-- ✅ MODAL DE COOKIES MELHORADO COM TRADUÇÕES -->
 <div id="cookie-modal" class="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-900 bg-opacity-80 z-50 hidden">
     <div class="w-full max-w-md mx-4">
         <div class="bg-white rounded-lg shadow-2xl p-6 cookie-notice" style="cursor: auto;">
@@ -56,39 +56,47 @@
                 <img class="-mt-1" src="https://www.svgrepo.com/show/30963/cookie.svg" alt="Ícone de Cookie">
             </div>
 
-            <h3 class="text-xl font-bold text-gray-900 mb-3 text-center">Utilizamos Cookies</h3>
+            <h3 class="text-xl font-bold text-gray-900 mb-3 text-center" data-translate="cookie-title">Utilizamos Cookies</h3>
             
-            <p class="text-sm text-gray-600 mb-4 text-center leading-relaxed">
+            <p class="text-sm text-gray-600 mb-4 text-center leading-relaxed" data-translate="cookie-message">
                 Utilizamos cookies para melhorar a sua experiência no nosso site, personalizar conteúdo e analisar o tráfego. Ao continuar a navegar, você concorda com o uso de cookies.
             </p>
 
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
-                <a class="text-sm text-gray-500 hover:text-primary transition duration-200 underline" href="politica-privacidade.html">
-                    Política de Privacidade
-                </a>
-                <button type="button" onclick="acceptCookies()" class="w-full sm:w-auto py-2.5 px-6 bg-primary hover:bg-opacity-90 text-white transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg">
-                    Aceitar Cookies
-                </button>
+            <div class="mb-4 p-3 bg-gray-50 rounded-lg">
+                <p class="text-xs text-gray-600 mb-2" data-translate="cookie-types-title">Tipos de cookies que utilizamos:</p>
+                <ul class="text-xs text-gray-600 space-y-1">
+                    <li>✓ <span data-translate="cookie-essential">Essenciais</span> - <span data-translate="cookie-essential-desc">Funcionamento do site</span></li>
+                    <li>✓ <span data-translate="cookie-functionality">Funcionalidade</span> - <span data-translate="cookie-functionality-desc">Idioma e preferências</span></li>
+                    <li>✓ <span data-translate="cookie-analytics">Analytics</span> - <span data-translate="cookie-analytics-desc">Análise de uso (opcional)</span></li>
+                </ul>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <a class="text-sm text-gray-500 hover:text-primary transition duration-200 underline order-2 sm:order-1" 
+                       href="politica-privacidade.html" 
+                       data-translate="cookie-privacy-link">
+                        Política de Privacidade
+                    </a>
+                    <div class="flex gap-2 order-1 sm:order-2 w-full sm:w-auto">
+                        <button type="button" 
+                                onclick="rejectCookies()" 
+                                class="flex-1 sm:flex-none py-2.5 px-4 bg-gray-200 hover:bg-gray-300 text-gray-800 transition ease-in duration-200 text-center text-sm font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 rounded-lg"
+                                data-translate="cookie-reject">
+                            Apenas Essenciais
+                        </button>
+                        <button type="button" 
+                                onclick="acceptCookies()" 
+                                class="flex-1 sm:flex-none py-2.5 px-4 bg-primary hover:bg-opacity-90 text-white transition ease-in duration-200 text-center text-sm font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg"
+                                data-translate="cookie-accept">
+                            Aceitar Todos
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-    const cookieModal = document.getElementById("cookie-modal");
-
-    const acceptCookies = () => {
-        localStorage.setItem('cookies_accepted', 'true');
-        cookieModal.classList.add('hidden');
-    };
-    
-    document.addEventListener('DOMContentLoaded', () => {
-        const cookiesAccepted = localStorage.getItem('cookies_accepted');
-        if (cookiesAccepted !== 'true') {
-            cookieModal.classList.remove('hidden'); 
-        }
-    });
-</script>
 
 <!-- Galeria Section -->
 <section id="galeria" class="py-16 bg-gray-50">
@@ -240,7 +248,7 @@
                     <a href="https://wa.me/258827288888?text=Ol%C3%A1%2C%20gostaria%20de%20um%20or%C3%A7amento%20para%20m%C3%B3veis%20planejados." 
                        target="_blank" 
                        rel="noopener" 
-                       class="bg-primary text-black px-8 py-3 rounded-button shadow-md hover:bg-opacity-90 transition duration-300 inline-block w-fit !rounded-button whitespace-nowrap" 
+                       class="bg-primary text-black px-8 py-3 rounded-button shadow-md hover:bg-opacity-90 transition duration-300 inline-block w-fit !rounded-button whitespace-nowrap !text-black" 
                        data-translate="contact-us-btn">
                         Fale Conosco
                     </a>
@@ -255,7 +263,7 @@
     </div>
 </section>
 
-<!-- ✅ Localização Section - Botão "Como Chegar" Corrigido -->
+<!-- Localização Section -->
 <section id="localizacao" class="py-16">
 <div class="container mx-auto px-4">
 <div class="text-center mb-12">
@@ -283,7 +291,7 @@
 <a href="https://maps.google.com/?q=-25.9753125,32.5756875" 
    target="_blank" 
    rel="noopener" 
-   class="bg-primary text-white px-6 py-3 rounded-button shadow-md hover:bg-opacity-90 transition duration-300 inline-flex items-center justify-center !rounded-button whitespace-nowrap font-semibold">
+   class="bg-primary text-black px-6 py-3 rounded-button shadow-md hover:bg-opacity-90 transition duration-300 inline-flex items-center justify-center !rounded-button whitespace-nowrap font-semibold !text-black">
 <i class="ri-direction-line mr-2"></i>
 <span data-translate="how-to-get-there">Como Chegar</span>
 </a>
@@ -294,18 +302,13 @@
 
 <div id="footer-placeholder"></div>
 
+<!-- ORDEM CORRETA DOS SCRIPTS -->
+<script src="cookies.js"></script>
+<script src="translations.js"></script>
+<script src="chatbot.js"></script>
 <script src="main.js"></script>
 <script src="script.js"></script>
-<script src="translations.js"></script>  
 <script src="component_loader.js"></script>
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-XXXXXXXXXX');
-</script>
 
 </body>
 </html>
