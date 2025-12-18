@@ -161,29 +161,7 @@
     <script src="component_loader.js"></script>
 
     <script>
-        function toggleMenu() {
-            const menuFiltros = document.getElementById("filtros-sidebar-menu");
-            const backdrop = document.getElementById("menu-backdrop");
-            const arrowIcon = document.getElementById("arrow-icon");
-
-            const isOpen = menuFiltros.classList.contains("filtros-sidebar-open");
-
-            if (isOpen) {
-                // Fechar menu
-                menuFiltros.classList.remove("filtros-sidebar-open");
-                if (backdrop) backdrop.classList.add("hidden");
-                if (arrowIcon) arrowIcon.style.transform = "rotate(0deg)";
-                document.body.classList.remove("overflow-hidden");
-            } else {
-                // Abrir menu
-                menuFiltros.classList.add("filtros-sidebar-open");
-                if (backdrop) backdrop.classList.remove("hidden");
-                if (arrowIcon) arrowIcon.style.transform = "rotate(180deg)";
-                document.body.classList.add("overflow-hidden");
-            }
-        }
-
-        function toggleSubcategories(id) {
+         function toggleSubcategories(id) {
             const submenu = document.getElementById(id);
             const arrowId = id.replace('-sub', '-arrow');
             const arrow = document.getElementById(arrowId);
@@ -229,23 +207,7 @@
         });
     </script>
 
-    <style>
-        /* Animação suave das setas */
-        .ri-arrow-down-s-line {
-            transition: transform 0.3s ease;
-        }
 
-        /* Ajustes adicionais para garantir visibilidade mobile */
-        @media (max-width: 1023px) {
-            #filtros-sidebar-menu {
-                z-index: 100 !important;
-            }
-            
-            #menu-backdrop {
-                z-index: 99;
-            }
-        }
-    </style>
 
 </body>
 </html>

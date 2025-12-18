@@ -44,5 +44,11 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Header and Footer components loaded successfully.');
         // Carrega o script do chatbot APÓS o footer ter sido carregado
         loadScript('chatbot.js').then(() => console.log('Chatbot script loaded successfully.'));
+const DOMContentLoadedEvent = new Event('DOMContentLoaded', {
+        bubbles: true,
+        cancelable: true
     });
+    document.dispatchEvent(DOMContentLoadedEvent);
+    
+    console.log('🚀 Evento DOMContentLoaded re-disparado para inicializar outros scripts.');    
 });

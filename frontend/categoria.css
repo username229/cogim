@@ -66,44 +66,43 @@ html, body {
 }
 
 /* --- LAYOUT MOBILE (< 1024px) --- */
+/* --- LAYOUT MOBILE (< 1024px) --- */
 @media (max-width: 1023px) {
     #main-container {
-        display: block; /* Remove o flex lateral para a galeria subir */
+        display: block; 
     }
 
     #filtros-sidebar-menu {
-        /* 1. Removemos do fluxo para não aparecer antes da galeria */
-        display: none; 
+        display: block; /* Mantemos block, mas controlado pelo left */
         position: fixed; 
         
-        /* 2. Posicionamento suspenso */
-        top: 9.5rem; /* Ajustado para ficar abaixo do botão de filtros */
-        left: 5%;
-        right: 5%;
-        width: 90%;
-        z-index: 100;
+        /* Transformamos em uma barra lateral deslizante */
+        top: 0;
+        left: -100%; /* Começa escondido fora da tela */
+        width: 85%;
+        max-width: 300px;
+        height: 100vh;
+        z-index: 9999; /* Garante que fique acima de tudo */
         
-        /* 3. Estética de Dropdown */
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        max-height: 70vh;
-        overflow-y: auto;
+        border-radius: 0 12px 12px 0; /* Arredonda apenas o canto direito */
+        box-shadow: 10px 0 25px -5px rgba(0, 0, 0, 0.2);
+        transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* 4. Mostra apenas quando a classe for ativada pelo JS */
+    /* Quando aberto, desliza para dentro da tela */
     #filtros-sidebar-menu.filtros-sidebar-open {
-        display: block !important;
-        opacity: 1;
-        visibility: visible;
-        animation: fadeInDown 0.3s ease-out;
+        left: 0 !important;
     }
+    /* Ajuste para o botão de fechar (X) que já existe no seu HTML */
+    #filtros-sidebar-menu .flex.justify-between.items-center.mb-6 {
+        padding-top: 1rem;
+    }
+
 
     #gallery-content {
         margin-top: 1rem;
     }
 }
-
 /* --- ESTILOS DA GALERIA --- */
 #galeria-grid {
     display: grid;
