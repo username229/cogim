@@ -392,6 +392,16 @@ let estatisticas = {
     tempoCarregamento: 0
 };
 
+
+function onComponentsReady(fn) {
+    if (window.__componentsReady) {
+        fn();
+    } else {
+        document.addEventListener("componentsLoaded", fn, { once: true });
+    }
+}
+
+
 function toggleMenu() {
     const menuFiltros = document.getElementById("filtros-sidebar-menu");
     const backdrop = document.getElementById("menu-backdrop");
@@ -857,51 +867,48 @@ async function aplicarFiltros() {
     }, 100);
 }
 
-// =======================================================
-// Limpar cache (Função esvaziada, pois não há cache de rede)
-// =======================================================
 function limparCache() {
     console.log("🗑️ Não há cache de rede para limpar. Reaplicando filtros...");
     aplicarFiltros();
 }
 
 
+if (window.__categoriaJSLoaded) {
+    console.warn("⚠️ categoria.js já foi carregado — evitando duplicação");
+} else {
+    window.__categoriaJSLoaded = true;
 
-function toggleDesktopSidebar() {
-    const sidebar = document.getElementById("sidebar-menu");
-    if (!sidebar) return;
-    sidebar.classList.toggle("sidebar-closed-desktop");
-    
-    const toggleBtn = document.querySelector("#toggle-desktop-btn i");
-    if (toggleBtn) toggleBtn.classList.toggle("rotate-180");
+    onComponentsReady(() => {
+        console.log("🚀 Sistema Cogim Gallery v3.0 iniciado (componentes prontos)");
+
+        // Backdrop do menu
+        document.addEventListener("click", (e) => {
+            if (e.target.id === "menu-backdrop") {
+                toggleMenu();
+            }
+        });
+
+        // Delegação de eventos para filtros
+        document.addEventListener("change", (e) => {
+            if (
+                e.target.matches(".filtro-categoria") ||
+                e.target.matches(".filtro-subcategoria") ||
+                e.target.id === "tudo"
+            ) {
+                aplicarFiltros();
+            }
+        });
+
+        // Atalhos de teclado
+        document.addEventListener("keydown", (e) => {
+            if (e.ctrlKey && e.key === "k") {
+                e.preventDefault();
+                const searchInput = document.querySelector('input[type="search"]');
+                if (searchInput) searchInput.focus();
+            }
+        });
+
+        console.log("⏳ Carregando galeria inicial...");
+        aplicarFiltros();
+    });
 }
-
-
-
-
-document.addEventListener("DOMContentLoaded", () => {
-    console.log("🚀 Sistema Cogim Gallery v3.0 (Estático) iniciado");
-    
-    const backdrop = document.getElementById("menu-backdrop");
-    if (backdrop) backdrop.addEventListener("click", toggleMenu);
-
-    const filterCheckboxes = document.querySelectorAll(
-        ".filtro-categoria, .filtro-subcategoria, #tudo"
-    );
-
-    filterCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener("change", aplicarFiltros);
-    });
-    
-    // Adiciona atalhos de teclado
-    document.addEventListener('keydown', (e) => {
-        if (e.ctrlKey && e.key === 'k') {
-            e.preventDefault();
-            const searchInput = document.querySelector('input[type="search"]');
-            if (searchInput) searchInput.focus();
-        }
-    });
-    
-    console.log("⏳ Carregando galeria inicial...");
-    aplicarFiltros();
-});

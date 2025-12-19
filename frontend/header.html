@@ -48,7 +48,7 @@
             </a>
 
             <!-- BOTÃO MOBILE -->
-            <button onclick="toggleMenu()" 
+            <button onclick="toggleNavbar()" 
                     class="md:hidden w-9 h-9 flex items-center justify-center text-gray-700 rounded-lg hover:bg-gray-100 transition">
                 <i id="menu-icon" class="ri-menu-line text-xl"></i>
             </button>
@@ -62,23 +62,23 @@
 
         <nav class="flex flex-col space-y-1 px-4 py-3 text-gray-700 text-sm">
 
-            <a href="/index.html#inicio" onclick="toggleMenu()" class="mobile-link py-2 hover:bg-gray-100 px-2 rounded" data-translate="nav-home">
+            <a href="/index.html#inicio" onclick="toggleNavbar()" class="mobile-link py-2 hover:bg-gray-100 px-2 rounded" data-translate="nav-home">
                 Início
             </a>
 
-            <a href="/categoria.html" onclick="toggleMenu()" class="mobile-link py-2 hover:bg-gray-100 px-2 rounded" data-translate="nav-gallery">
+            <a href="/categoria.html" onclick="toggleNavbar()" class="mobile-link py-2 hover:bg-gray-100 px-2 rounded" data-translate="nav-gallery">
                 Galeria
             </a>
 
-            <a href="/index.html#sobre" onclick="toggleMenu()" class="mobile-link py-2 hover:bg-gray-100 px-2 rounded" data-translate="nav-about">
+            <a href="/index.html#sobre" onclick="toggleNavbar()" class="mobile-link py-2 hover:bg-gray-100 px-2 rounded" data-translate="nav-about">
                 Sobre
             </a>
 
-            <a href="/index.html#localizacao" onclick="toggleMenu()" class="mobile-link py-2 hover:bg-gray-100 px-2 rounded" data-translate="nav-location">
+            <a href="/index.html#localizacao" onclick="toggleNavbar()" class="mobile-link py-2 hover:bg-gray-100 px-2 rounded" data-translate="nav-location">
                 Localização
             </a>
 
-            <a href="tel:+258827288888" onclick="toggleMenu()" class="mobile-link py-2 hover:bg-gray-100 px-2 rounded">
+            <a href="tel:+258827288888" onclick="toggleNavbar()" class="mobile-link py-2 hover:bg-gray-100 px-2 rounded">
                 Contacto
             </a>
 
@@ -90,7 +90,7 @@
 
 <!-- MENU SCRIPT -->
 <script>
-function toggleMenu() {
+function toggleNavbar() {
     const menuPanel = document.getElementById("mobile-menu-panel");
     const menuIcon = document.getElementById("menu-icon");
 
@@ -100,4 +100,5 @@ function toggleMenu() {
     menuIcon.classList.toggle("ri-menu-line", !isHidden);
     menuIcon.classList.toggle("ri-close-line", isHidden);
 }
+
 </script>
