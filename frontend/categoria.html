@@ -60,7 +60,7 @@
                 <!-- TUDO -->
                 <label class="flex justify-between items-center px-3 py-2 bg-indigo-50 rounded-lg font-bold cursor-pointer hover:bg-indigo-100 transition">
                     <span>Tudo</span>
-                    <input type="checkbox" id="tudo-checkbox" class="cursor-pointer">
+                    <input type="checkbox" id="tudo" class="filtro-categoria cursor-pointer" checked>
                 </label>
 
                 <!-- COZINHAS -->
@@ -74,15 +74,15 @@
                     <div id="cozinhas-sub" class="ml-4 hidden space-y-1">
                         <label class="flex justify-between px-3 py-1 cursor-pointer hover:bg-gray-50 rounded">
                             <span>Com Bancada</span>
-                            <input type="checkbox" class="cursor-pointer">
+                            <input type="checkbox" class="filtro-subcategoria cursor-pointer" value="cozinha-bancada">
                         </label>
                         <label class="flex justify-between px-3 py-1 cursor-pointer hover:bg-gray-50 rounded">
                             <span>Península</span>
-                            <input type="checkbox" class="cursor-pointer">
+                            <input type="checkbox" class="filtro-subcategoria cursor-pointer" value="cozinha-peninsula">
                         </label>
                         <label class="flex justify-between px-3 py-1 cursor-pointer hover:bg-gray-50 rounded">
                             <span>Ilha</span>
-                            <input type="checkbox" class="cursor-pointer">
+                            <input type="checkbox" class="filtro-subcategoria cursor-pointer" value="cozinha-ilha">
                         </label>
                     </div>
                 </div>
@@ -98,35 +98,35 @@
                     <div id="guardafatos-sub" class="ml-4 hidden space-y-1">
                         <label class="flex justify-between px-3 py-1 cursor-pointer hover:bg-gray-50 rounded">
                             <span>Com Espelho</span>
-                            <input type="checkbox" class="cursor-pointer">
+                            <input type="checkbox" class="filtro-subcategoria cursor-pointer" value="guardafato-espelho">
                         </label>
                         <label class="flex justify-between px-3 py-1 cursor-pointer hover:bg-gray-50 rounded">
                             <span>Porta de Correr</span>
-                            <input type="checkbox" class="cursor-pointer">
+                            <input type="checkbox" class="filtro-subcategoria cursor-pointer" value="guardafato-portas-correr">
                         </label>
                     </div>
                 </div>
 
-                <!-- SIMPLES -->
+                <!-- CATEGORIAS SIMPLES -->
                 <label class="flex justify-between px-3 py-2 hover:bg-gray-100 rounded transition cursor-pointer">
                     <span>Teto Falso</span>
-                    <input type="checkbox" class="cursor-pointer">
+                    <input type="checkbox" class="filtro-categoria cursor-pointer" value="tetofalso">
                 </label>
                 <label class="flex justify-between px-3 py-2 hover:bg-gray-100 rounded transition cursor-pointer">
                     <span>Casa de Banho</span>
-                    <input type="checkbox" class="cursor-pointer">
+                    <input type="checkbox" class="filtro-categoria cursor-pointer" value="casa-de-banho">
                 </label>
                 <label class="flex justify-between px-3 py-2 hover:bg-gray-100 rounded transition cursor-pointer">
                     <span>Racks</span>
-                    <input type="checkbox" class="cursor-pointer">
+                    <input type="checkbox" class="filtro-categoria cursor-pointer" value="racks">
                 </label>
                 <label class="flex justify-between px-3 py-2 hover:bg-gray-100 rounded transition cursor-pointer">
                     <span>Camas</span>
-                    <input type="checkbox" class="cursor-pointer">
+                    <input type="checkbox" class="filtro-categoria cursor-pointer" value="camas">
                 </label>
                 <label class="flex justify-between px-3 py-2 hover:bg-gray-100 rounded transition cursor-pointer">
                     <span>Sofás e Mesas</span>
-                    <input type="checkbox" class="cursor-pointer">
+                    <input type="checkbox" class="filtro-categoria cursor-pointer" value="cadeiras-sofas-e-mesas">
                 </label>
 
             </nav>
@@ -181,10 +181,10 @@
 
         // Handle "Tudo" checkbox - select all categories
         document.addEventListener('DOMContentLoaded', function() {
-            const tudoCheckbox = document.getElementById('tudo-checkbox');
+            const tudoCheckbox = document.getElementById('tudo');
             if (tudoCheckbox) {
                 tudoCheckbox.addEventListener('change', function() {
-                    const allCheckboxes = document.querySelectorAll('input[type="checkbox"]:not(#tudo-checkbox)');
+                    const allCheckboxes = document.querySelectorAll('input[type="checkbox"]:not(#tudo)');
                     allCheckboxes.forEach(checkbox => {
                         checkbox.checked = this.checked;
                     });
