@@ -4,7 +4,7 @@ const translations = {
         // Navegação
         'nav-home': 'Início',
         'nav-gallery': 'Galeria',
-        'nav-about': 'Sobre a Cogim Cozinhas',
+        'nav-about': 'Sobre a Cogim',
         'nav-location': 'Localização',
         
         // Página inicial - Hero
@@ -89,7 +89,7 @@ const translations = {
         'specialized-team-desc': 'Nossa equipe de profissionais é altamente qualificada e experiente em projetos de móveis planejados.',
         'personalized-service': 'Atendimento Personalizado',
         'personalized-service-desc': 'Oferecemos atendimento personalizado desde o projeto até a instalação dos móveis.',
-        'about-cogim-title': 'Sobre a Cogim Cozinhas',
+        'about-cogim-title': 'Sobre a Cogim',
         'about-cogim-p1': 'A Cogim Cozinhas é uma empresa especializada na fabricação de móveis planejados sob medida em Maputo, Moçambique. Com anos de experiência no mercado, nos destacamos pela qualidade dos nossos produtos e excelência no atendimento.',
         'about-cogim-p2': 'Nossa missão é transformar ambientes através de móveis funcionais e esteticamente agradáveis, sempre respeitando as necessidades e preferências dos nossos clientes.',
         '3d-projects': 'Projetos 3D',
