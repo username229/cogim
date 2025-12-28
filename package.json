@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "nodemailer": "^7.0.12",
     "sitemap": "^8.0.2"
   }
 }
