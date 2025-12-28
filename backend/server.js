@@ -3,9 +3,7 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const twilio = require('twilio');
-const nodemaile
-
-r = require('nodemailer');
+const nodemailer = require('nodemailer');
 const bcrypt = require('bcryptjs');
 const fs = require('fs').promises;
 const crypto = require('crypto');
