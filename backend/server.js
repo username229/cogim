@@ -3,7 +3,9 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const twilio = require('twilio');
-const nodemailer = require('nodemailer');
+const nodemaile
+
+r = require('nodemailer');
 const bcrypt = require('bcryptjs');
 const fs = require('fs').promises;
 const crypto = require('crypto');
@@ -61,10 +63,10 @@ app.post('/api/send-email', async (req, res) => {
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log(`✅ E-mail de verificação enviado para: ${email}`);
+        console.log(`E-mail de verificação enviado para: ${email}`);
         res.json({ success: true });
     } catch (error) {
-        console.error("❌ Erro ao enviar e-mail:", error);
+        console.error(" Erro ao enviar e-mail:", error);
         res.status(500).json({ success: false, error: 'Erro ao processar e-mail de segurança' });
     }
 });
@@ -119,10 +121,10 @@ app.get('*', (req, res) => {
 
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`
-    🚀 Servidor Unificado Online
+     Servidor Unificado Online
     ---------------------------
-    🌍 Site: http://localhost:${PORT}
-    🔐 Admin: http://localhost:${PORT}/admin
-    📂 Root: ${frontendPath}
+     Site: http://localhost:${PORT}
+     Admin: http://localhost:${PORT}/admin
+    Root: ${frontendPath}
     `);
 });
